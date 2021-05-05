@@ -49,3 +49,5 @@ report
 .env
 
 bin/
+
+.vscode
