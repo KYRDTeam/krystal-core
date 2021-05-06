@@ -3,22 +3,20 @@
 [![built-with openzeppelin](https://img.shields.io/badge/built%20with-OpenZeppelin-3677FF)](https://docs.openzeppelin.com/)
 [![Build Status](https://api.travis-ci.com/KyberNetwork/kyber_reserves_sc.svg?branch=master&status=passed)](https://travis-ci.com/github/KyberNetwork/kyber_reserves_sc)
 
-
 Smart Contracts for Smart Wallet to help interacting with Kyber Network's protocol and Uniswap (+ its clones, for example: Sushiswap, SashimiSwap, etc);
 
-
 ## Package Manager
+
 We use `yarn` as the package manager. You may use `npm` and `npx` instead, but commands in bash scripts may have to be changed accordingly.
 
-
 ## Setup
+
 1. Clone this repo
 2. `yarn install`
 
-
 ## Compilation with Buidler
-`yarn compile` to compile contracts for all solidity versions.
 
+`yarn compile` to compile contracts for all solidity versions.
 
 ## Contract Deployment / Interactions
 
@@ -30,27 +28,30 @@ INFURA_API_KEY=********************************
 ```
 
 ## Testing with Buidler
+
 1. If contracts have not been compiled, run `yarn compile`. This step can be skipped subsequently.
 2. Run `yarn test`
 3. Use `./tst.sh -f` for running a specific test file.
 
 ### Example Commands
+
 - `yarn test` (Runs all tests)
 - `./tst.sh -f ./test/swapAndDepositTests.js` (Test only kyberReserve.js)
 
 ### Example
+
 `yarn buidler test --no-compile ./test/swapAndDepositTests.js`
 
 ### Coverage with `buidler-coverage`
+
 - Run `yarn coverage` for coverage on files
 
-
 ### Functionalities
-
 
 #### Exchange tokens
 
 - Get expected returned amount and conversion rate if using Kyber Network's protocol. Use `hint` for reserve routing.
+
 ```
 function getExpectedReturnKyber(
         IERC20Ext src,
@@ -65,6 +66,7 @@ function getExpectedReturnKyber(
 ```
 
 - Get expected returned amount and conversion rate if using Uni-Router, `router` must be added to the list supported routers;
+
 ```
 function getExpectedReturnUniswap(
         IUniswapV2Router02 router,
@@ -114,6 +116,7 @@ function swapUniswap(
 - **ISmartWalletLending.LendingPlatform**: 0: AAVE_V1, 1: AAVE_V2, 2: COMPOUND.
 
 - Swap on Kyber, then deposit to AAVE v1, AAVE v2 and Compound. Allow user to swap on Kyber, then deposit all dest token to Lending platform. If `src == dest`, user deposits directly without swapping. Note: Fee could be applied when user deposits directly.
+
 ```
     function swapKyberAndDeposit(
         ISmartWalletLending.LendingPlatform platform,
@@ -128,7 +131,8 @@ function swapUniswap(
     ) external payable returns (uint256 destAmount);
 ```
 
- - Swap on Uniswap, then deposit to AAVE v1, AAVE v2 and Compound. Allow user to swap on Uniswap, then deposit all dest token to Lending platform. If `src == dest`, user deposits directly without swapping. Note: Fee will be taken in dest token for both direct deposit or swap & deposit.
+- Swap on Uniswap, then deposit to AAVE v1, AAVE v2 and Compound. Allow user to swap on Uniswap, then deposit all dest token to Lending platform. If `src == dest`, user deposits directly without swapping. Note: Fee will be taken in dest token for both direct deposit or swap & deposit.
+
 ```
     function swapUniswapAndDeposit(
         ISmartWalletLending.LendingPlatform platform,
@@ -143,6 +147,7 @@ function swapUniswap(
 ```
 
 - Swap on Kyber, then repay to AAVE v1, AAVE v2 and Compound. Allow user to swap on Kyber, then repay `payAmount` of dest token to Lending platform. If `src == dest`, user repays directly without swapping. Note: Fee could be applied when user repays directly.
+
 ```
     function swapKyberAndRepay(
         ISmartWalletLending.LendingPlatform platform,
@@ -157,7 +162,8 @@ function swapUniswap(
     ) external payable returns (uint256 destAmount);
 ```
 
- - Swap on Uniswap, then repay to AAVE v1, AAVE v2 and Compound. Allow user to swap on Uniswap, then repay all dest token to Lending platform. If `src == dest`, user repays directly without swapping. Note: Fee will be taken in dest token for both direct repay or swap & deposit.
+- Swap on Uniswap, then repay to AAVE v1, AAVE v2 and Compound. Allow user to swap on Uniswap, then repay all dest token to Lending platform. If `src == dest`, user repays directly without swapping. Note: Fee will be taken in dest token for both direct repay or swap & deposit.
+
 ```
     function swapUniswapAndRepay(
         ISmartWalletLending.LendingPlatform platform,
@@ -171,8 +177,8 @@ function swapUniswap(
     ) external payable returns (uint256 destAmount);
 ```
 
-
 - Withdraw tokens from AAVE v1, AAVE v2 and COMPOUND, given token user wants to withdraw. Contract will get the corresponding aToken or cToken to collect from user's wallet, then burn these tokens to get back `token`.
+
 ```
     function withdrawFromLendingPlatform(
         ISmartWalletLending.LendingPlatform platform,
@@ -182,4 +188,3 @@ function swapUniswap(
         bool useGasToken
     ) external returns (uint256 returnedAmount);
 ```
- 

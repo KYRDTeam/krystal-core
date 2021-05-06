@@ -658,7 +658,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         destAmount = amount - feeAmount;
         if (token == BNB_TOKEN_ADDRESS) {
             require(msg.value >= amount);
-            (bool success, ) = to.call{value: destAmount}("");
+            (bool success, ) = to.call{value: destAmount}('');
             require(success, "transfer eth failed");
         } else {
             uint256 balanceBefore = token.balanceOf(to);

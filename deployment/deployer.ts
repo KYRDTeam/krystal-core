@@ -62,11 +62,7 @@ function printInfo(tx) {
 task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
-  const deployContracts = [
-    'SmartWalletLending',
-    'SmartWalletSwapImplementation',
-    'SmartWalletSwapProxy',
-  ];
+  const deployContracts = ['SmartWalletLending', 'SmartWalletSwapImplementation', 'SmartWalletSwapProxy'];
   const instances = {};
   let instance;
   let args;
@@ -78,11 +74,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   console.log(`Deploying Contracts using ${deployerAddress}`);
   console.log('============================\n');
 
-  args = [
-    [deployerAddress],
-    [deployerAddress],
-    [deployerAddress, null, kyberProxy, [pancakeRouter]],
-  ];
+  args = [[deployerAddress], [deployerAddress], [deployerAddress, null, kyberProxy, [pancakeRouter]]];
   for (let index in deployContracts) {
     if (deployContracts[index] === 'SmartWalletSwapProxy') args[index][1] = ADDRESSES['SmartWalletSwapImplementation'];
     instances[deployContracts[index]] = await deploy(step, ethers, deployContracts[index], ...args[index]);
@@ -136,12 +128,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   console.log(`   ${parseInt(step) + 1}.  updateVenusData`);
   console.log('   ------------------------------------');
 
-  tx = await instance.updateVenusData(
-    compTroller,
-    vBnb,
-    vTokens,
-    {gasLimit}
-  );
+  tx = await instance.updateVenusData(compTroller, vBnb, vTokens, {gasLimit});
   printInfo(tx);
   step++;
   console.log('\n');
@@ -149,10 +136,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   // Update proxy to lending implementation
   console.log(`   ${parseInt(step) + 1}.  updateSwapImplementation`);
   console.log('   ------------------------------------');
-  tx = await instance.updateSwapImplementation(
-    ADDRESSES['SmartWalletSwapProxy'],
-    {gasLimit}
-);
+  tx = await instance.updateSwapImplementation(ADDRESSES['SmartWalletSwapProxy'], {gasLimit});
   printInfo(tx);
   step++;
   console.log('\n');
