@@ -9,7 +9,7 @@ require('solidity-coverage');
 require('dotenv').config();
 
 // Hardhat Tasks
-require('./deployment/mainnet/bscTestnetDeployer');
+require('./deployment/deployer');
 
 module.exports = {
   contractSizer: {
@@ -168,7 +168,10 @@ module.exports = {
     compilers: [{
       version: "0.7.6",
       settings: {
-        optimizer: require("./solcOptimiserSettings.js")
+        optimizer: {
+          enabled: true,
+          runs: 780
+        }
       }
     }]
   },
@@ -183,8 +186,8 @@ module.exports = {
   },
 
   etherscan: {
-    // Your API key for Etherscan
-    // Obtain one at https://etherscan.io/
+    // Your API key for bscscan
+    // Obtain one at https://bscscan.io/
     apiKey: process.env.BSCSCAN_KEY
   }
 };

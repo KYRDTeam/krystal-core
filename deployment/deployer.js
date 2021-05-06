@@ -59,7 +59,7 @@ function printInfo(tx) {
   console.log(`   > gas used:\t${tx.gasLimit.toString()}`);
 }
 
-task('deploy', 'Deploys the SmartWallet contracts').setAction(async () => {
+task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
   const deployContracts = [
