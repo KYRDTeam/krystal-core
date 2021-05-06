@@ -1,4 +1,4 @@
-const hre = require('hardhat');
+import hre from 'hardhat';
 const Math = require('mathjs');
 const BN = web3.utils.BN;
 const {constants, time} = require('@openzeppelin/test-helpers');

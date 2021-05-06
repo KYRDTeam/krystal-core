@@ -5,9 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "typeRoots": ["./typechain", "./node_modules/@types"],
-    "types": ["@nomiclabs/hardhat-ethers"]
   },
-  "include": ["./test"],
+  "include": ["./scripts", "./test"],
   "files": ["./hardhat.config.ts"]
 }

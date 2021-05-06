@@ -1,7 +1,11 @@
+import {task} from 'hardhat/config';
+
 import '@nomiclabs/hardhat-truffle5';
 import '@nomiclabs/hardhat-web3';
 import '@nomiclabs/hardhat-ganache';
 import '@nomiclabs/hardhat-etherscan';
+import '@nomiclabs/hardhat-ethers';
+
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
@@ -9,16 +13,20 @@ import 'solidity-coverage';
 require('dotenv').config();
 
 // Hardhat Tasks
-require('./deployment/deployer');
+// require('./scripts/deployer');
+
+task('acc', 'Deploys the Krystal contracts').setAction(async () => {
+  console.log('test');
+});
 
 module.exports = {
+  defaultNetwork: 'hardhat',
+
   contractSizer: {
     alphaSort: false,
     runOnCompile: true,
     disambiguatePaths: false,
   },
-
-  defaultNetwork: "hardhat",
 
   gasReporter: {
     currency: 'USD',
@@ -152,6 +160,11 @@ module.exports = {
           optimizer: {
             enabled: true,
             runs: 780,
+          },
+          metadata: {
+            // metadata hash is machine dependent, we want all generated code to be deterministic
+            // https://docs.soliditylang.org/en/v0.7.6/metadata.html
+            bytecodeHash: 'none',
           },
         },
       },

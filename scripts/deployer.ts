@@ -1,7 +1,7 @@
-const {constants} = require('@openzeppelin/test-helpers');
-require('@nomiclabs/hardhat-ethers');
+import {ethers} from 'hardhat';
+import {TransactionResponse} from '@ethersproject/abstract-provider';
 
-const ADDRESSES = {};
+const ADDRESSES: Record<string, string> = {};
 const gasLimit = 500000;
 const bnbAddress = '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB';
 const busdAddress = '0xed24fc36d5ee211ea25a80239fb8c4cfd80f12ee';
@@ -40,30 +40,30 @@ const supportedWallets = [
   '0x440bBd6a888a36DE6e2F6A25f65bc4e16874faa9', // web
 ];
 
-async function deploy(step, ethers, contract, ...args) {
-  console.log(`   ${parseInt(step) + 1}. Deploying '${contract}'`);
+async function deploy(step: number, contract: string, ...args: any[]) {
+  console.log(`   ${step + 1}. Deploying '${contract}'`);
   console.log('   ------------------------------------');
 
   const Contract = await ethers.getContractFactory(contract);
   const instance = await Contract.deploy(...args);
-  tx = await instance.deployed();
+  const tx = await instance.deployed();
   printInfo(tx.deployTransaction);
   console.log(`   > address:\t${instance.address}\n\n`);
 
   ADDRESSES[contract] = instance.address;
 }
 
-function printInfo(tx) {
+function printInfo(tx: TransactionResponse) {
   console.log(`   > tx hash:\t${tx.hash}`);
   console.log(`   > gas price:\t${tx.gasPrice.toString()}`);
   console.log(`   > gas used:\t${tx.gasLimit.toString()}`);
 }
 
-task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
+async function main() {
+  console.log('Start deploying Krystal contracts ...');
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
   const deployContracts = ['SmartWalletLending', 'SmartWalletSwapImplementation', 'SmartWalletSwapProxy'];
-  const instances = {};
   let instance;
   let args;
   let step = 0;
@@ -77,7 +77,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   args = [[deployerAddress], [deployerAddress], [deployerAddress, null, kyberProxy, [pancakeRouter]]];
   for (let index in deployContracts) {
     if (deployContracts[index] === 'SmartWalletSwapProxy') args[index][1] = ADDRESSES['SmartWalletSwapImplementation'];
-    instances[deployContracts[index]] = await deploy(step, ethers, deployContracts[index], ...args[index]);
+    await deploy(step, deployContracts[index], ...args[index]);
     step++;
   }
 
@@ -88,7 +88,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   instance = await ethers.getContractAt('SmartWalletSwapImplementation', ADDRESSES['SmartWalletSwapProxy']);
 
   // Approve allowances to Kyber and PancakeSwap routers
-  console.log(`   ${parseInt(step) + 1}.  approveAllowances`);
+  console.log(`   ${step + 1}.  approveAllowances`);
   console.log('   ------------------------------------');
   tx = await instance.approveAllowances(
     [busdAddress, daiAddress, usdcAddress, usdtAddress],
@@ -101,7 +101,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   console.log('\n');
 
   // Update lending implementation and proxy
-  console.log(`   ${parseInt(step) + 1}.  updateLendingImplementation`);
+  console.log(`   ${step + 1}.  updateLendingImplementation`);
   console.log('   ------------------------------------');
   tx = await instance.updateLendingImplementation(ADDRESSES['SmartWalletLending'], {
     gasLimit,
@@ -111,7 +111,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   console.log('\n');
 
   // Add supported platform wallets
-  console.log(`   ${parseInt(step) + 1}.  updateSupportedPlatformWallets`);
+  console.log(`   ${step + 1}.  updateSupportedPlatformWallets`);
   console.log('   ------------------------------------');
   tx = await instance.updateSupportedPlatformWallets(supportedWallets, true, {
     gasLimit,
@@ -125,7 +125,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   instance = await ethers.getContractAt('SmartWalletLending', ADDRESSES['SmartWalletLending']);
 
   // Update Venus lending pool data to lending implementation
-  console.log(`   ${parseInt(step) + 1}.  updateVenusData`);
+  console.log(`   ${step + 1}.  updateVenusData`);
   console.log('   ------------------------------------');
 
   tx = await instance.updateVenusData(compTroller, vBnb, vTokens, {gasLimit});
@@ -134,7 +134,7 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   console.log('\n');
 
   // Update proxy to lending implementation
-  console.log(`   ${parseInt(step) + 1}.  updateSwapImplementation`);
+  console.log(`   ${step + 1}.  updateSwapImplementation`);
   console.log('   ------------------------------------');
   tx = await instance.updateSwapImplementation(ADDRESSES['SmartWalletSwapProxy'], {gasLimit});
   printInfo(tx);
@@ -150,4 +150,11 @@ task('deploy', 'Deploys the Krystal contracts').setAction(async () => {
   }
 
   console.log('\nDeployment complete!');
-});
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
