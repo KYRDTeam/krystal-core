@@ -1,5 +1,3 @@
-import {task} from 'hardhat/config';
-
 import '@nomiclabs/hardhat-truffle5';
 import '@nomiclabs/hardhat-web3';
 import '@nomiclabs/hardhat-ganache';
@@ -11,13 +9,6 @@ import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 
 require('dotenv').config();
-
-// Hardhat Tasks
-// require('./scripts/deployer');
-
-task('acc', 'Deploys the Krystal contracts').setAction(async () => {
-  console.log('test');
-});
 
 module.exports = {
   defaultNetwork: 'hardhat',

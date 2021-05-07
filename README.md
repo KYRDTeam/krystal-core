@@ -24,7 +24,7 @@ For interactions or contract deployments on public testnets / mainnet, create a 
 
 ```
 PRIVATE_KEY=0x****************************************************************
-INFURA_API_KEY=********************************
+BSCSCAN_KEY=********************************
 ```
 
 ## Testing with Buidler
