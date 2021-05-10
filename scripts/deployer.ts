@@ -1,6 +1,8 @@
 import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
+import {SmartWalletLending} from '../typechain/SmartWalletLending';
+import {SmartWalletSwapImplementation} from '../typechain/SmartWalletSwapImplementation';
 
 const deployedContracts: Record<string, string> = {};
 const gasLimit = 500000;
@@ -16,41 +18,38 @@ async function main() {
   const deployerAddress = await deployer.getAddress();
   const deployContracts = ['SmartWalletLending', 'SmartWalletSwapImplementation', 'SmartWalletSwapProxy'];
   let instance;
-  let args;
-  let step = 0;
-  let tx;
-
-  // Deployment
-
-  console.log(`Deploying Contracts using ${deployerAddress}`);
-  console.log('============================\n');
-
-  args = [
+  let args = [
     [deployerAddress],
     [deployerAddress],
     [deployerAddress, null, networkConfig.kyberProxy, [networkConfig.pancakeRouter]],
   ];
+  let step = 0;
+  let tx;
+
+  // Deployment
+  console.log(`Deploying Contracts using ${deployerAddress}`);
+  console.log('============================\n');
   for (let index in deployContracts) {
     if (deployContracts[index] === 'SmartWalletSwapProxy')
       args[index][1] = deployedContracts['SmartWalletSwapImplementation'];
-    await deploy(step, deployContracts[index], ...args[index]);
-
+    await deploy(++step, deployContracts[index], ...args[index]);
+    // auto verify contract
     await run('verify:verify', {
       address: deployedContracts[deployContracts[index]],
       constructorArguments: args[index],
     });
-
-    step++;
   }
 
   // Initialization
-
   console.log('Initializing SmartWalletSwapProxy');
   console.log('======================\n');
-  instance = await ethers.getContractAt('SmartWalletSwapImplementation', deployedContracts['SmartWalletSwapProxy']);
+  instance = (await ethers.getContractAt(
+    'SmartWalletSwapImplementation',
+    deployedContracts['SmartWalletSwapProxy']
+  )) as SmartWalletSwapImplementation;
 
   // Approve allowances to Kyber and PancakeSwap routers
-  console.log(`   ${step + 1}.  approveAllowances`);
+  console.log(`   ${++step}.  approveAllowances`);
   console.log('   ------------------------------------');
   tx = await instance.approveAllowances(
     [networkConfig.busdAddress, networkConfig.daiAddress, networkConfig.usdcAddress, networkConfig.usdtAddress],
@@ -59,7 +58,6 @@ async function main() {
     {gasLimit}
   );
   printInfo(tx);
-  step++;
   console.log('\n');
 
   // Update lending implementation and proxy
@@ -82,7 +80,10 @@ async function main() {
 
   console.log('Initializing SmartWalletLending');
   console.log('======================\n');
-  instance = await ethers.getContractAt('SmartWalletLending', deployedContracts['SmartWalletLending']);
+  instance = (await ethers.getContractAt(
+    'SmartWalletLending',
+    deployedContracts['SmartWalletLending']
+  )) as SmartWalletLending;
 
   // Update Venus lending pool data to lending implementation
   console.log(`   ${++step}.  updateVenusData`);
@@ -113,7 +114,7 @@ async function main() {
 }
 
 async function deploy(step: number, contractName: string, ...args: any[]) {
-  console.log(`   ${step + 1}. Deploying '${contractName}'`);
+  console.log(`   ${step}. Deploying '${contractName}'`);
   console.log('   ------------------------------------');
 
   const factory = await ethers.getContractFactory(contractName);

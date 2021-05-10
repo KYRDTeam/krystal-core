@@ -3,6 +3,7 @@ import '@nomiclabs/hardhat-web3';
 import '@nomiclabs/hardhat-ganache';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-ethers';
+import '@typechain/hardhat';
 
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
@@ -175,6 +176,11 @@ module.exports = {
     // Your API key for bscscan
     // Obtain one at https://bscscan.io/
     apiKey: process.env.BSCSCAN_KEY,
+  },
+
+  typechain: {
+    outDir: './typechain',
+    target: 'ethers-v5',
   },
 };
 
