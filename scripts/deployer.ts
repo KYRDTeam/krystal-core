@@ -17,11 +17,7 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
   const deployContracts = ['SmartWalletLending', 'SmartWalletSwapImplementation', 'SmartWalletSwapProxy'];
-  let args = [
-    [deployerAddress],
-    [deployerAddress],
-    [deployerAddress, null, networkConfig.kyberProxy, [networkConfig.pancakeRouter]],
-  ];
+  let args = [[deployerAddress], [deployerAddress], [deployerAddress, null, [networkConfig.pancakeRouter]]];
   let step = 0;
   let tx;
 
@@ -52,7 +48,7 @@ async function main() {
   console.log('   ------------------------------------');
   tx = await swapProxyInstance.approveAllowances(
     [networkConfig.busdAddress, networkConfig.daiAddress, networkConfig.usdcAddress, networkConfig.usdtAddress],
-    [networkConfig.kyberProxy, networkConfig.pancakeRouter],
+    [networkConfig.pancakeRouter],
     false,
     {gasLimit}
   );

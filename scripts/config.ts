@@ -5,7 +5,6 @@ interface IConfig {
   usdtAddress: string;
 
   pancakeRouter: string;
-  kyberProxy: string;
   vBnb: string;
   vTokens: string[];
 
@@ -22,7 +21,6 @@ export const NetworkConfig: Record<string, IConfig> = {
     usdtAddress: '0x337610d27c682e347c9cd60bd4b3b107c9d34ddd',
 
     pancakeRouter: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1',
-    kyberProxy: '0x9AAb3f75489902f3a48495025729a0AF77d4b11e',
     vBnb: '0x2E7222e51c0f6e98610A1543Aa3836E092CDe62c',
     compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',
     vTokens: [

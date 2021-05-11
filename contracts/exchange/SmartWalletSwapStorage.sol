@@ -1,6 +1,5 @@
 pragma solidity 0.7.6;
 
-import "../interfaces/IKyberProxy.sol";
 import "../interfaces/IPancakeRouter02.sol";
 import "../lending/ISmartWalletLending.sol";
 import "@kyber.network/utils-sc/contracts/IBEP20.sol";

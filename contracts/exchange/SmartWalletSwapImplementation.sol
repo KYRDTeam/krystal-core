@@ -71,30 +71,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
 
     /// ========== SWAP ========== ///
 
-    /// @dev swap token via Kyber
-    /// @notice for some tokens that are paying fee, for example: DGX
-    /// contract will trade with received src token amount (after minus fee)
-    /// for Kyber, fee will be taken in ETH as part of their feature
-    function swapKyber(
-        IBEP20 src,
-        IBEP20 dest,
-        uint256 srcAmount,
-        uint256 minConversionRate,
-        address payable recipient,
-        address payable platformWallet
-    ) external payable override nonReentrant returns (uint256 destAmount) {
-        destAmount = doKyberTrade(
-            src,
-            dest,
-            srcAmount,
-            minConversionRate,
-            recipient,
-            platformWallet
-        );
-
-        emit KyberTrade(msg.sender, src, dest, srcAmount, destAmount, recipient, platformWallet);
-    }
-
     /// @dev swap token via a supported PancakeSwap router
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
@@ -137,53 +113,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
     }
 
     /// ========== SWAP & DEPOSIT ========== ///
-
-    function swapKyberAndDeposit(
-        ISmartWalletLending.LendingPlatform platform,
-        IBEP20 src,
-        IBEP20 dest,
-        uint256 srcAmount,
-        uint256 minConversionRate,
-        uint256 platformFeeBps,
-        address payable platformWallet
-    ) external payable override nonReentrant returns (uint256 destAmount) {
-        require(lendingImpl != ISmartWalletLending(0));
-
-        if (src == dest) {
-            // just collect src token, no need to swap
-            destAmount = safeForwardTokenAndCollectFee(
-                src,
-                msg.sender,
-                payable(address(lendingImpl)),
-                srcAmount,
-                platformFeeBps,
-                platformWallet
-            );
-        } else {
-            destAmount = doKyberTrade(
-                src,
-                dest,
-                srcAmount,
-                minConversionRate,
-                payable(address(lendingImpl)),
-                platformWallet
-            );
-        }
-
-        // eth or token alr transferred to the address
-        lendingImpl.depositTo(platform, msg.sender, dest, destAmount);
-
-        emit KyberTradeAndDeposit(
-            msg.sender,
-            platform,
-            src,
-            dest,
-            srcAmount,
-            destAmount,
-            platformFeeBps,
-            platformWallet
-        );
-    }
 
     /// @dev swap Pancake then deposit to platform
     ///     if tradePath has only 1 token, don't need to do swap
@@ -278,68 +207,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         emit WithdrawFromLending(platform, token, amount, minReturn, returnedAmount);
     }
 
-    /// @dev swap on Kyber and repay borrow for sender
-    /// if src == dest, no need to swap, use src token to repay directly
-    /// @param payAmount: amount that user wants to pay, if the dest amount (after swap) is higher,
-    ///     the remain amount will be sent back to user's wallet
-    /// Other params are params for trade on Kyber
-    function swapKyberAndRepay(
-        ISmartWalletLending.LendingPlatform platform,
-        IBEP20 src,
-        IBEP20 dest,
-        uint256 srcAmount,
-        uint256 payAmount,
-        address payable platformWallet
-    ) external payable override nonReentrant returns (uint256 destAmount) {
-        {
-            require(lendingImpl != ISmartWalletLending(0));
-
-            {
-                // use user debt value if debt is <= payAmount,
-                // user can pay all debt by putting really high payAmount as param
-                payAmount = checkUserDebt(platform, address(dest), payAmount);
-                if (src == dest) {
-                    if (src == BNB_TOKEN_ADDRESS) {
-                        require(msg.value == srcAmount, "invalid msg value");
-                        transferToken(payable(address(lendingImpl)), src, srcAmount);
-                    } else {
-                        destAmount = srcAmount > payAmount ? payAmount : srcAmount;
-                        src.safeTransferFrom(msg.sender, address(lendingImpl), destAmount);
-                    }
-                } else {
-                    // use user debt value if debt is <= payAmount
-                    payAmount = checkUserDebt(platform, address(dest), payAmount);
-
-                    // use min rate so it can return earlier if failed to swap
-                    uint256 minRate =
-                        calcRateFromQty(srcAmount, payAmount, src.decimals(), dest.decimals());
-
-                    destAmount = doKyberTrade(
-                        src,
-                        dest,
-                        srcAmount,
-                        minRate,
-                        payable(address(lendingImpl)),
-                        platformWallet
-                    );
-                }
-            }
-
-            lendingImpl.repayBorrowTo(platform, msg.sender, dest, destAmount, payAmount);
-        }
-
-        emit KyberTradeAndRepay(
-            msg.sender,
-            platform,
-            src,
-            dest,
-            srcAmount,
-            destAmount,
-            payAmount,
-            platformWallet
-        );
-    }
-
     /// @dev swap on Uni-clone and repay borrow for sender
     /// if tradePath.length == 1, no need to swap, use tradePath[0] token to repay directly
     /// @param payAmount: amount that user wants to pay, if the dest amount (after swap) is higher,
@@ -402,22 +269,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         );
     }
 
-    /// @dev get expected return and conversion rate if using Kyber
-    function getExpectedReturnKyber(
-        IBEP20 src,
-        IBEP20 dest,
-        uint256 srcAmount
-    ) external view override returns (uint256 destAmount, uint256 expectedRate) {
-        try kyberProxy.getConversionRate(src, dest, srcAmount, block.number) returns (
-            uint256 rate
-        ) {
-            expectedRate = rate;
-        } catch {
-            expectedRate = 0;
-        }
-        destAmount = calcDestAmount(src, dest, srcAmount, expectedRate);
-    }
-
     /// @dev get expected return and conversion rate if using a Pancake router
     function getExpectedReturnPancake(
         IPancakeRouter02 router,
@@ -455,26 +306,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         }
 
         return debt;
-    }
-
-    function doKyberTrade(
-        IBEP20 src,
-        IBEP20 dest,
-        uint256 srcAmount,
-        uint256 minConversionRate,
-        address payable recipient,
-        address payable platformWallet
-    ) internal virtual returns (uint256 destAmount) {
-        uint256 actualSrcAmount =
-            validateAndPrepareSourceAmount(address(kyberProxy), src, srcAmount, platformWallet);
-        uint256 callValue = src == BNB_TOKEN_ADDRESS ? actualSrcAmount : 0;
-        destAmount = kyberProxy.trade{value: callValue}(
-            src,
-            actualSrcAmount,
-            dest,
-            recipient,
-            minConversionRate
-        );
     }
 
     function swapPancakeInternal(
@@ -652,7 +483,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         }
     }
 
-    function transferToken(
+        function transferToken(
         address payable recipient,
         IBEP20 token,
         uint256 amount
