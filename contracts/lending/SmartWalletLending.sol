@@ -7,7 +7,6 @@ import "@kyber.network/utils-sc/contracts/Utils.sol";
 import "@kyber.network/utils-sc/contracts/Withdrawable.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-
 contract SmartWalletLending is ISmartWalletLending, Utils, Withdrawable {
     using SafeERC20 for IBEP20;
     using SafeMath for uint256;
@@ -113,10 +112,7 @@ contract SmartWalletLending is ISmartWalletLending, Utils, Withdrawable {
                 require(IVBep20(vToken).mint(amount) == 0, "can not mint vToken");
             }
             uint256 vTokenBalanceAfter = IBEP20(vToken).balanceOf(address(this));
-            IBEP20(vToken).safeTransfer(
-                onBehalfOf,
-                vTokenBalanceAfter.sub(vTokenBalanceBefore)
-            );
+            IBEP20(vToken).safeTransfer(onBehalfOf, vTokenBalanceAfter.sub(vTokenBalanceBefore));
         }
     }
 
@@ -188,7 +184,7 @@ contract SmartWalletLending is ISmartWalletLending, Utils, Withdrawable {
     }
 
     /** @dev Calculate the current user debt and return
-    */
+     */
     function storeAndRetrieveUserDebtCurrent(
         LendingPlatform platform,
         address _reserve,
@@ -199,9 +195,9 @@ contract SmartWalletLending is ISmartWalletLending, Utils, Withdrawable {
     }
 
     /** @dev Return the stored user debt from given platform
-    *   to get the latest data of user's debt for repaying, should call
-    *   storeAndRetrieveUserDebtCurrent function, esp for Venus platform
-    */
+     *   to get the latest data of user's debt for repaying, should call
+     *   storeAndRetrieveUserDebtCurrent function, esp for Venus platform
+     */
     function getUserDebtStored(
         LendingPlatform platform,
         address _reserve,

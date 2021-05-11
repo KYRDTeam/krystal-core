@@ -6,7 +6,6 @@ import "../interfaces/ISmartWalletSwapImplementation.sol";
 import "../interfaces/IPancakeRouter02.sol";
 import "./SmartWalletSwapStorage.sol";
 
-
 contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSwapImplementation {
     using SafeERC20 for IBEP20;
     using SafeMath for uint256;
@@ -93,15 +92,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             platformWallet
         );
 
-        emit KyberTrade(
-            msg.sender,
-            src,
-            dest,
-            srcAmount,
-            destAmount,
-            recipient,
-            platformWallet
-        );
+        emit KyberTrade(msg.sender, src, dest, srcAmount, destAmount, recipient, platformWallet);
     }
 
     /// @dev swap token via a supported PancakeSwap router
@@ -284,13 +275,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             minReturn
         );
 
-        emit WithdrawFromLending(
-            platform,
-            token,
-            amount,
-            minReturn,
-            returnedAmount
-        );
+        emit WithdrawFromLending(platform, token, amount, minReturn, returnedAmount);
     }
 
     /// @dev swap on Kyber and repay borrow for sender
@@ -340,13 +325,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
                 }
             }
 
-            lendingImpl.repayBorrowTo(
-                platform,
-                msg.sender,
-                dest,
-                destAmount,
-                payAmount
-            );
+            lendingImpl.repayBorrowTo(platform, msg.sender, dest, destAmount, payAmount);
         }
 
         emit KyberTradeAndRepay(
@@ -407,13 +386,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
                 );
             }
 
-            lendingImpl.repayBorrowTo(
-                platform,
-                msg.sender,
-                dest,
-                destAmount,
-                payAmount
-            );
+            lendingImpl.repayBorrowTo(platform, msg.sender, dest, destAmount, payAmount);
         }
 
         emit PancakeTradeAndRepay(
@@ -453,7 +426,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         uint256 platformFee
     ) external view override returns (uint256 destAmount, uint256 expectedRate) {
         if (platformFee >= BPS) return (0, 0); // platform fee is too high
-        if (!isRouterSupported[router]) return (0, 0); // router is not supported
+        if (!pancakeRouters[router]) return (0, 0); // router is not supported
         uint256 srcAmountAfterFee = (srcAmount * (BPS - platformFee)) / BPS;
         if (srcAmountAfterFee == 0) return (0, 0);
         // in case pair is not supported
@@ -525,7 +498,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             });
 
         // extra validation when swapping on Pancake
-        require(isRouterSupported[router], "unsupported router");
+        require(pancakeRouters[router], "unsupported router");
         require(platformFeeBps < BPS, "high platform fee");
 
         IBEP20 src = IBEP20(tradePath[0]);
@@ -658,7 +631,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         destAmount = amount - feeAmount;
         if (token == BNB_TOKEN_ADDRESS) {
             require(msg.value >= amount);
-            (bool success, ) = to.call{value: destAmount}('');
+            (bool success, ) = to.call{value: destAmount}("");
             require(success, "transfer eth failed");
         } else {
             uint256 balanceBefore = token.balanceOf(to);

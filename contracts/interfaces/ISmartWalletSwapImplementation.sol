@@ -4,7 +4,6 @@ import "../lending/ISmartWalletLending.sol";
 import "../interfaces/IPancakeRouter02.sol";
 import "@kyber.network/utils-sc/contracts/IBEP20.sol";
 
-
 interface ISmartWalletSwapImplementation {
     event KyberTrade(
         address indexed trader,
@@ -92,20 +91,14 @@ interface ISmartWalletSwapImplementation {
         IBEP20 src,
         IBEP20 dest,
         uint256 srcAmount
-    ) external view returns (
-        uint256 destAmount,
-        uint256 expectedRate
-    );
+    ) external view returns (uint256 destAmount, uint256 expectedRate);
 
     function getExpectedReturnPancake(
         IPancakeRouter02 router,
         uint256 srcAmount,
         address[] calldata tradePath,
         uint256 platformFeeBps
-    ) external view returns (
-        uint256 destAmount,
-        uint256 expectedRate
-    );
+    ) external view returns (uint256 destAmount, uint256 expectedRate);
 
     function swapKyber(
         IBEP20 src,
@@ -173,8 +166,6 @@ interface ISmartWalletSwapImplementation {
         address payable platformWallet
     ) external payable returns (uint256 destAmount);
 
-    function claimPlatformFees(
-        address[] calldata platformWallets,
-        IBEP20[] calldata tokens
-    ) external;
+    function claimPlatformFees(address[] calldata platformWallets, IBEP20[] calldata tokens)
+        external;
 }

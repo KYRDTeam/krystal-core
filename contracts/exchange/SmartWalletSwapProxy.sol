@@ -2,8 +2,6 @@ pragma solidity 0.7.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./SmartWalletSwapStorage.sol";
-import "../interfaces/IPancakeRouter02.sol";
-
 
 contract SmartWalletSwapProxy is SmartWalletSwapStorage {
     using Address for address;
@@ -19,7 +17,7 @@ contract SmartWalletSwapProxy is SmartWalletSwapStorage {
         _setImplementation(_implementation);
         kyberProxy = _proxy;
         for (uint256 i = 0; i < _routers.length; i++) {
-            isRouterSupported[_routers[i]] = true;
+            pancakeRouters[_routers[i]] = true;
         }
     }
 

@@ -2,9 +2,7 @@ pragma solidity 0.7.6;
 
 import "@kyber.network/utils-sc/contracts/IBEP20.sol";
 
-
 interface IKyberProxy {
-
     function trade(
         IBEP20 src,
         uint256 srcAmount,

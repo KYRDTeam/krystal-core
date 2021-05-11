@@ -5,10 +5,8 @@ import "@kyber.network/utils-sc/contracts/IBEP20.sol";
 import "../interfaces/IBnb.sol";
 import "../interfaces/IVBep20.sol";
 
-
 interface ISmartWalletLending {
-
-    enum LendingPlatform { VENUS }
+    enum LendingPlatform {VENUS}
 
     function updateVenusData(
         address _comptroller,
@@ -45,10 +43,14 @@ interface ISmartWalletLending {
         address _user
     ) external returns (uint256 debt);
 
-    function getLendingToken(LendingPlatform platform, IBEP20 token) external view returns(address);
-
-    function getUserDebtStored(LendingPlatform platform, address reserve, address user)
+    function getLendingToken(LendingPlatform platform, IBEP20 token)
         external
         view
-        returns (uint256 debt);
+        returns (address);
+
+    function getUserDebtStored(
+        LendingPlatform platform,
+        address reserve,
+        address user
+    ) external view returns (uint256 debt);
 }

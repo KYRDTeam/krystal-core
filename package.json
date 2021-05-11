@@ -13,7 +13,9 @@
     "deploy": "yarn hardhat deploy",
     "prettier": "./node_modules/.bin/prettier --write",
     "size": "yarn run hardhat size-contracts",
-    "s": "yarn run hardhat size-contracts"
+    "s": "yarn run hardhat size-contracts",
+    "lint": "yarn solhint contracts/**/*.sol",
+    "lint:fix": "yarn prettier contracts/**/*.sol"
   },
   "repository": {
     "type": "git",
