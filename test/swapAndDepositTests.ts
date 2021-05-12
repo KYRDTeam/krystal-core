@@ -1,4 +1,6 @@
-const { expectEvent } = require('@openzeppelin/test-helpers');
+import {web3, contract} from 'hardhat';
+
+const {expectEvent} = require('@openzeppelin/test-helpers');
 const BN = web3.utils.BN;
 
 const {
@@ -12,12 +14,10 @@ const {
   uniswapRouter,
   assertTxSuccess,
   assertLesser,
-  assertGreaterOrEqual
+  assertGreaterOrEqual,
 } = require('./helper');
 
-const {
-  setupBeforeTest,
-} = require('./setupTestingEnvironment');
+const {setupBeforeTest} = require('./setupTestingEnvironment');
 
 let globalSnapshotId;
 let snapshotId;
@@ -34,10 +34,10 @@ let cUsdtToken;
 let lendingUsdtTokensByPlatform;
 let lendingEthTokensByPlatform;
 
-contract('SmartWalletSwapImplementation', accounts => {
+contract('SmartWalletSwapImplementation', (accounts) => {
   before('setup testing environment', async () => {
     globalSnapshotId = await evm_snapshot();
-    const result = await setupBeforeTest(accounts)
+    const result = await setupBeforeTest(accounts);
 
     user = result.user;
     lending = result.lending;
@@ -92,8 +92,15 @@ contract('SmartWalletSwapImplementation', accounts => {
 
       for (let i = 0; i < lendingPlatforms.length; i++) {
         const tx = await swapProxy.swapUniswapAndDeposit(
-          i, uniswapRouter, srcAmount, 0, swapTradePath, bps, user, false,
-          { from: user, value: srcAmount }
+          i,
+          uniswapRouter,
+          srcAmount,
+          0,
+          swapTradePath,
+          bps,
+          user,
+          false,
+          {from: user, value: srcAmount}
         );
         assertTxSuccess(tx);
 
@@ -112,8 +119,15 @@ contract('SmartWalletSwapImplementation', accounts => {
         const usdtToken = lendingUsdtTokensByPlatform[i];
 
         const tx = await swapProxy.swapUniswapAndDeposit(
-          i, uniswapRouter, srcAmount, 0, swapTradePath, 8, user, false,
-          { from: user, value: srcAmount }
+          i,
+          uniswapRouter,
+          srcAmount,
+          0,
+          swapTradePath,
+          8,
+          user,
+          false,
+          {from: user, value: srcAmount}
         );
 
         assertTxSuccess(tx);
@@ -124,15 +138,14 @@ contract('SmartWalletSwapImplementation', accounts => {
         assertGreaterOrEqual(aTokenBalance, destAmount);
 
         /** Withdraw from lending platform **/
-        const withdrawReceipt = await swapProxy.withdrawFromLendingPlatform(
-          i, usdtAddress, aTokenBalance, 0, false,
-          { from: user }
-        );
+        const withdrawReceipt = await swapProxy.withdrawFromLendingPlatform(i, usdtAddress, aTokenBalance, 0, false, {
+          from: user,
+        });
 
         expectEvent(withdrawReceipt, 'WithdrawFromLending', {
           platform: i.toString(),
           token: usdtAddress,
-          amount: aTokenBalance
+          amount: aTokenBalance,
         });
       }
     });
@@ -141,9 +154,10 @@ contract('SmartWalletSwapImplementation', accounts => {
       /** Swap ETH to token for testing **/
       const ethAmount = new BN(10).pow(ethDecimals);
       const tradePath = [ethAddress, usdtAddress];
-      await swapProxy.swapUniswap(
-        uniswapRouter, ethAmount, 0, tradePath, user, 8, user, true, false, { from: user, value: ethAmount }
-      );
+      await swapProxy.swapUniswap(uniswapRouter, ethAmount, 0, tradePath, user, 8, user, true, false, {
+        from: user,
+        value: ethAmount,
+      });
 
       /** Swap token to ETH and deposit **/
       const srcAmount = new BN(10).pow(new BN(6));
@@ -153,8 +167,15 @@ contract('SmartWalletSwapImplementation', accounts => {
         const ethToken = lendingEthTokensByPlatform[i];
 
         const tx = await swapProxy.swapUniswapAndDeposit(
-          i, uniswapRouter, srcAmount, 0, swapTradePath, 8, user, false,
-          { from: user }
+          i,
+          uniswapRouter,
+          srcAmount,
+          0,
+          swapTradePath,
+          8,
+          user,
+          false,
+          {from: user}
         );
         assertTxSuccess(tx);
 
@@ -170,15 +191,14 @@ contract('SmartWalletSwapImplementation', accounts => {
 
         /** Test withdraw ETH from AAVE v2 **/
         if (i === 1) {
-          const withdrawReceipt = await swapProxy.withdrawFromLendingPlatform(
-            i, ethAddress, aTokenBalance, 0, false,
-            { from: user }
-          );
+          const withdrawReceipt = await swapProxy.withdrawFromLendingPlatform(i, ethAddress, aTokenBalance, 0, false, {
+            from: user,
+          });
 
           expectEvent(withdrawReceipt, 'WithdrawFromLending', {
             platform: '1',
             token: ethAddress,
-            amount: aTokenBalance
+            amount: aTokenBalance,
           });
         }
       }
@@ -211,8 +231,16 @@ contract('SmartWalletSwapImplementation', accounts => {
       const srcAmount = new BN(5).pow(ethDecimals);
 
       const tx = await swapProxy.swapKyberAndDeposit(
-        0, ethAddress, ethAddress, srcAmount, 0, 8, user, emptyHint, false,
-        { from: user, value: srcAmount }
+        0,
+        ethAddress,
+        ethAddress,
+        srcAmount,
+        0,
+        8,
+        user,
+        emptyHint,
+        false,
+        {from: user, value: srcAmount}
       );
       assertTxSuccess(tx);
 
@@ -229,8 +257,16 @@ contract('SmartWalletSwapImplementation', accounts => {
       const minDestAmount = rate.destAmount.mul(new BN(97)).div(new BN(100));
 
       const tx = await swapProxy.swapKyberAndDeposit(
-        0, ethAddress, usdtAddress, srcAmount, minDestAmount, 8, user, emptyHint, false,
-        { from: user, value: srcAmount }
+        0,
+        ethAddress,
+        usdtAddress,
+        srcAmount,
+        minDestAmount,
+        8,
+        user,
+        emptyHint,
+        false,
+        {from: user, value: srcAmount}
       );
 
       assertTxSuccess(tx);
@@ -244,16 +280,25 @@ contract('SmartWalletSwapImplementation', accounts => {
     it('should swap token to ETH and deposit ETH to AAVE v1', async () => {
       /** Swap ETH to token for testing **/
       const ethAmount = new BN(10).pow(ethDecimals);
-      await swapProxy.swapKyber(
-        ethAddress, usdtAddress, ethAmount, 0, user, 8, user, emptyHint, false, { from: user, value: ethAmount }
-      );
+      await swapProxy.swapKyber(ethAddress, usdtAddress, ethAmount, 0, user, 8, user, emptyHint, false, {
+        from: user,
+        value: ethAmount,
+      });
 
       /** Swap token to ETH and deposit **/
       const srcAmount = new BN(5).pow(new BN(6));
 
       const tx = await swapProxy.swapKyberAndDeposit(
-        0, usdtAddress, ethAddress, srcAmount, 0, 8, user, emptyHint, false,
-        { from: user }
+        0,
+        usdtAddress,
+        ethAddress,
+        srcAmount,
+        0,
+        8,
+        user,
+        emptyHint,
+        false,
+        {from: user}
       );
       assertTxSuccess(tx);
 
@@ -262,5 +307,5 @@ contract('SmartWalletSwapImplementation', accounts => {
 
       assertGreaterOrEqual(aTokenBalance, destAmount);
     });
-  })
+  });
 });

@@ -1,98 +1,76 @@
 import hre from 'hardhat';
+import BN from 'bn.js';
+import { IBEP20 } from '../typechain';
+
 const Math = require('mathjs');
-const BN = web3.utils.BN;
 const {constants, time} = require('@openzeppelin/test-helpers');
 require('chai').use(require('chai-as-promised')).use(require('chai-bn')(BN)).should();
 
 const BPS = new BN(10000);
 const precisionUnits = new BN(10).pow(new BN(18));
-const ethDecimals = new BN(18);
-const ethAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-const wethAddress = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
-const usdtAddress = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
-const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
-const daiAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
-const gasTokenAddress = '0x0000000000b3F879cb30FE243b4Dfee438691c04';
-const kyberProxyAddress = '0x9AAb3f75489902f3a48495025729a0AF77d4b11e';
-const uniswapRouter = '0x7a250d5630b4cf539739df2c5dacb4c659f2488d';
-const sushiswapRouter = '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f';
-const binanceColdWallet = '0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE';
-const zeroAddress = constants.ZERO_ADDRESS;
-const emptyHint = '0x';
-const zeroBN = new BN(0);
-const MAX_QTY = new BN(10).pow(new BN(28));
-const MAX_RATE = precisionUnits.mul(new BN(10).pow(new BN(7)));
-const MAX_ALLOWANCE = new BN(2).pow(new BN(256)).sub(new BN(1));
-const AAVE_V1_ADDRESSES = {
+export const ethDecimals = new BN(18);
+export const ethAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const wethAddress = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
+export const usdtAddress = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+export const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+export const daiAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
+export const gasTokenAddress = '0x0000000000b3F879cb30FE243b4Dfee438691c04';
+export const kyberProxyAddress = '0x9AAb3f75489902f3a48495025729a0AF77d4b11e';
+export const uniswapRouter = '0x7a250d5630b4cf539739df2c5dacb4c659f2488d';
+export const sushiswapRouter = '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f';
+export const binanceColdWallet = '0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE';
+export const zeroAddress = constants.ZERO_ADDRESS;
+export const emptyHint = '0x';
+export const zeroBN = new BN(0);
+export const MAX_QTY = new BN(10).pow(new BN(28));
+export const MAX_RATE = precisionUnits.mul(new BN(10).pow(new BN(7)));
+export const MAX_ALLOWANCE = new BN(2).pow(new BN(256)).sub(new BN(1));
+export const AAVE_V1_ADDRESSES = {
   aEthAddress: '0x3a3a65aab0dd2a17e3f1947ba16138cd37d08c04',
   aUsdtAddress: '0x71fc860f7d3a592a4a98740e39db31d25db65ae8',
   aDaiAddress: '0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d',
   aavePoolV1Address: '0x398eC7346DcD622eDc5ae82352F02bE94C62d119',
   aavePoolCoreV1Address: '0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3',
 };
-const AAVE_V2_ADDRESSES = {
+export const AAVE_V2_ADDRESSES = {
   aWethAddress: '0x030bA81f1c18d280636F32af80b9AAd02Cf0854e',
   aUsdtAddress: '0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811',
   aDaiAddress: '0x028171bCA77440897B824Ca71D1c56caC55b68A3',
   aavePoolV2Address: '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9',
   aaveProviderV2Address: '0x057835Ad21a177dbdd3090bB1CAE03EaCF78Fc6d',
 };
-const COMPOUND_ADDRESSES = {
+export const COMPOUND_ADDRESSES = {
   cEthAddress: '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5',
   cUsdtAddress: '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9',
   cDaiAddress: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
   comptroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',
 };
-const lendingPlatforms = [0, 1, 2];
+export const lendingPlatforms = [0, 1, 2];
 
-module.exports = {
-  BPS,
-  precisionUnits,
-  ethDecimals,
-  ethAddress,
-  zeroAddress,
-  kyberProxyAddress,
-  sushiswapRouter,
-  uniswapRouter,
-  lendingPlatforms,
-  gasTokenAddress,
-  daiAddress,
-  usdtAddress,
-  usdcAddress,
-  wethAddress,
-  emptyHint,
-  zeroBN,
-  MAX_QTY,
-  MAX_RATE,
-  MAX_ALLOWANCE,
-  AAVE_V1_ADDRESSES,
-  AAVE_V2_ADDRESSES,
-  COMPOUND_ADDRESSES,
-};
-
-module.exports.evm_snapshot = async function () {
+export const evm_snapshot = async function () {
   return await hre.network.provider.request({
     method: 'evm_snapshot',
     params: [],
   });
 };
 
-module.exports.evm_revert = async function (snapshotId) {
+export const evm_revert = async function (snapshotId: any) {
   return await hre.network.provider.request({
     method: 'evm_revert',
     params: [snapshotId],
   });
 };
 
-module.exports.fundWallet = async function (wallet, Token, amount) {
+export const fundWallet = async function (wallet: string, Token: IBEP20, amount: number) {
   await hre.network.provider.request({
     method: 'hardhat_impersonateAccount',
     params: [binanceColdWallet],
   });
 
-  amount = new BN(amount).mul(new BN(10).pow(await Token.decimals()));
+  const tokenDec = await Token.decimals();
+  const bnAmount = new BN(amount).mul(new BN(10).pow(new BN(tokenDec)));
 
-  await Token.transfer(wallet, amount, {from: binanceColdWallet});
+  await Token.transfer(wallet, bnAmount.toString(), {from: binanceColdWallet});
 
   await hre.network.provider.request({
     method: 'hardhat_stopImpersonatingAccount',
@@ -100,18 +78,18 @@ module.exports.fundWallet = async function (wallet, Token, amount) {
   });
 };
 
-module.exports.isRevertErrorMessageContains = function (error, msg) {
+export const isRevertErrorMessageContains = function (error, msg) {
   return error.message.search(msg) >= 0;
 };
 
-module.exports.isRevertErrorMessage = function (error) {
+export const isRevertErrorMessage = function (error) {
   if (error.message.search('invalid opcode') >= 0) return true;
   if (error.message.search('revert') >= 0) return true;
   if (error.message.search('out of gas') >= 0) return true;
   return false;
 };
 
-module.exports.expectThrow = async function (promise, message) {
+export const expectThrow = async function (promise, message) {
   try {
     await promise;
   } catch (error) {
@@ -127,7 +105,7 @@ module.exports.expectThrow = async function (promise, message) {
   assert.fail('Expected throw not received');
 };
 
-module.exports.sendEtherWithPromise = function (sender, recv, amount) {
+export const sendEtherWithPromise = function (sender, recv, amount) {
   return new Promise(function (fulfill, reject) {
     web3.eth.sendTransaction({to: recv, from: sender, value: amount}, function (error, result) {
       if (error) {
@@ -148,9 +126,9 @@ function getBalancePromise(account) {
   });
 }
 
-module.exports.getBalancePromise = getBalancePromise;
+export const getBalancePromise = getBalancePromise;
 
-module.exports.getCurrentBlock = function () {
+export const getCurrentBlock = function () {
   return new Promise(function (fulfill, reject) {
     web3.eth.getBlockNumber(function (err, result) {
       if (err) reject(err);
@@ -159,7 +137,7 @@ module.exports.getCurrentBlock = function () {
   });
 };
 
-module.exports.getCurrentBlockTime = function () {
+export const getCurrentBlockTime = function () {
   return new Promise(function (fulfill, reject) {
     web3.eth.getBlock('latest', false, function (err, result) {
       if (err) reject(err);
@@ -168,7 +146,7 @@ module.exports.getCurrentBlockTime = function () {
   });
 };
 
-module.exports.bytesToHex = function (byteArray) {
+export const bytesToHex = function (byteArray) {
   let strNum = toHexString(byteArray);
   let num = '0x' + strNum;
   return num;
@@ -180,7 +158,7 @@ function toHexString(byteArray) {
   }).join('');
 }
 
-module.exports.sendPromise = function (method, params) {
+export const sendPromise = function (method, params) {
   return new Promise(function (fulfill, reject) {
     web3.currentProvider.sendAsync(
       {
@@ -202,7 +180,7 @@ module.exports.sendPromise = function (method, params) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports.exp = function (num1, num2) {
+export const exp = function (num1, num2) {
   const num1Math = Math.bignumber(new BN(num1 * 10 ** 9).toString(10)).div(10 ** 9);
   const num2Math = Math.bignumber(new BN(num2 * 10 ** 9).toString(10)).div(10 ** 9);
 
@@ -211,7 +189,7 @@ module.exports.exp = function (num1, num2) {
   return result.toNumber();
 };
 
-module.exports.ln = function (num) {
+export const ln = function (num) {
   const numMath = Math.bignumber(new BN(num * 10 ** 9).toString(10)).div(10 ** 9);
 
   const result = Math.log(numMath);
@@ -241,7 +219,7 @@ function absDiff(num1, num2) {
   }
 }
 
-module.exports.assertAbsDiff = function (val1, val2, expectedDiffInPct, errorStr) {
+export const assertAbsDiff = function (val1, val2, expectedDiffInPct, errorStr) {
   val1 = val1.toString();
   val2 = val2.toString();
   assert(
@@ -262,7 +240,7 @@ function assertEqual(val1, val2, errorStr) {
   assert(new BN(val1).should.be.a.bignumber.that.equals(new BN(val2)), errorStr);
 }
 
-module.exports.assertEqual = assertEqual;
+export const assertEqual = assertEqual;
 
 function assertApproximate(val1, val2, errorStr) {
   if (new BN(val2).lt(new BN(10).pow(new BN(12)))) assertEqual(val1, val2, errorStr);
@@ -272,16 +250,16 @@ function assertApproximate(val1, val2, errorStr) {
   }
 }
 
-module.exports.assertEqualArray = assertEqualArray;
+export const assertEqualArray = assertEqualArray;
 function assertEqualArray(arr1, arr2, errorStr) {
   assert(arr1.equals(arr2), `${errorStr} actual=${arr1} expected=${arr2}`);
 }
 
-module.exports.assertTxSuccess = (tx) => {
+export const assertTxSuccess = (tx) => {
   expect(tx.receipt.status).to.equal(true);
 };
 
-module.exports.assertTxSuccess = (tx) => {
+export const assertTxSuccess = (tx) => {
   expect(tx.receipt.status).to.equal(true);
 };
 
@@ -316,37 +294,37 @@ Array.prototype.equals = function (array) {
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, 'equals', {enumerable: false});
 
-module.exports.assertApproximate = assertApproximate;
+export const assertApproximate = assertApproximate;
 
-module.exports.assertGreater = function (val1, val2, errorStr) {
+export const assertGreater = function (val1, val2, errorStr) {
   assert(new BN(val1).should.be.a.bignumber.that.is.greaterThan(new BN(val2)), errorStr);
 };
 
-module.exports.assertGreaterOrEqual = function (val1, val2) {
+export const assertGreaterOrEqual = function (val1, val2) {
   assert(new BN(val1).should.be.a.bignumber.that.is.least(new BN(val2)));
 };
 
-module.exports.assertLessOrEqual = function (val1, val2, errorStr) {
+export const assertLessOrEqual = function (val1, val2, errorStr) {
   assert(new BN(val1).should.be.a.bignumber.that.is.most(new BN(val2)), errorStr);
 };
 
-module.exports.assertLesser = function (val1, val2, errorStr) {
+export const assertLesser = function (val1, val2, errorStr) {
   assert(new BN(val1).should.be.a.bignumber.that.is.lessThan(new BN(val2)), errorStr);
 };
 
-module.exports.assertGreater = function (val1, val2, errorStr) {
+export const assertGreater = function (val1, val2, errorStr) {
   assert(new BN(val1).should.be.a.bignumber.that.is.greaterThan(new BN(val2)), errorStr);
 };
 
-module.exports.assertLesser = function (val1, val2, errorStr) {
+export const assertLesser = function (val1, val2, errorStr) {
   assert(new BN(val1).should.be.a.bignumber.that.is.lessThan(new BN(val2)), errorStr);
 };
 
-module.exports.addBps = function (rate, bps) {
+export const addBps = function (rate, bps) {
   return new BN(rate).mul(new BN(10000 + bps)).div(new BN(10000));
 };
 
-module.exports.calcSrcQty = function (dstQty, srcDecimals, dstDecimals, rate) {
+export const calcSrcQty = function (dstQty, srcDecimals, dstDecimals, rate) {
   //source quantity is rounded up. to avoid dest quantity being too low.
   dstQty = new BN(dstQty);
   srcDecimals = new BN(srcDecimals);
@@ -366,7 +344,7 @@ module.exports.calcSrcQty = function (dstQty, srcDecimals, dstDecimals, rate) {
   return numerator.add(denominator).sub(new BN(1)).div(denominator);
 };
 
-module.exports.calcDstQty = function (srcQty, srcDecimals, dstDecimals, rate) {
+export const calcDstQty = function (srcQty, srcDecimals, dstDecimals, rate) {
   srcQty = new BN(srcQty);
   srcDecimals = new BN(srcDecimals);
   dstDecimals = new BN(dstDecimals);
@@ -386,17 +364,17 @@ module.exports.calcDstQty = function (srcQty, srcDecimals, dstDecimals, rate) {
   return result;
 };
 
-module.exports.assertSameEtherBalance = async function (accountAddress, expectedBalance) {
+export const assertSameEtherBalance = async function (accountAddress, expectedBalance) {
   let balance = await getBalancePromise(accountAddress);
   assertEqual(balance, expectedBalance, 'wrong ether balance');
 };
 
-module.exports.assertSameTokenBalance = async function (accountAddress, token, expectedBalance) {
+export const assertSameTokenBalance = async function (accountAddress, token, expectedBalance) {
   let balance = await token.balanceOf(accountAddress);
   assertEqual(balance, expectedBalance, 'wrong token balance');
 };
 
-module.exports.calcRateFromQty = function (srcQty, dstQty, srcDecimals, dstDecimals) {
+export const calcRateFromQty = function (srcQty, dstQty, srcDecimals, dstDecimals) {
   let decimals;
   dstDecimals = new BN(dstDecimals);
 
@@ -409,34 +387,34 @@ module.exports.calcRateFromQty = function (srcQty, dstQty, srcDecimals, dstDecim
   }
 };
 
-module.exports.getRandomInt = function (min, max) {
+export const getRandomInt = function (min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-module.exports.increaseBlockNumber = async function (blocks) {
+export const increaseBlockNumber = async function (blocks) {
   for (let id = 0; id < blocks; id++) {
     await time.advanceBlock();
   }
 };
 
-module.exports.increaseBlockNumberTo = async function (newBlock) {
+export const increaseBlockNumberTo = async function (newBlock) {
   await time.advanceBlockTo(newBlock);
 };
 
-module.exports.txAfterBlocks = async function (blocks, txFunc) {
-  await module.exports.increaseBlockNumber(blocks);
+export const txAfterBlocks = async function (blocks, txFunc) {
+  await export const increaseBlockNumber(blocks);
   await txFunc();
 };
 
-module.exports.txAtBlock = async function (block, txFunc) {
-  await module.exports.increaseBlockNumberTo(block - 1);
+export const txAtBlock = async function (block, txFunc) {
+  await export const increaseBlockNumberTo(block - 1);
   await txFunc();
 };
 
-module.exports.increaseNextBlockTimestamp = async function (duration) {
-  currentChainTime = await module.exports.getCurrentBlockTime();
+export const increaseNextBlockTimestamp = async function (duration) {
+  currentChainTime = await export const getCurrentBlockTime();
   return new Promise((resolve, reject) => {
     web3.currentProvider.send.bind(web3.currentProvider)(
       {
@@ -456,7 +434,7 @@ module.exports.increaseNextBlockTimestamp = async function (duration) {
   });
 };
 
-module.exports.setNextBlockTimestamp = async function (timestamp) {
+export const setNextBlockTimestamp = async function (timestamp) {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send.bind(web3.currentProvider)(
       {
@@ -475,7 +453,7 @@ module.exports.setNextBlockTimestamp = async function (timestamp) {
   });
 };
 
-module.exports.txAtTime = async function (timestamp, txFunc) {
+export const txAtTime = async function (timestamp, txFunc) {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send.bind(web3.currentProvider)(
       {
@@ -494,7 +472,7 @@ module.exports.txAtTime = async function (timestamp, txFunc) {
   });
 };
 
-module.exports.mineNewBlockAt = async function (timestamp) {
+export const mineNewBlockAt = async function (timestamp) {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send.bind(web3.currentProvider)(
       {
@@ -513,8 +491,8 @@ module.exports.mineNewBlockAt = async function (timestamp) {
   });
 };
 
-module.exports.mineNewBlockAfter = async function (duration) {
-  currentChainTime = await module.exports.getCurrentBlockTime();
+export const mineNewBlockAfter = async function (duration) {
+  currentChainTime = await export const getCurrentBlockTime();
   return new Promise((resolve, reject) => {
     web3.currentProvider.send.bind(web3.currentProvider)(
       {
@@ -534,7 +512,7 @@ module.exports.mineNewBlockAfter = async function (duration) {
   });
 };
 
-module.exports.buildHint = function (tradeType) {
+export const buildHint = function (tradeType) {
   if (tradeType == 'SPLIT') {
     return (tradeType, reserveIds, splits) => {
       let sortedReserveIds = [];
@@ -567,7 +545,7 @@ module.exports.buildHint = function (tradeType) {
   }
 };
 
-module.exports.buildHintT2T = function (
+export const buildHintT2T = function (
   t2eType,
   t2eOpcode,
   t2eReserveIds,
@@ -583,7 +561,7 @@ module.exports.buildHintT2T = function (
   return web3.eth.abi.encodeParameters(['bytes', 'bytes'], [t2eHint, e2tHint]);
 };
 
-module.exports.zeroNetworkBalance = async function (network, tokens, admin) {
+export const zeroNetworkBalance = async function (network, tokens, admin) {
   let balance = await getBalancePromise(network.address);
 
   if (balance.gt(zeroBN)) {

@@ -1,5 +1,7 @@
-const IERC20Ext = artifacts.require('@kyber.network/utils-sc/contracts/IERC20Ext.sol');
-const BN = web3.utils.BN;
+import hre from 'hardhat';
+import BN from 'bn.js';
+
+const IERC20Ext = hre.artifacts.require('@kyber.network/utils-sc/contracts/IERC20Ext.sol');
 
 const {
   evm_revert,

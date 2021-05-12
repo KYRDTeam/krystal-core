@@ -36,6 +36,8 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         emit UpdatedSupportedPlatformWallets(wallets, isSupported);
     }
 
+    /// Claim fee to platform wallets
+    /// @dev set fee to 1 to avoid the SSTORE initial gas cost
     function claimPlatformFees(address[] calldata platformWallets, IBEP20[] calldata tokens)
         external
         override
@@ -53,6 +55,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         emit ClaimedPlatformFees(platformWallets, tokens, msg.sender);
     }
 
+    /// Approve LPs usage on the particular tokens
     function approveAllowances(
         IBEP20[] calldata tokens,
         address[] calldata spenders,
@@ -132,7 +135,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         uint256 platformFeeBps,
         address payable platformWallet
     ) external payable override nonReentrant returns (uint256 destAmount) {
-        require(lendingImpl != ISmartWalletLending(0));
+        require(lendingImpl != ISmartWalletLending(0), "invalid lending contract");
 
         {
             IBEP20 dest = IBEP20(tradePath[tradePath.length - 1]);
@@ -159,7 +162,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
                 );
             }
 
-            // eth or token alr transferred to the address
+            // BNB or token already transferred to the address
             lendingImpl.depositTo(platform, msg.sender, dest, destAmount);
         }
 
@@ -187,7 +190,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         uint256 amount,
         uint256 minReturn
     ) external override nonReentrant returns (uint256 returnedAmount) {
-        require(lendingImpl != ISmartWalletLending(0));
+        require(lendingImpl != ISmartWalletLending(0), "invalid lending contract");
 
         IBEP20 lendingToken = IBEP20(lendingImpl.getLendingToken(platform, token));
         require(lendingToken != IBEP20(0), "unsupported token");
@@ -207,8 +210,8 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         emit WithdrawFromLending(platform, token, amount, minReturn, returnedAmount);
     }
 
-    /// @dev swap on Uni-clone and repay borrow for sender
-    /// if tradePath.length == 1, no need to swap, use tradePath[0] token to repay directly
+    /// @dev swap and repay borrow for sender
+    ///     if tradePath.length == 1, no need to swap, use tradePath[0] token to repay directly
     /// @param payAmount: amount that user wants to pay, if the dest amount (after swap) is higher,
     ///     the remain amount will be sent back to user's wallet
     /// @param feeAndRateMode: user needs to specify the rateMode to repay
@@ -224,9 +227,9 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         uint256 feeAndRateMode,
         address payable platformWallet
     ) external payable override nonReentrant returns (uint256 destAmount) {
+        // scope to prevent stack too deep
         {
-            // scope to prevent stack too deep
-            require(lendingImpl != ISmartWalletLending(0));
+            require(lendingImpl != ISmartWalletLending(0), "invalid lending contract");
             IBEP20 dest = IBEP20(tradePath[tradePath.length - 1]);
 
             // use user debt value if debt is <= payAmount
@@ -278,7 +281,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
     ) external view override returns (uint256 destAmount, uint256 expectedRate) {
         if (platformFee >= BPS) return (0, 0); // platform fee is too high
         if (!pancakeRouters[router]) return (0, 0); // router is not supported
-        uint256 srcAmountAfterFee = (srcAmount * (BPS - platformFee)) / BPS;
+        uint256 srcAmountAfterFee = srcAmount * (BPS - platformFee) / BPS;
         if (srcAmountAfterFee == 0) return (0, 0);
         // in case pair is not supported
         try router.getAmountsOut(srcAmountAfterFee, tradePath) returns (uint256[] memory amounts) {
@@ -461,9 +464,9 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         uint256 feeAmount = (amount * platformFeeBps) / BPS;
         destAmount = amount - feeAmount;
         if (token == BNB_TOKEN_ADDRESS) {
-            require(msg.value >= amount);
+            require(msg.value >= amount, "insufficient BNB");
             (bool success, ) = to.call{value: destAmount}("");
-            require(success, "transfer eth failed");
+            require(success, "transfer BNB failed");
         } else {
             uint256 balanceBefore = token.balanceOf(to);
             token.safeTransferFrom(from, to, amount);
@@ -474,16 +477,16 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
     }
 
     function addFeeToPlatform(
-        address wallet,
+        address platformWallet,
         IBEP20 token,
         uint256 amount
     ) internal {
         if (amount > 0) {
-            platformWalletFees[wallet][token] = platformWalletFees[wallet][token].add(amount);
+            platformWalletFees[platformWallet][token] = platformWalletFees[platformWallet][token].add(amount);
         }
     }
 
-        function transferToken(
+    function transferToken(
         address payable recipient,
         IBEP20 token,
         uint256 amount
@@ -491,7 +494,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         if (amount == 0) return;
         if (token == BNB_TOKEN_ADDRESS) {
             (bool success, ) = recipient.call{value: amount}("");
-            require(success, "failed to transfer eth");
+            require(success, "failed to transfer BNB");
         } else {
             token.safeTransfer(recipient, amount);
         }

@@ -1,6 +1,4 @@
-import '@nomiclabs/hardhat-truffle5';
 import '@nomiclabs/hardhat-web3';
-import '@nomiclabs/hardhat-ganache';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-ethers';
 import '@typechain/hardhat';

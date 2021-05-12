@@ -1,10 +1,8 @@
 import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
-import {SmartWalletLending} from '../typechain/SmartWalletLending';
-import {SmartWalletSwapProxy} from '../typechain/SmartWalletSwapProxy';
+import {SmartWalletSwapImplementation, SmartWalletLending} from '../typechain';
 
-const deployedContracts: Record<string, string> = {};
 const gasLimit = 700000;
 
 const networkConfig = NetworkConfig[network.name];
@@ -12,7 +10,9 @@ if (!networkConfig) {
   throw new Error(`Missing deploy config for ${network.name}`);
 }
 
-async function main() {
+export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<string, string>> => {
+  const deployedContracts: Record<string, string> = {};
+
   console.log('Start deploying Krystal contracts ...');
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
@@ -27,7 +27,7 @@ async function main() {
   for (let index in deployContracts) {
     if (deployContracts[index] === 'SmartWalletSwapProxy')
       args[index][1] = deployedContracts['SmartWalletSwapImplementation'];
-    await deploy(++step, deployContracts[index], ...args[index]);
+    deployedContracts[deployContracts[index]] = await deployContract(++step, deployContracts[index], ...args[index]);
     // auto verify contract
     await run('verify:verify', {
       address: deployedContracts[deployContracts[index]],
@@ -38,10 +38,11 @@ async function main() {
   // Initialization
   console.log('Initializing SmartWalletSwapProxy');
   console.log('======================\n');
+  // Using SwapProxy address under SmartWalletSwapImplementation logics
   let swapProxyInstance = (await ethers.getContractAt(
-    'SmartWalletSwapProxy',
+    'SmartWalletSwapImplementation',
     deployedContracts['SmartWalletSwapProxy']
-  )) as SmartWalletSwapProxy;
+  )) as SmartWalletSwapImplementation;
 
   // Approve allowances to Kyber and PancakeSwap routers
   console.log(`   ${++step}.  approveAllowances`);
@@ -50,7 +51,7 @@ async function main() {
     [networkConfig.busdAddress, networkConfig.daiAddress, networkConfig.usdcAddress, networkConfig.usdtAddress],
     [networkConfig.pancakeRouter],
     false,
-    {gasLimit}
+    {gasLimit, ...extraArgs}
   );
   printInfo(tx);
   console.log('\n');
@@ -60,6 +61,7 @@ async function main() {
   console.log('   ------------------------------------');
   tx = await swapProxyInstance.updateLendingImplementation(deployedContracts['SmartWalletLending'], {
     gasLimit,
+    ...extraArgs,
   });
   printInfo(tx);
   console.log('\n');
@@ -69,6 +71,7 @@ async function main() {
   console.log('   ------------------------------------');
   tx = await swapProxyInstance.updateSupportedPlatformWallets(networkConfig.supportedWallets, true, {
     gasLimit,
+    ...extraArgs,
   });
   printInfo(tx);
   console.log('\n');
@@ -86,6 +89,7 @@ async function main() {
 
   tx = await lendingInstance.updateVenusData(networkConfig.compTroller, networkConfig.vBnb, networkConfig.vTokens, {
     gasLimit,
+    ...extraArgs,
   });
   printInfo(tx);
   console.log('\n');
@@ -93,7 +97,10 @@ async function main() {
   // Update proxy to lending implementation
   console.log(`   ${++step}.  updateSwapImplementation`);
   console.log('   ------------------------------------');
-  tx = await lendingInstance.updateSwapImplementation(deployedContracts['SmartWalletSwapProxy'], {gasLimit});
+  tx = await lendingInstance.updateSwapImplementation(deployedContracts['SmartWalletSwapProxy'], {
+    gasLimit,
+    ...extraArgs,
+  });
   printInfo(tx);
   console.log('\n');
 
@@ -106,9 +113,10 @@ async function main() {
   }
 
   console.log('\nDeployment complete!');
-}
+  return deployedContracts;
+};
 
-async function deploy(step: number, contractName: string, ...args: any[]) {
+async function deployContract(step: number, contractName: string, ...args: any[]): Promise<string> {
   console.log(`   ${step}. Deploying '${contractName}'`);
   console.log('   ------------------------------------');
 
@@ -118,7 +126,7 @@ async function deploy(step: number, contractName: string, ...args: any[]) {
   printInfo(tx.deployTransaction);
   console.log(`   > address:\t${contract.address}\n\n`);
 
-  deployedContracts[contractName] = contract.address;
+  return contract.address;
 }
 
 function printInfo(tx: TransactionResponse) {
@@ -127,7 +135,7 @@ function printInfo(tx: TransactionResponse) {
   console.log(`   > gas limit:\t${tx.gasLimit.toString()}`);
 }
 
-main()
+deploy()
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);

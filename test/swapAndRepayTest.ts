@@ -1,3 +1,5 @@
+import {contract} from 'hardhat';
+
 const IERC20Ext = artifacts.require('@kyber.network/utils-sc/contracts/IERC20Ext.sol');
 const BN = web3.utils.BN;
 
@@ -14,9 +16,7 @@ const {
   COMPOUND_ADDRESSES,
 } = require('./helper');
 
-const {
-  setupBeforeTest,
-} = require('./setupTestingEnvironment');
+const {setupBeforeTest} = require('./setupTestingEnvironment');
 
 let globalSnapshotId;
 let snapshotId;
@@ -27,10 +27,10 @@ let swapProxy;
 let user;
 let cDaiToken;
 
-contract('SmartWalletSwapImplementation', accounts => {
+contract('SmartWalletSwapImplementation', (accounts) => {
   before('setup testing environment', async () => {
     globalSnapshotId = await evm_snapshot();
-    const result = await setupBeforeTest(accounts)
+    const result = await setupBeforeTest(accounts);
 
     user = result.user;
     swapProxy = result.swapProxy;
@@ -63,10 +63,10 @@ contract('SmartWalletSwapImplementation', accounts => {
         const lendingPool = lendingPools[i];
 
         /** Deposit ETH **/
-        await swapProxy.swapUniswapAndDeposit(
-          i, uniswapRouter, ethAmount, 0, swapTradePath, 8, user, false,
-          { from: user, value: ethAmount }
-        );
+        await swapProxy.swapUniswapAndDeposit(i, uniswapRouter, ethAmount, 0, swapTradePath, 8, user, false, {
+          from: user,
+          value: ethAmount,
+        });
 
         if (i === 0) {
           /** Enable ETH as collateral **/
@@ -75,22 +75,16 @@ contract('SmartWalletSwapImplementation', accounts => {
 
         if (i === 0) {
           /** Borrow AAVE v1 **/
-          await lendingPool.borrow(
-            daiAddress, borrowAmount, 1, 0,
-            { from: user }
-          );
-        } else if(i === 1) {
+          await lendingPool.borrow(daiAddress, borrowAmount, 1, 0, {from: user});
+        } else if (i === 1) {
           /** Borrow AAVE v2 **/
-          await lendingPool.borrow(
-            daiAddress, borrowAmount, 1, 0, user,
-            { from: user }
-          );
+          await lendingPool.borrow(daiAddress, borrowAmount, 1, 0, user, {from: user});
         } else {
           /** Enable ETH as collateral **/
           await lendingPool.enterMarkets([COMPOUND_ADDRESSES.cEthAddress]);
 
           /** Borrow Compound **/
-          await cDaiToken.borrow(borrowAmount, { from: user });
+          await cDaiToken.borrow(borrowAmount, {from: user});
         }
 
         let balance = (await daiToken.balanceOf(user)).sub(startBalance);
@@ -98,8 +92,16 @@ contract('SmartWalletSwapImplementation', accounts => {
 
         /** Repay **/
         const tx = await swapProxy.swapKyberAndRepay(
-          i, daiAddress, daiAddress, borrowAmount, borrowAmount, 10000, user, emptyHint, false,
-          { from: user }
+          i,
+          daiAddress,
+          daiAddress,
+          borrowAmount,
+          borrowAmount,
+          10000,
+          user,
+          emptyHint,
+          false,
+          {from: user}
         );
 
         assertTxSuccess(tx);
@@ -109,5 +111,5 @@ contract('SmartWalletSwapImplementation', accounts => {
         assertEqual(balanceAfterRepay, new BN(0), '');
       }
     });
-  })
+  });
 });
