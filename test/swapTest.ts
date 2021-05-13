@@ -57,7 +57,7 @@ describe('swap test', async () => {
 
         // Missing value
         await expect(
-          await setup.swapProxyInstance.swapPancake(
+          setup.swapProxyInstance.swapPancake(
             setup.network.pancake.router,
             bnbAmount,
             minDestAmount,
