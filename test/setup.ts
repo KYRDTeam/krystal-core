@@ -1,27 +1,15 @@
-import hre from 'hardhat';
-import BN from 'bn.js';
-import {
-  evm_snapshot,
-  fundWallet,
-  ethDecimals,
-  daiAddress,
-  usdtAddress,
-  usdcAddress,
-  wethAddress,
-  AAVE_V1_ADDRESSES,
-  AAVE_V2_ADDRESSES,
-  MAX_ALLOWANCE,
-} from './helper';
+import {ethers, network} from 'hardhat';
+import {evm_snapshot} from './helper';
 import {SmartWalletLending, SmartWalletSwapImplementation} from '../typechain';
-import {deploy} from '../scripts/deployer';
+import {deploy} from '../scripts/deployLogic';
+import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
+import {NetworkConfig, IConfig} from '../scripts/config';
 
-const ethers = hre.ethers;
-
-export const setupBeforeTest = async (accounts: string[]) => {
+const setupContracts = async (accounts: SignerWithAddress[]) => {
   let user = accounts[0];
   let admin = accounts[0];
 
-  const deployedContracts = await deploy({from: admin});
+  const deployedContracts = await deploy({from: admin.address});
 
   // Using proxy under the implementaton interface
   let swapProxyInstance = (await ethers.getContractAt(
@@ -56,13 +44,34 @@ export const setupBeforeTest = async (accounts: string[]) => {
   // const wethToken = await WETH.at(wethAddress);
   // await wethToken.deposit({value: new BN('100').mul(new BN(10).pow(ethDecimals))});
 
-  const snapshotId = await evm_snapshot();
-
   return {
     user,
     lendingInstance,
     swapImplementationInstance,
     swapProxyInstance,
-    snapshotId,
+    postSetupSnapshotId: await evm_snapshot(),
   };
+};
+
+export interface IInitialSetup {
+  user: SignerWithAddress;
+  preSetupSnapshotId: any;
+  postSetupSnapshotId: any;
+  lendingInstance: SmartWalletLending;
+  swapImplementationInstance: SmartWalletSwapImplementation;
+  swapProxyInstance: SmartWalletSwapImplementation;
+  network: IConfig;
+}
+
+let initialSetup: IInitialSetup;
+
+export const getInitialSetup = async (): Promise<IInitialSetup> => {
+  console.log('\n\n\n=== Setting initial testing contracts ===');
+  return (
+    initialSetup || {
+      preSetupSnapshotId: await evm_snapshot(),
+      ...(await setupContracts(await ethers.getSigners())),
+      network: NetworkConfig[network.name],
+    }
+  );
 };

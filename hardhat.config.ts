@@ -1,6 +1,6 @@
-import '@nomiclabs/hardhat-web3';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 
 import 'hardhat-contract-sizer';
@@ -33,6 +33,7 @@ module.exports = {
       forking: {
         url: 'https://bsc-dataseed.binance.org/',
         chainId: 56,
+        fork: 7371623,
         // url: 'http://localhost:8545'
       },
       accounts: [
