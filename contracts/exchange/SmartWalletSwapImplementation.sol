@@ -357,7 +357,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         uint256 tradeLen = tradePath.length;
         IBEP20 actualDest = IBEP20(tradePath[tradeLen - 1]);
         {
-            // convert eth -> weth address to trade on Pancake
+            // convert bnb -> wbnb address to trade on Pancake
             if (tradePath[0] == address(BNB_TOKEN_ADDRESS)) {
                 tradePath[0] = router.WETH();
             }
@@ -383,7 +383,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
 
         uint256[] memory amounts;
         if (src == BNB_TOKEN_ADDRESS) {
-            // swap eth -> token
+            // swap bnb -> token
             amounts = router.swapExactETHForTokens{value: srcAmountAfterFee}(
                 input.minData,
                 tradePath,
@@ -392,7 +392,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             );
         } else {
             if (actualDest == BNB_TOKEN_ADDRESS) {
-                // swap token -> eth
+                // swap token -> bnb
                 amounts = router.swapExactTokensForETH(
                     srcAmountAfterFee,
                     input.minData,

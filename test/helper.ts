@@ -1,6 +1,6 @@
-import hre from 'hardhat';
+import hre, {ethers} from 'hardhat';
 import BN from 'bn.js';
-import {IBEP20} from '../typechain';
+import {IBEP20, IBEP20__factory} from '../typechain';
 
 const Math = require('mathjs');
 const {constants, time} = require('@openzeppelin/test-helpers');
@@ -54,16 +54,16 @@ export const evm_revert = async function (snapshotId: any) {
   });
 };
 
-export const fundWallet = async function (wallet: string, Token: IBEP20, amount: number) {
+export const fundWallet = async function (wallet: string, tokenAddress: string, amount: number) {
   await hre.network.provider.request({
     method: 'hardhat_impersonateAccount',
     params: [binanceColdWallet],
   });
 
-  const tokenDec = await Token.decimals();
+  const tokenContract = IBEP20__factory.connect(tokenAddress, ethers.provider.getSigner(tokenAddress));
+  const tokenDec = await tokenContract.decimals();
   const bnAmount = new BN(amount).mul(new BN(10).pow(new BN(tokenDec)));
-
-  await Token.transfer(wallet, bnAmount.toString(), {from: binanceColdWallet});
+  await tokenContract.transfer(wallet, bnAmount.toString(), {gasLimit: 100000, from: binanceColdWallet});
 
   await hre.network.provider.request({
     method: 'hardhat_stopImpersonatingAccount',

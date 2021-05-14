@@ -37,7 +37,7 @@ module.exports = {
         // url: 'http://localhost:8545'
       },
       accounts: [
-        // 20 accounts with 10^14 ETH each
+        // 20 accounts with 10^14 BNB each
         // Addresses:
         //   0xc783df8a850f42e7f7e57013759c285caa701eb6
         //   0xead9c93b79ae7c1591b1fb5323bd777e86e150d4
