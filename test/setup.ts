@@ -1,5 +1,5 @@
 import {ethers, network} from 'hardhat';
-import {bnbAddress, bnbDecimals, evm_snapshot, fundWallet} from './helper';
+import {bnbAddress, bnbDecimals, evm_snapshot} from './helper';
 import {IBEP20, SmartWalletSwapImplementation} from '../typechain';
 import {deploy} from '../scripts/deployLogic';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
@@ -31,7 +31,6 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
     networkConfig.daiAddress,
     networkConfig.busdAddress,
   ]) {
-    // await fundWallet(user.address, t, 10000);
     const bnbAmount = BigNumber.from(1000).mul(BigNumber.from(10).pow(bnbDecimals));
     await swapProxyInstance.swapPancake(
       networkConfig.pancake.router,
