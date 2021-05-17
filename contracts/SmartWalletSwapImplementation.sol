@@ -2,8 +2,8 @@ pragma solidity 0.7.6;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@kyber.network/utils-sc/contracts/IBEP20.sol";
-import "../interfaces/ISmartWalletSwapImplementation.sol";
-import "../interfaces/IPancakeRouter02.sol";
+import "./interfaces/ISmartWalletSwapImplementation.sol";
+import "./interfaces/IPancakeRouter02.sol";
 import "./SmartWalletSwapStorage.sol";
 
 contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSwapImplementation {
@@ -11,19 +11,12 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
     using SafeMath for uint256;
 
     event UpdatedSupportedPlatformWallets(address[] wallets, bool isSupported);
-    event UpdatedLendingImplementation(ISmartWalletLending impl);
     event ApprovedAllowances(IBEP20[] tokens, address[] spenders, bool isReset);
     event ClaimedPlatformFees(address[] wallets, IBEP20[] tokens, address claimer);
 
     constructor(address _admin) SmartWalletSwapStorage(_admin) {}
 
     receive() external payable {}
-
-    function updateLendingImplementation(ISmartWalletLending newImpl) external onlyAdmin {
-        require(newImpl != ISmartWalletLending(0), "invalid lending impl");
-        lendingImpl = newImpl;
-        emit UpdatedLendingImplementation(newImpl);
-    }
 
     /// @dev to prevent other integrations to call trade from this contract
     function updateSupportedPlatformWallets(address[] calldata wallets, bool isSupported)
@@ -114,164 +107,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             feeInSrc
         );
     }
-
-    /// ========== SWAP & DEPOSIT ========== ///
-
-    /// @dev swap Pancake then deposit to platform
-    ///     if tradePath has only 1 token, don't need to do swap
-    /// @param platform platform to deposit
-    /// @param router which Uni-clone to use for swapping
-    /// @param srcAmount amount of src token
-    /// @param minDestAmount minimal accepted dest amount
-    /// @param tradePath path of the trade on Pancake
-    /// @param platformFeeBps fee if swapping
-    /// @param platformWallet wallet to receive fee
-    function swapPancakeAndDeposit(
-        ISmartWalletLending.LendingPlatform platform,
-        IPancakeRouter02 router,
-        uint256 srcAmount,
-        uint256 minDestAmount,
-        address[] calldata tradePath,
-        uint256 platformFeeBps,
-        address payable platformWallet
-    ) external payable override nonReentrant returns (uint256 destAmount) {
-        require(lendingImpl != ISmartWalletLending(0), "invalid lending contract");
-
-        {
-            IBEP20 dest = IBEP20(tradePath[tradePath.length - 1]);
-            if (tradePath.length == 1) {
-                // just collect src token, no need to swap
-                destAmount = safeForwardTokenAndCollectFee(
-                    dest,
-                    msg.sender,
-                    payable(address(lendingImpl)),
-                    srcAmount,
-                    platformFeeBps,
-                    platformWallet
-                );
-            } else {
-                destAmount = swapPancakeInternal(
-                    router,
-                    srcAmount,
-                    minDestAmount,
-                    tradePath,
-                    payable(address(lendingImpl)),
-                    platformFeeBps,
-                    platformWallet,
-                    false
-                );
-            }
-
-            // BNB or token already transferred to the address
-            lendingImpl.depositTo(platform, msg.sender, dest, destAmount);
-        }
-
-        emit PancakeTradeAndDeposit(
-            msg.sender,
-            platform,
-            router,
-            tradePath,
-            srcAmount,
-            destAmount,
-            platformFeeBps,
-            platformWallet
-        );
-    }
-
-    /// @dev withdraw token from Lending platforms (VENUS)
-    /// @param platform platform to withdraw token
-    /// @param token underlying token to withdraw, e.g ETH, USDT, DAI
-    /// @param amount amount of vToken (VENUS) to withdraw
-    /// @param minReturn minimum amount of USDT tokens to return
-    /// @return returnedAmount returns the amount withdrawn to the user
-    function withdrawFromLendingPlatform(
-        ISmartWalletLending.LendingPlatform platform,
-        IBEP20 token,
-        uint256 amount,
-        uint256 minReturn
-    ) external override nonReentrant returns (uint256 returnedAmount) {
-        require(lendingImpl != ISmartWalletLending(0), "invalid lending contract");
-
-        IBEP20 lendingToken = IBEP20(lendingImpl.getLendingToken(platform, token));
-        require(lendingToken != IBEP20(0), "unsupported token");
-
-        uint256 tokenBalanceBefore = lendingToken.balanceOf(address(lendingImpl));
-        lendingToken.safeTransferFrom(msg.sender, address(lendingImpl), amount);
-        uint256 tokenBalanceAfter = lendingToken.balanceOf(address(lendingImpl));
-
-        returnedAmount = lendingImpl.withdrawFrom(
-            platform,
-            msg.sender,
-            token,
-            tokenBalanceAfter.sub(tokenBalanceBefore),
-            minReturn
-        );
-
-        emit WithdrawFromLending(platform, token, amount, minReturn, returnedAmount);
-    }
-
-    /// @dev swap and repay borrow for sender
-    ///     if tradePath.length == 1, no need to swap, use tradePath[0] token to repay directly
-    /// @param payAmount: amount that user wants to pay, if the dest amount (after swap) is higher,
-    ///     the remain amount will be sent back to user's wallet
-    /// @param feeAndRateMode: user needs to specify the rateMode to repay
-    ///     to prevent stack too deep, combine fee and rateMode into a single value
-    ///     platformFee: feeAndRateMode % BPS, rateMode: feeAndRateMode / BPS
-    /// Other params are params for trade on Uni-clone
-    function swapPancakeAndRepay(
-        ISmartWalletLending.LendingPlatform platform,
-        IPancakeRouter02 router,
-        uint256 srcAmount,
-        uint256 payAmount,
-        address[] calldata tradePath,
-        uint256 feeAndRateMode,
-        address payable platformWallet
-    ) external payable override nonReentrant returns (uint256 destAmount) {
-        // scope to prevent stack too deep
-        {
-            require(lendingImpl != ISmartWalletLending(0), "invalid lending contract");
-            IBEP20 dest = IBEP20(tradePath[tradePath.length - 1]);
-
-            // use user debt value if debt is <= payAmount
-            // user can pay all debt by putting really high payAmount as param
-            payAmount = checkUserDebt(platform, address(dest), payAmount);
-            if (tradePath.length == 1) {
-                if (dest == BNB_TOKEN_ADDRESS) {
-                    require(msg.value == srcAmount, "invalid msg value");
-                    transferToken(payable(address(lendingImpl)), dest, srcAmount);
-                } else {
-                    destAmount = srcAmount > payAmount ? payAmount : srcAmount;
-                    dest.safeTransferFrom(msg.sender, address(lendingImpl), destAmount);
-                }
-            } else {
-                destAmount = swapPancakeInternal(
-                    router,
-                    srcAmount,
-                    payAmount,
-                    tradePath,
-                    payable(address(lendingImpl)),
-                    feeAndRateMode % BPS,
-                    platformWallet,
-                    false
-                );
-            }
-
-            lendingImpl.repayBorrowTo(platform, msg.sender, dest, destAmount, payAmount);
-        }
-
-        emit PancakeTradeAndRepay(
-            msg.sender,
-            platform,
-            router,
-            tradePath,
-            srcAmount,
-            destAmount,
-            payAmount,
-            feeAndRateMode,
-            platformWallet
-        );
-    }
-
     /// @dev get expected return and conversion rate if using a Pancake router
     function getExpectedReturnPancake(
         IPancakeRouter02 router,
@@ -295,20 +130,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             getDecimals(IBEP20(tradePath[0])),
             getDecimals(IBEP20(tradePath[tradePath.length - 1]))
         );
-    }
-
-    function checkUserDebt(
-        ISmartWalletLending.LendingPlatform platform,
-        address token,
-        uint256 amount
-    ) internal returns (uint256) {
-        uint256 debt = lendingImpl.storeAndRetrieveUserDebtCurrent(platform, token, msg.sender);
-
-        if (debt >= amount) {
-            return amount;
-        }
-
-        return debt;
     }
 
     function swapPancakeInternal(

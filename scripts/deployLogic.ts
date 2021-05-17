@@ -1,7 +1,7 @@
 import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
-import {SmartWalletSwapImplementation, SmartWalletLending} from '../typechain';
+import {SmartWalletSwapImplementation} from '../typechain';
 
 const gasLimit = 700000;
 
@@ -16,8 +16,8 @@ export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<st
   console.log('Start deploying Krystal contracts ...');
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
-  const deployContracts = ['SmartWalletLending', 'SmartWalletSwapImplementation', 'SmartWalletSwapProxy'];
-  let args = [[deployerAddress], [deployerAddress], [deployerAddress, null, [networkConfig.pancake.router]]];
+  const deployContracts = ['SmartWalletSwapImplementation', 'SmartWalletSwapProxy'];
+  let args = [[deployerAddress], [deployerAddress, null, [networkConfig.pancake.router]]];
   let step = 0;
   let tx;
 
@@ -58,53 +58,10 @@ export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<st
   printInfo(tx);
   console.log('\n');
 
-  // Update lending implementation and proxy
-  console.log(`   ${++step}.  updateLendingImplementation`);
-  console.log('   ------------------------------------');
-  tx = await swapProxyInstance.updateLendingImplementation(deployedContracts['SmartWalletLending'], {
-    gasLimit,
-    ...extraArgs,
-  });
-  printInfo(tx);
-  console.log('\n');
-
   // Add supported platform wallets
   console.log(`   ${++step}.  updateSupportedPlatformWallets`);
   console.log('   ------------------------------------');
   tx = await swapProxyInstance.updateSupportedPlatformWallets(networkConfig.supportedWallets, true, {
-    gasLimit,
-    ...extraArgs,
-  });
-  printInfo(tx);
-  console.log('\n');
-
-  console.log('Initializing SmartWalletLending');
-  console.log('======================\n');
-  let lendingInstance = (await ethers.getContractAt(
-    'SmartWalletLending',
-    deployedContracts['SmartWalletLending']
-  )) as SmartWalletLending;
-
-  // Update Venus lending pool data to lending implementation
-  console.log(`   ${++step}.  updateVenusData`);
-  console.log('   ------------------------------------');
-
-  tx = await lendingInstance.updateVenusData(
-    networkConfig.venus.compTroller,
-    networkConfig.venus.vBnb,
-    networkConfig.venus.vTokens,
-    {
-      gasLimit,
-      ...extraArgs,
-    }
-  );
-  printInfo(tx);
-  console.log('\n');
-
-  // Update proxy to lending implementation
-  console.log(`   ${++step}.  updateSwapImplementation`);
-  console.log('   ------------------------------------');
-  tx = await lendingInstance.updateSwapImplementation(deployedContracts['SmartWalletSwapProxy'], {
     gasLimit,
     ...extraArgs,
   });

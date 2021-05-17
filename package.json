@@ -8,15 +8,15 @@
   "scripts": {
     "test": "./tst.sh",
     "t": "./tst.sh",
-    "compile": "./cmp.sh",
-    "c": "./cmp.sh",
+    "compile": "NODE_OPTIONS=--max-old-space-size=4096 yarn hardhat compile",
+    "c": "yarn compile",
     "deploy": "yarn hardhat run scripts/deployer.ts",
-    "d": "yarn d",
+    "d": "yarn deploy",
     "prettier": "./node_modules/.bin/prettier --write",
     "size": "yarn run hardhat size-contracts",
     "s": "yarn run hardhat size-contracts",
-    "lint": "yarn solhint contracts/**/*.sol",
-    "lint:fix": "yarn prettier contracts/**/*.sol"
+    "lint": "yarn solhint contracts/**/*.sol && yarn eslint . --ext .ts",
+    "lint:fix": "yarn prettier --write contracts/**/*.sol && yarn eslint --fix . --ext .ts "
   },
   "repository": {
     "type": "git",
@@ -72,6 +72,5 @@
     "ts-node": "^9.1.1",
     "typechain": "^4.0.3",
     "typescript": "^4.2.4"
-  },
-  "postinstall": "typechain"
+  }
 }

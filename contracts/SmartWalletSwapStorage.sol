@@ -1,7 +1,6 @@
 pragma solidity 0.7.6;
 
-import "../interfaces/IPancakeRouter02.sol";
-import "../lending/ISmartWalletLending.sol";
+import "./interfaces/IPancakeRouter02.sol";
 import "@kyber.network/utils-sc/contracts/IBEP20.sol";
 import "@kyber.network/utils-sc/contracts/Utils.sol";
 import "@kyber.network/utils-sc/contracts/Withdrawable.sol";
@@ -26,8 +25,6 @@ contract SmartWalletSwapStorage is Utils, Withdrawable, ReentrancyGuard {
         address payable platformWallet;
         bytes hint;
     }
-
-    ISmartWalletLending public lendingImpl;
 
     // [EIP-1967] bytes32(uint256(keccak256("SmartWalletSwapImplementation")) - 1)
     bytes32 internal constant IMPLEMENTATION =

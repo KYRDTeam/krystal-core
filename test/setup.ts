@@ -1,6 +1,6 @@
 import {ethers, network} from 'hardhat';
 import {bnbAddress, bnbDecimals, evm_snapshot, fundWallet} from './helper';
-import {IBEP20, SmartWalletLending, SmartWalletSwapImplementation} from '../typechain';
+import {IBEP20, SmartWalletSwapImplementation} from '../typechain';
 import {deploy} from '../scripts/deployLogic';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import {NetworkConfig, IConfig} from '../scripts/config';
@@ -23,11 +23,6 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
     'SmartWalletSwapImplementation',
     deployedContracts['SmartWalletSwapImplementation']
   )) as SmartWalletSwapImplementation;
-
-  let lendingInstance = (await ethers.getContractAt(
-    'SmartWalletLending',
-    deployedContracts['SmartWalletLending']
-  )) as SmartWalletLending;
 
   // Fund wallet
   for (let tokenAddress of [
@@ -64,7 +59,6 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
 
   return {
     user,
-    lendingInstance,
     swapImplementationInstance,
     swapProxyInstance,
     postSetupSnapshotId: await evm_snapshot(),
@@ -75,7 +69,6 @@ export interface IInitialSetup {
   user: SignerWithAddress;
   preSetupSnapshotId: any;
   postSetupSnapshotId: any;
-  lendingInstance: SmartWalletLending;
   swapImplementationInstance: SmartWalletSwapImplementation;
   swapProxyInstance: SmartWalletSwapImplementation;
   network: IConfig;
