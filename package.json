@@ -10,6 +10,7 @@
     "t": "./tst.sh",
     "compile": "export NODE_OPTIONS=--max-old-space-size=4096 && yarn hardhat compile",
     "c": "yarn compile",
+    "coverage": "yarn hardhat coverage",
     "deploy": "yarn hardhat run scripts/deployer.ts",
     "d": "yarn deploy",
     "prettier": "./node_modules/.bin/prettier --write",
