@@ -16,8 +16,8 @@ export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<st
   console.log('Start deploying Krystal contracts ...');
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
-  const deployContracts = ['SmartWalletSwapImplementation', 'SmartWalletSwapProxy'];
-  let args = [[deployerAddress], [deployerAddress, null, [networkConfig.pancake.router]]];
+  const deployContracts = ['SmartWalletSwapImplementation', 'SmartWalletSwapProxy', 'FetchTokenBalances'];
+  let args = [[deployerAddress], [deployerAddress, null, [networkConfig.pancake.router]], [deployerAddress]];
   let step = 0;
   let tx;
 
