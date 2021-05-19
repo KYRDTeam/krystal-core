@@ -7,7 +7,7 @@ import "@kyber.network/utils-sc/contracts/Withdrawable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract SmartWalletSwapStorage is Utils, Withdrawable, ReentrancyGuard {
-    uint256 internal constant MAX_AMOUNT = uint256(-1);
+    uint256 internal constant MAX_AMOUNT = type(uint256).max;
 
     mapping(address => mapping(IBEP20 => uint256)) public platformWalletFees;
 

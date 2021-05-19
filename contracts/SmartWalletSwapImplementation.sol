@@ -189,7 +189,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
 
         uint256 srcAmountFee;
         uint256 srcAmountAfterFee;
-        uint256 destBalanceBefore;
         address recipient;
 
         if (feeInSrc) {
@@ -198,14 +197,14 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             recipient = input.recipient;
         } else {
             srcAmountAfterFee = input.srcAmount;
-            destBalanceBefore = getBalance(actualDest, address(this));
             recipient = address(this);
         }
 
-        uint256[] memory amounts;
+        uint256 destBalanceBefore = getBalance(actualDest, recipient);
+        
         if (src == BNB_TOKEN_ADDRESS) {
             // swap bnb -> token
-            amounts = router.swapExactETHForTokens{value: srcAmountAfterFee}(
+            router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: srcAmountAfterFee}(
                 input.minData,
                 tradePath,
                 recipient,
@@ -214,7 +213,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         } else {
             if (actualDest == BNB_TOKEN_ADDRESS) {
                 // swap token -> bnb
-                amounts = router.swapExactTokensForETH(
+                router.swapExactTokensForETHSupportingFeeOnTransferTokens(
                     srcAmountAfterFee,
                     input.minData,
                     tradePath,
@@ -223,7 +222,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
                 );
             } else {
                 // swap token -> token
-                amounts = router.swapExactTokensForTokens(
+                router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
                     srcAmountAfterFee,
                     input.minData,
                     tradePath,
@@ -233,9 +232,11 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             }
         }
 
+        uint256 destBalanceAfter = getBalance(actualDest, recipient);
+        destAmount = destBalanceAfter.sub(destBalanceBefore);
+
         if (!feeInSrc) {
             // fee in dest token, calculated received dest amount
-            uint256 destBalanceAfter = getBalance(actualDest, address(this));
             destAmount = destBalanceAfter.sub(destBalanceBefore);
             uint256 destAmountFee = destAmount.mul(input.platformFeeBps).div(BPS);
             // charge fee in dest token
@@ -245,7 +246,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             transferToken(input.recipient, actualDest, destAmount);
         } else {
             // fee in src amount
-            destAmount = amounts[amounts.length - 1];
             addFeeToPlatform(input.platformWallet, src, srcAmountFee);
         }
     }
@@ -270,31 +270,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
 
             safeApproveAllowance(protocol, src);
         }
-    }
-
-    function safeForwardTokenAndCollectFee(
-        IBEP20 token,
-        address from,
-        address payable to,
-        uint256 amount,
-        uint256 platformFeeBps,
-        address payable platformWallet
-    ) internal returns (uint256 destAmount) {
-        require(platformFeeBps < BPS, "high platform fee");
-        require(supportedPlatformWallets[platformWallet], "unsupported platform wallet");
-        uint256 feeAmount = (amount * platformFeeBps) / BPS;
-        destAmount = amount - feeAmount;
-        if (token == BNB_TOKEN_ADDRESS) {
-            require(msg.value >= amount, "insufficient BNB");
-            (bool success, ) = to.call{value: destAmount}("");
-            require(success, "transfer BNB failed");
-        } else {
-            uint256 balanceBefore = token.balanceOf(to);
-            token.safeTransferFrom(from, to, amount);
-            uint256 balanceAfter = token.balanceOf(to);
-            destAmount = balanceAfter.sub(balanceBefore);
-        }
-        addFeeToPlatform(platformWallet, token, feeAmount);
     }
 
     function addFeeToPlatform(
