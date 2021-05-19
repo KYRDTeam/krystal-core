@@ -53,9 +53,9 @@ const NetworkConfig: Record<string, IConfig> = {
       ],
     },
     supportedWallets: [
-      '0x3fFFF2F4f6C0831FAC59534694ACd14AC2Ea501b', // android
-      '0x9a68f7330A3Fe9869FfAEe4c3cF3E6BBef1189Da', // ios
-      '0x440bBd6a888a36DE6e2F6A25f65bc4e16874faa9', // web
+      '0xa1738F8DD7c42cd4175CcdCa79Af89b3EC7b68E9', // android
+      '0x5250b8202AEBca35328E2c217C687E894d70Cd31', // ios
+      '0x168E4c3AC8d89B00958B6bE6400B066f0347DDc9', // web
     ],
   },
 
@@ -82,9 +82,9 @@ const NetworkConfig: Record<string, IConfig> = {
     },
 
     supportedWallets: [
-      '0x3fFFF2F4f6C0831FAC59534694ACd14AC2Ea501b', // android
-      '0x9a68f7330A3Fe9869FfAEe4c3cF3E6BBef1189Da', // ios
-      '0x440bBd6a888a36DE6e2F6A25f65bc4e16874faa9', // web
+      '0xa1738F8DD7c42cd4175CcdCa79Af89b3EC7b68E9', // android
+      '0x5250b8202AEBca35328E2c217C687E894d70Cd31', // ios
+      '0x168E4c3AC8d89B00958B6bE6400B066f0347DDc9', // web
     ],
   },
 };
