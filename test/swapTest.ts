@@ -1,4 +1,4 @@
-import {bnbAddress, bnbDecimals, evm_revert, evm_snapshot} from './helper';
+import {bnbAddress, bnbDecimals, BPS, evm_revert, evm_snapshot} from './helper';
 import {getInitialSetup, IInitialSetup} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
@@ -20,6 +20,37 @@ describe('swap test', async () => {
   });
 
   describe('should swap on Pancake', async () => {
+    const testGetExpectedRate = async (
+      srcAmount: BigNumber,
+      tradePath: string[],
+      feeInSrc: boolean = true
+    ): Promise<BigNumber> => {
+      const data = await setup.swapProxyInstance.getExpectedReturnPancake(
+        setup.network.pancake.router,
+        srcAmount,
+        tradePath,
+        platformFee,
+        feeInSrc
+      );
+      assert(!data.destAmount.isZero(), 'non-zero destAmount');
+      assert(!data.expectedRate.isZero(), 'non-zero expectedRate');
+
+      const pancakeData = await setup.pancakeRouter.getAmountsOut(srcAmount, tradePath);
+      const pancakeDest = pancakeData[pancakeData.length - 1];
+      const amountDiff = pancakeDest.sub(data.destAmount);
+
+      assert(
+        amountDiff.gt(0),
+        `krystal dest should be smaller than pancake dest as of the fee. dest: ${data.destAmount.toString()}, pancake dest: ${pancakeDest.toString()}`
+      );
+      assert(
+        amountDiff.div(pancakeDest).mul(BPS).lte(platformFee),
+        `fee should be lte ${platformFee} bps. dest: ${data.destAmount.toString()}, pancake dest: ${pancakeDest.toString()}`
+      );
+
+      return data.destAmount;
+    };
+
     it('swap from bnb to token', async () => {
       let bnbAmount = BigNumber.from(10).pow(BigNumber.from(bnbDecimals)); // one bnb
 
@@ -28,16 +59,9 @@ describe('swap test', async () => {
         let tradePath = [setup.network.wbnb, token]; // get rate needs to use wbnb
 
         // Get rate
-        let data = await setup.swapProxyInstance.getExpectedReturnPancake(
-          setup.network.pancake.router,
-          bnbAmount,
-          tradePath,
-          platformFee
-        );
-        assert(!data.destAmount.isZero(), 'non-zero destAmount');
-        assert(!data.expectedRate.isZero(), 'non-zero expectedRate');
+        const destAmount = await testGetExpectedRate(bnbAmount, tradePath);
 
-        let minDestAmount = data.destAmount.mul(97).div(100);
+        let minDestAmount = destAmount.mul(97).div(100);
         tradePath[0] = bnbAddress; // trade needs to use bnb address
 
         // Send txn
@@ -88,17 +112,12 @@ describe('swap test', async () => {
           await token.approve(setup.swapProxyInstance.address, tokenAmount);
 
           // Get rate
-          let data = await setup.swapProxyInstance.getExpectedReturnPancake(
-            setup.network.pancake.router,
-            tokenAmount,
-            // get rate needs to use wbnb
-            [tokenAddresses[i], targetToken === bnbAddress ? setup.network.wbnb : targetToken],
-            platformFee
-          );
-          assert(!data.destAmount.isZero(), 'non-zero destAmount');
-          assert(!data.expectedRate.isZero(), 'non-zero expectedRate');
+          const destAmount = await testGetExpectedRate(tokenAmount, [
+            tokenAddresses[i],
+            targetToken === bnbAddress ? setup.network.wbnb : targetToken,
+          ]);
 
-          let minDestAmount = data.destAmount.mul(97).div(100);
+          let minDestAmount = destAmount.mul(97).div(100);
 
           // Send txn
           await expect(() => {

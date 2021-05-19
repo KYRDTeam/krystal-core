@@ -19,11 +19,10 @@ contract SmartWalletSwapStorage is Utils, Withdrawable, ReentrancyGuard {
 
     struct TradeInput {
         uint256 srcAmount;
-        uint256 minData; // min rate if Kyber, min return if Uni-pools
+        uint256 minData; // min return for Pancake
         address payable recipient;
         uint256 platformFeeBps;
         address payable platformWallet;
-        bytes hint;
     }
 
     // [EIP-1967] bytes32(uint256(keccak256("SmartWalletSwapImplementation")) - 1)

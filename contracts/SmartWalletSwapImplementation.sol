@@ -112,18 +112,32 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         IPancakeRouter02 router,
         uint256 srcAmount,
         address[] calldata tradePath,
-        uint256 platformFee
+        uint256 platformFee,
+        bool feeInSrc
     ) external view override returns (uint256 destAmount, uint256 expectedRate) {
         if (platformFee >= BPS) return (0, 0); // platform fee is too high
         if (!pancakeRouters[router]) return (0, 0); // router is not supported
-        uint256 srcAmountAfterFee = srcAmount * (BPS - platformFee) / BPS;
+
+        uint256 srcAmountAfterFee;
+        if (feeInSrc) {
+            srcAmountAfterFee = srcAmount * (BPS - platformFee) / BPS;
+        } else {
+            srcAmountAfterFee = srcAmount;
+        }
+
         if (srcAmountAfterFee == 0) return (0, 0);
+
         // in case pair is not supported
         try router.getAmountsOut(srcAmountAfterFee, tradePath) returns (uint256[] memory amounts) {
             destAmount = amounts[tradePath.length - 1];
         } catch {
             destAmount = 0;
         }
+
+        if (!feeInSrc) {
+            destAmount = srcAmount * (BPS - platformFee) / BPS;
+        }
+
         expectedRate = calcRateFromQty(
             srcAmountAfterFee,
             destAmount,
@@ -148,8 +162,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
                 minData: minDestAmount,
                 recipient: recipient,
                 platformFeeBps: platformFeeBps,
-                platformWallet: platformWallet,
-                hint: ""
+                platformWallet: platformWallet
             });
 
         // extra validation when swapping on Pancake
@@ -264,8 +277,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
             require(msg.value == 0, "bad msg value");
             uint256 balanceBefore = src.balanceOf(address(this));
             src.safeTransferFrom(msg.sender, address(this), srcAmount);
-            uint256 balanceAfter = src.balanceOf(address(this));
-            actualSrcAmount = balanceAfter.sub(balanceBefore);
+            actualSrcAmount = src.balanceOf(address(this)).sub(balanceBefore);
             require(actualSrcAmount > 0, "invalid src amount");
 
             safeApproveAllowance(protocol, src);

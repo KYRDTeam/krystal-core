@@ -20,7 +20,8 @@ interface ISmartWalletSwapImplementation {
         IPancakeRouter02 router,
         uint256 srcAmount,
         address[] calldata tradePath,
-        uint256 platformFeeBps
+        uint256 platformFeeBps,
+        bool feeInSrc
     ) external view returns (uint256 destAmount, uint256 expectedRate);
 
     function swapPancake(
