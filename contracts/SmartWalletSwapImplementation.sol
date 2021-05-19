@@ -135,7 +135,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         }
 
         if (!feeInSrc) {
-            destAmount = srcAmount * (BPS - platformFee) / BPS;
+            destAmount = destAmount * (BPS - platformFee) / BPS;
         }
 
         expectedRate = calcRateFromQty(

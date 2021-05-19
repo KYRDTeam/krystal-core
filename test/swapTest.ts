@@ -8,6 +8,7 @@ import {ethers} from 'hardhat';
 describe('swap test', async () => {
   let setup: IInitialSetup;
   let platformFee = 8;
+  let eps = 10e-2;
   let tokenAddresses: string[] = [];
 
   before(async () => {
@@ -38,18 +39,21 @@ describe('swap test', async () => {
       const pancakeData = await setup.pancakeRouter.getAmountsOut(srcAmount, tradePath);
       const pancakeDest = pancakeData[pancakeData.length - 1];
       const amountDiff = pancakeDest.sub(data.destAmount);
-
+      const actualFee = amountDiff.mul(BPS).mul(1000).div(pancakeDest).toNumber() / 1000;
       assert(
-        amountDiff.gt(0),
-        `krystal dest should be smaller than pancake dest as of the fee. dest: ${data.destAmount.toString()}, pancake dest: ${pancakeDest.toString()}`
-      );
-      assert(
-        amountDiff.div(pancakeDest).mul(BPS).lte(platformFee),
-        `fee should be lte ${platformFee} bps. dest: ${data.destAmount.toString()}, pancake dest: ${pancakeDest.toString()}`
+        Math.abs(actualFee - platformFee) < eps,
+        `fee should be around ${platformFee} bps. actual fee = ${actualFee}, expected = ${platformFee}`
       );
 
       return data.destAmount;
     };
+
+    it('get expected rate correctly', async () => {
+      let bnbAmount = BigNumber.from(10).pow(BigNumber.from(bnbDecimals)); // one bnb
+      let tradePath = [setup.network.wbnb, tokenAddresses[0]]; // get rate needs to use wbnb
+      await testGetExpectedRate(bnbAmount, tradePath, false);
+      await testGetExpectedRate(bnbAmount, tradePath, true);
+    });
 
     it('swap from bnb to token', async () => {
       let bnbAmount = BigNumber.from(10).pow(BigNumber.from(bnbDecimals)); // one bnb

@@ -11,7 +11,7 @@ contract SmartWalletSwapStorage is Utils, Withdrawable, ReentrancyGuard {
 
     mapping(address => mapping(IBEP20 => uint256)) public platformWalletFees;
 
-    // Proxy and routers will be set only once in constructor
+    // Routers will be set only once in constructor
     // Pancake / its clones routers
     mapping(IPancakeRouter02 => bool) public pancakeRouters;
 
