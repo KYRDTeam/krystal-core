@@ -46,18 +46,6 @@ export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<st
     deployedContracts['SmartWalletSwapProxy']
   )) as SmartWalletSwapImplementation;
 
-  // Approve allowances to Kyber and PancakeSwap routers
-  console.log(`   ${++step}.  approveAllowances`);
-  console.log('   ------------------------------------');
-  tx = await swapProxyInstance.approveAllowances(
-    [networkConfig.busdAddress, networkConfig.daiAddress, networkConfig.usdcAddress, networkConfig.usdtAddress],
-    [networkConfig.pancake.router],
-    false,
-    {gasLimit, ...extraArgs}
-  );
-  printInfo(tx);
-  console.log('\n');
-
   // Add supported platform wallets
   console.log(`   ${++step}.  updateSupportedPlatformWallets`);
   console.log('   ------------------------------------');
