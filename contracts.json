@@ -1,0 +1,7 @@
+{
+  "testnet": {
+    "SmartWalletSwapImplementation": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
+    "SmartWalletSwapProxy": "0xE7314051BCFD832398e232f2c274278c44121a3f",
+    "FetchTokenBalances": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
+  }
+}

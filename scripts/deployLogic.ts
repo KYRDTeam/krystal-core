@@ -30,10 +30,14 @@ export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<st
     deployedContracts[deployContracts[index]] = await deployContract(++step, deployContracts[index], ...args[index]);
     // auto verify contract on mainnet/testnet
     if (networkConfig.autoVerifyContract) {
-      await run('verify:verify', {
-        address: deployedContracts[deployContracts[index]],
-        constructorArguments: args[index],
-      });
+      try {
+        await run('verify:verify', {
+          address: deployedContracts[deployContracts[index]],
+          constructorArguments: args[index],
+        });
+      } catch (e) {
+        console.log('failed to verify contract', e);
+      }
     }
   }
 
