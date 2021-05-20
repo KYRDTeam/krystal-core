@@ -1,7 +1,7 @@
 {
   "overrides": [
     {
-      "files": "*.sol",
+      "files": ["*.sol"],
       "options": {
         "printWidth": 99,
         "tabWidth": 4,
@@ -12,7 +12,7 @@
       }
     },
     {
-      "files": "*.js",
+      "files": ["*.ts"],
       "options": {
         "printWidth": 119,
         "tabWidth": 2,
