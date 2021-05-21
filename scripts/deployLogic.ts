@@ -10,7 +10,10 @@ if (!networkConfig) {
   throw new Error(`Missing deploy config for ${network.name}`);
 }
 
-export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<string, string>> => {
+export const deploy = async (
+  existingContract: Record<string, string> | undefined = undefined,
+  extraArgs: {from?: string} = {}
+): Promise<Record<string, string>> => {
   const deployedContracts: Record<string, string> = {};
 
   console.log('Start deploying Krystal contracts ...');
@@ -25,18 +28,28 @@ export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<st
   console.log(`Deploying Contracts using ${deployerAddress}`);
   console.log('============================\n');
   for (let index in deployContracts) {
-    if (deployContracts[index] === 'SmartWalletSwapProxy')
-      args[index][1] = deployedContracts['SmartWalletSwapImplementation'];
-    deployedContracts[deployContracts[index]] = await deployContract(++step, deployContracts[index], ...args[index]);
-    // auto verify contract on mainnet/testnet
-    if (networkConfig.autoVerifyContract) {
-      try {
-        await run('verify:verify', {
-          address: deployedContracts[deployContracts[index]],
-          constructorArguments: args[index],
-        });
-      } catch (e) {
-        console.log('failed to verify contract', e);
+    const contractName = deployContracts[index];
+
+    if (existingContract?.[contractName]) {
+      deployedContracts[contractName] = existingContract[contractName];
+
+      console.log(`   ${++step}. contract already exists, skip deploy '${contractName}'`);
+      console.log(`   contract address = ${existingContract[contractName]}`);
+      console.log('   ------------------------------------\n');
+    } else {
+      if (deployContracts[index] === 'SmartWalletSwapProxy')
+        args[index][1] = deployedContracts['SmartWalletSwapImplementation'];
+      deployedContracts[contractName] = await deployContract(++step, contractName, ...args[index]);
+      // auto verify contract on mainnet/testnet
+      if (networkConfig.autoVerifyContract) {
+        try {
+          await run('verify:verify', {
+            address: deployedContracts[contractName],
+            constructorArguments: args[index],
+          });
+        } catch (e) {
+          console.log('failed to verify contract', e);
+        }
       }
     }
   }
@@ -61,7 +74,6 @@ export const deploy = async (extraArgs: {from?: string} = {}): Promise<Record<st
   console.log('\n');
 
   // Summary
-
   console.log('Summary');
   console.log('=======\n');
   for (let contract of deployContracts) {

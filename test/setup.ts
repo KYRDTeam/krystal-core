@@ -10,7 +10,7 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
   let user = accounts[0];
   let admin = accounts[0];
 
-  const deployedContracts = await deploy({from: admin.address});
+  const deployedContracts = await deploy(undefined, {from: admin.address});
   const networkConfig = NetworkConfig[network.name];
 
   // Using proxy under the implementaton interface
