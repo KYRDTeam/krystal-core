@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.7.6;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
@@ -13,6 +14,14 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
     event UpdatedSupportedPlatformWallets(address[] wallets, bool isSupported);
     event ApprovedAllowances(IBEP20[] tokens, address[] spenders, bool isReset);
     event ClaimedPlatformFees(address[] wallets, IBEP20[] tokens, address claimer);
+
+    struct TradeInput {
+        uint256 srcAmount;
+        uint256 minData; // min return for Pancake
+        address payable recipient;
+        uint256 platformFeeBps;
+        address payable platformWallet;
+    }
 
     constructor(address _admin) SmartWalletSwapStorage(_admin) {}
 
@@ -118,13 +127,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         if (platformFee >= BPS) return (0, 0); // platform fee is too high
         if (!pancakeRouters[router]) return (0, 0); // router is not supported
 
-        uint256 srcAmountAfterFee;
-        if (feeInSrc) {
-            srcAmountAfterFee = srcAmount * (BPS - platformFee) / BPS;
-        } else {
-            srcAmountAfterFee = srcAmount;
-        }
-
+        uint256 srcAmountAfterFee = feeInSrc ? srcAmount * (BPS - platformFee) / BPS : srcAmount;
         if (srcAmountAfterFee == 0) return (0, 0);
 
         // in case pair is not supported
@@ -250,7 +253,6 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
 
         if (!feeInSrc) {
             // fee in dest token, calculated received dest amount
-            destAmount = destBalanceAfter.sub(destBalanceBefore);
             uint256 destAmountFee = destAmount.mul(input.platformFeeBps).div(BPS);
             // charge fee in dest token
             addFeeToPlatform(input.platformWallet, actualDest, destAmountFee);
