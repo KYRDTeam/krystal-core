@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.7.6;
 
 import "./interfaces/IPancakeRouter02.sol";
@@ -16,14 +17,6 @@ contract SmartWalletSwapStorage is Utils, Withdrawable, ReentrancyGuard {
     mapping(IPancakeRouter02 => bool) public pancakeRouters;
 
     mapping(address => bool) public supportedPlatformWallets;
-
-    struct TradeInput {
-        uint256 srcAmount;
-        uint256 minData; // min return for Pancake
-        address payable recipient;
-        uint256 platformFeeBps;
-        address payable platformWallet;
-    }
 
     // [EIP-1967] bytes32(uint256(keccak256("SmartWalletSwapImplementation")) - 1)
     bytes32 internal constant IMPLEMENTATION =
