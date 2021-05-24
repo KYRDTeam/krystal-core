@@ -70,7 +70,7 @@ export const deploy = async (
     deployedContracts['SmartWalletSwapProxy']
   )) as SmartWalletSwapImplementation;
 
-  // Add supported platform wallets
+  // Update supported platform wallets
   console.log(`   ${++step}.  updateSupportedPlatformWallets`);
   console.log('   ------------------------------------');
   const toUpdateWallets = [];
@@ -80,9 +80,31 @@ export const deploy = async (
       toUpdateWallets.push(w);
     }
   }
-  if (toUpdateWallets?.length) {
+  if (toUpdateWallets.length) {
     console.log('   new wallets', toUpdateWallets);
     tx = await swapProxyInstance.updateSupportedPlatformWallets(toUpdateWallets, true, {
+      gasLimit,
+      ...extraArgs,
+    });
+    printInfo(tx);
+    console.log('\n');
+  } else {
+    console.log(`   Nothing to update\n`);
+  }
+
+  // Update pancake routers
+  console.log(`   ${++step}.  updatePancakeRouters`);
+  console.log('   ------------------------------------');
+  const toUpdateRouters = [];
+  for (let w of networkConfig.pancake.routers) {
+    let supported = await swapProxyInstance.pancakeRouters(w);
+    if (!supported) {
+      toUpdateRouters.push(w);
+    }
+  }
+  if (toUpdateRouters.length) {
+    console.log('   new routers', toUpdateRouters);
+    tx = await swapProxyInstance.updatePancakeRouters(toUpdateRouters, true, {
       gasLimit,
       ...extraArgs,
     });
