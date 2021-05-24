@@ -8,7 +8,7 @@ export interface IConfig {
   wbnb: string;
 
   pancake: {
-    router: string;
+    routers: string[];
   };
 
   venus: {
@@ -32,7 +32,7 @@ const NetworkConfig: Record<string, IConfig> = {
 
     // Pancake
     pancake: {
-      router: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1',
+      routers: ['0xD99D1c33F9fC3444f8101754aBC46c52416550D1'],
     },
 
     // Venus
@@ -69,7 +69,10 @@ const NetworkConfig: Record<string, IConfig> = {
     wbnb: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
     pancake: {
-      router: '0x05ff2b0db69458a0750badebc4f9e13add608c7f',
+      routers: [
+        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // v1
+        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // v2
+      ],
     },
 
     venus: {
