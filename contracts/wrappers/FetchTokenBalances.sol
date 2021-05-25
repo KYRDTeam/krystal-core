@@ -7,9 +7,8 @@ import "@kyber.network/utils-sc/contracts/IBEP20.sol";
 contract FetchTokenBalances is Withdrawable {
     constructor(address _admin) Withdrawable(_admin) {}
 
-    IBEP20 internal constant BNB_TOKEN_ADDRESS = IBEP20(
-        0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB
-    );
+    IBEP20 internal constant BNB_TOKEN_ADDRESS =
+        IBEP20(0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB);
 
     function getBalances(address account, IBEP20[] calldata tokens)
         external

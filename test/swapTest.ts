@@ -27,7 +27,7 @@ describe('swap test', async () => {
       feeInSrc: boolean = true
     ): Promise<BigNumber> => {
       const data = await setup.swapProxyInstance.getExpectedReturnPancake(
-        setup.network.pancake.router,
+        setup.network.pancake.routers[0],
         srcAmount,
         tradePath,
         platformFee,
@@ -71,7 +71,7 @@ describe('swap test', async () => {
         // Send txn
         await expect(
           await setup.swapProxyInstance.swapPancake(
-            setup.network.pancake.router,
+            setup.network.pancake.routers[0],
             bnbAmount,
             minDestAmount,
             tradePath,
@@ -89,7 +89,7 @@ describe('swap test', async () => {
         // Missing value
         await expect(
           setup.swapProxyInstance.swapPancake(
-            setup.network.pancake.router,
+            setup.network.pancake.routers[0],
             bnbAmount,
             minDestAmount,
             tradePath,
@@ -126,7 +126,7 @@ describe('swap test', async () => {
           // Send txn
           await expect(() => {
             setup.swapProxyInstance.swapPancake(
-              setup.network.pancake.router,
+              setup.network.pancake.routers[0],
               tokenAmount,
               minDestAmount,
               [tokenAddresses[i], targetToken],
@@ -143,7 +143,7 @@ describe('swap test', async () => {
           // Extra value not needed
           await expect(
             setup.swapProxyInstance.swapPancake(
-              setup.network.pancake.router,
+              setup.network.pancake.routers[0],
               tokenAmount,
               minDestAmount,
               [tokenAddresses[i], targetToken],

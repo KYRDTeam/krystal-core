@@ -14,6 +14,7 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
     event UpdatedSupportedPlatformWallets(address[] wallets, bool isSupported);
     event ApprovedAllowances(IBEP20[] tokens, address[] spenders, bool isReset);
     event ClaimedPlatformFees(address[] wallets, IBEP20[] tokens, address claimer);
+    event UpdatedPancakeRouters(IPancakeRouter02[] routers, bool isSupported);
 
     struct TradeInput {
         uint256 srcAmount;
@@ -37,6 +38,18 @@ contract SmartWalletSwapImplementation is SmartWalletSwapStorage, ISmartWalletSw
         }
         emit UpdatedSupportedPlatformWallets(wallets, isSupported);
     }
+
+    /// @dev to update pancake routers
+    function updatePancakeRouters(IPancakeRouter02[] calldata routers, bool isSupported)
+        external
+        onlyAdmin
+    {
+        for (uint256 i = 0; i < routers.length; i++) {
+            pancakeRouters[routers[i]] = isSupported;
+        }
+        emit UpdatedPancakeRouters(routers, isSupported);
+    }
+
 
     /// Claim fee to platform wallets
     /// @dev set fee to 1 to avoid the SSTORE initial gas cost

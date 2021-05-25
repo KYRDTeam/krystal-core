@@ -26,7 +26,7 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
 
   let pancakeRouter = (await ethers.getContractAt(
     'IPancakeRouter02',
-    networkConfig.pancake.router
+    networkConfig.pancake.routers[0]
   )) as IPancakeRouter02;
 
   // Fund wallet
@@ -38,7 +38,7 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
   ]) {
     const bnbAmount = BigNumber.from(1000).mul(BigNumber.from(10).pow(bnbDecimals));
     await swapProxyInstance.swapPancake(
-      networkConfig.pancake.router,
+      networkConfig.pancake.routers[0],
       bnbAmount,
       0,
       [bnbAddress, tokenAddress],
