@@ -1,63 +1,67 @@
 {
-  "name": "smart-wallet-contracts",
+  "name": "krystal-bsc-core",
   "version": "1.0.0",
-  "description": "This repository has the main contracts for Smart Wallet.",
-  "main": "truffle.js",
+  "description": "Core smart contracts of Krystal BSC",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "./tst.sh",
     "t": "./tst.sh",
-    "compile": "./cmp.sh",
-    "c": "./cmp.sh",
-    "prettier": "./node_modules/.bin/prettier --write"
+    "compile": "export NODE_OPTIONS=--max-old-space-size=4096 && yarn hardhat compile",
+    "c": "yarn compile",
+    "coverage": "yarn hardhat coverage",
+    "deploy": "yarn hardhat run scripts/deployer.ts",
+    "d": "yarn deploy",
+    "prettier": "./node_modules/.bin/prettier --write",
+    "size": "yarn run hardhat size-contracts",
+    "s": "yarn run hardhat size-contracts",
+    "lint": "yarn solhint contracts/**/*.sol && yarn eslint . --ext .ts",
+    "lint:fix": "yarn prettier --write contracts/**/*.sol && yarn eslint --fix . --ext .ts "
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KyberNetwork/smart-contracts.git"
+    "url": "https://github.com/KyberSwap/krystal-bsc-core"
   },
-  "author": "",
+  "author": "Krystal team",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/KyberSwap/SmartWalletContracts/issues"
   },
   "homepage": "https://github.com/KyberSwap/SmartWalletContracts#readme",
   "dependencies": {
-    "@kyber.network/utils-sc": "2.1.3",
-    "@openzeppelin/contracts": "3.3.0",
-    "chai-as-promised": "7.1.1",
-    "compare-versions": "3.6.0",
-    "dotenv": "^8.2.0",
-    "ethers": "5.0.26",
-    "ganache-cli": "6.12.2",
-    "mathjs": "9.0.0",
-    "rlp": "2.2.6",
-    "secp256k1": "4.0.2",
-    "sha3": "2.1.3",
-    "solc": "0.6.6",
-    "solhint": "3.3.2",
-    "truffle-assertions": "0.9.2",
-    "truffle-flattener": "1.5.0",
-    "web3": "1.3.3",
-    "web3-utils": "1.3.3",
-    "winston": "^3.3.3",
-    "yargs": "16.2.0"
+    "@kyber.network/utils-sc": "^2.2.2-bsc",
+    "@openzeppelin/contracts": "^3.4.1",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-ganache": "2.0.0",
-    "@nomiclabs/hardhat-truffle5": "2.0.0",
-    "@nomiclabs/hardhat-web3": "2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-etherscan": "^2.0.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/test-helpers": "0.5.10",
+    "@typechain/ethers-v5": "^6.0.5",
+    "@typechain/hardhat": "^1.0.1",
+    "@types/chai": "^4.2.17",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.0.2",
+    "@typescript-eslint/parser": "^4.22.1",
     "@uniswap/v2-periphery": "1.1.0-beta.0",
-    "chai": "4.2.0",
+    "chai": "^4.3.4",
     "chai-bn": "0.2.1",
-    "got": "^11.8.1",
+    "eslint": "^7.25.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.1.4",
     "hardhat": "2.0.8",
+    "hardhat-contract-sizer": "^2.0.3",
     "hardhat-gas-reporter": "^1.0.4",
-    "mv": "2.1.1",
-    "prettier": "2.2.1",
-    "prettier-plugin-solidity": "1.0.0-beta.3",
-    "solidity-coverage": "0.7.14"
+    "prettier": "^2.2.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.10",
+    "solhint": "^3.3.4",
+    "solhint-plugin-prettier": "^0.0.5",
+    "solidity-coverage": "0.7.14",
+    "ts-node": "^9.1.1",
+    "typechain": "^4.0.3",
+    "typescript": "^4.2.4"
   }
 }

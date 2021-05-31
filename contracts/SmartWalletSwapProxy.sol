@@ -1,8 +1,8 @@
-pragma solidity 0.6.6;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity 0.7.6;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./SmartWalletSwapStorage.sol";
-
 
 contract SmartWalletSwapProxy is SmartWalletSwapStorage {
     using Address for address;
@@ -12,13 +12,11 @@ contract SmartWalletSwapProxy is SmartWalletSwapStorage {
     constructor(
         address _admin,
         address _implementation,
-        IKyberProxy _proxy,
-        IUniswapV2Router02[] memory _routers
-    ) public SmartWalletSwapStorage(_admin) {
+        IPancakeRouter02[] memory _routers
+    ) SmartWalletSwapStorage(_admin) {
         _setImplementation(_implementation);
-        kyberProxy = _proxy;
         for (uint256 i = 0; i < _routers.length; i++) {
-            isRouterSupported[_routers[i]] = true;
+            pancakeRouters[_routers[i]] = true;
         }
     }
 
