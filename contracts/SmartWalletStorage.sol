@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.7.6;
 
-import "./interfaces/IPancakeRouter02.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 import "@kyber.network/utils-sc/contracts/Utils.sol";
 import "@kyber.network/utils-sc/contracts/Withdrawable.sol";

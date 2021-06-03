@@ -1,6 +1,5 @@
 pragma solidity 0.7.6;
 
-import "../interfaces/IPancakeRouter02.sol";
 import "../swap/ISwap.sol";
 import "../lending/ILending.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
@@ -24,7 +23,8 @@ interface ISmartWalletImplementation {
         uint256 srcAmount,
         address[] calldata tradePath,
         uint256 platformFeeBps,
-        FeeMode feeMode
+        FeeMode feeMode,
+        bytes calldata extraArgs
     ) external view returns (uint256 destAmount, uint256 expectedRate);
 
     function swap(

@@ -50,32 +50,6 @@ abstract contract BaseSwap is ISwap, Withdrawable, Utils, ReentrancyGuard {
             minData: minDestAmount,
             recipient: recipient
         });
-
-        IERC20Ext src = IERC20Ext(tradePath[0]);
-        input.srcAmount = validateAndPrepareSourceAmount(
-            protocol,
-            src,
-            srcAmount
-        );
-    }
-
-    function validateAndPrepareSourceAmount(
-        address protocol,
-        IERC20Ext src,
-        uint256 srcAmount
-    ) internal virtual returns (uint256 actualSrcAmount) {
-        if (src == ETH_TOKEN_ADDRESS) {
-            require(msg.value == srcAmount, "wrong msg value");
-            actualSrcAmount = srcAmount;
-        } else {
-            require(msg.value == 0, "bad msg value");
-            uint256 balanceBefore = src.balanceOf(address(this));
-            src.safeTransferFrom(msg.sender, address(this), srcAmount);
-            actualSrcAmount = src.balanceOf(address(this)).sub(balanceBefore);
-            require(actualSrcAmount > 0, "invalid src amount");
-
-            safeApproveAllowance(protocol, src);
-        }
     }
 
     function safeApproveAllowance(address spender, IERC20Ext token) internal {

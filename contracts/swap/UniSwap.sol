@@ -80,13 +80,11 @@ contract UniSwap is BaseSwap {
 
         {
             // prevent stack too deep
-            TradeInput memory tradeInput = validateAndPrepareTradeInput(
-                address(router),
-                srcAmount,
-                minDestAmount,
-                tradePath,
-                recipient
-            );
+            TradeInput memory tradeInput = TradeInput({
+                srcAmount: srcAmount,
+                minData: minDestAmount,
+                recipient: recipient
+            });
             destAmount = doUniTrade(
                 router,
                 tradePath,
@@ -153,8 +151,7 @@ contract UniSwap is BaseSwap {
         // Store address in 32 bytes
         require(extraArgs.length == 32, "invalid args");
         assembly {
-            // first 0x20(or 32) bytes are for the bytes length
-            router := calldataload(add(extraArgs.offset, 0x20))
+            router := calldataload(extraArgs.offset)
         } 
         require(router != IUniswapV2Router02(0), "invalid address");
         require(uniRouters.contains(address(router)), "unsupported router");

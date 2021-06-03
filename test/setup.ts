@@ -1,7 +1,7 @@
 import {ethers, network} from 'hardhat';
-import {nativeTokenAddress, nativeTokenDecimals, evm_snapshot} from './helper';
-import {IBEP20, IPancakeRouter02, SmartWalletImplementation} from '../typechain';
-import {deploy} from '../scripts/deployLogic';
+import {nativeTokenDecimals, evm_snapshot, MAX_AMOUNT} from './helper';
+import {IERC20Ext, IUniswapV2Router02, SmartWalletImplementation} from '../typechain';
+import {deploy, KrystalContracts} from '../scripts/deployLogic';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import {NetworkConfig, IConfig} from '../scripts/config';
 import {BigNumber} from '@ethersproject/bignumber';
@@ -10,52 +10,37 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
   let user = accounts[0];
   let admin = accounts[0];
 
-  const deployedContracts = await deploy(undefined, {from: admin.address});
+  const krystalContracts = await deploy(undefined, {from: admin.address});
   const networkConfig = NetworkConfig[network.name];
 
-  // Using proxy under the implementaton interface
-  let swapProxyInstance = (await ethers.getContractAt(
-    'SmartWalletImplementation',
-    deployedContracts['SmartWalletProxy']
-  )) as SmartWalletImplementation;
+  let uniRouter = (await ethers.getContractAt(
+    'IUniswapV2Router02',
+    networkConfig.uniswap!.routers[0]
+  )) as IUniswapV2Router02;
 
-  let swapImplementationInstance = (await ethers.getContractAt(
+  let proxyInstance = (await ethers.getContractAt(
     'SmartWalletImplementation',
-    deployedContracts['SmartWalletImplementation']
+    krystalContracts.smartWalletProxy.address
   )) as SmartWalletImplementation;
-
-  let pancakeRouter = (await ethers.getContractAt(
-    'IPancakeRouter02',
-    networkConfig.uniswap.routers[0]
-  )) as IPancakeRouter02;
 
   // Fund wallet
-  for (let tokenAddress of [
-    networkConfig.usdtAddress,
-    networkConfig.usdcAddress,
-    networkConfig.daiAddress,
-    networkConfig.busdAddress,
-  ]) {
-    const bnbAmount = BigNumber.from(1000).mul(BigNumber.from(10).pow(nativeTokenDecimals));
-    await swapProxyInstance.swapPancake(
-      networkConfig.uniswap.routers[0],
-      bnbAmount,
+  for (let {symbol, address} of networkConfig.tokens) {
+    const nativeTokenAmount = BigNumber.from(1000).mul(BigNumber.from(10).pow(nativeTokenDecimals));
+    await uniRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
       0,
-      [nativeTokenAddress, tokenAddress],
+      [networkConfig.wNative, address],
       user.address,
-      0,
-      networkConfig.supportedWallets[0],
-      true,
+      MAX_AMOUNT,
       {
         from: user.address,
-        value: bnbAmount,
+        value: nativeTokenAmount,
       }
     );
 
-    const tokenContract = (await ethers.getContractAt('IBEP20', tokenAddress)) as IBEP20;
+    const tokenContract = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
     console.log('Funded', {
-      token: await tokenContract.symbol(),
-      token_address: tokenAddress,
+      token: symbol,
+      token_address: address,
       address: user.address,
       new_balance: (await tokenContract.balanceOf(user.address)).toString(),
     });
@@ -63,9 +48,8 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
 
   return {
     user,
-    swapImplementationInstance,
-    swapProxyInstance,
-    pancakeRouter,
+    krystalContracts,
+    proxyInstance,
     postSetupSnapshotId: await evm_snapshot(),
   };
 };
@@ -74,21 +58,25 @@ export interface IInitialSetup {
   user: SignerWithAddress;
   preSetupSnapshotId: any;
   postSetupSnapshotId: any;
-  swapImplementationInstance: SmartWalletImplementation;
-  swapProxyInstance: SmartWalletImplementation;
-  pancakeRouter: IPancakeRouter02;
+  proxyInstance: SmartWalletImplementation;
   network: IConfig;
+  krystalContracts: KrystalContracts;
 }
+
+export const networkSetting = NetworkConfig[network.name];
 
 let initialSetup: IInitialSetup;
 
 export const getInitialSetup = async (): Promise<IInitialSetup> => {
-  console.log('\n\n\n=== Setting initial testing contracts ===');
-  return (
-    initialSetup || {
+  if (!initialSetup) {
+    console.log('\n\n\n=== Setting initial testing contracts ===');
+    let signers = await ethers.getSigners();
+    let data = await setupContracts(signers);
+    initialSetup = {
       preSetupSnapshotId: await evm_snapshot(),
-      ...(await setupContracts(await ethers.getSigners())),
-      network: NetworkConfig[network.name],
-    }
-  );
+      ...data,
+      network: networkSetting,
+    };
+  }
+  return initialSetup;
 };

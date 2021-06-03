@@ -1,9 +1,17 @@
 import {BigNumber} from '@ethersproject/bignumber';
 import * as hre from 'hardhat';
 
+export const MAX_AMOUNT = BigNumber.from(10e10);
 export const BPS = BigNumber.from(10000);
 export const nativeTokenDecimals = 18;
 export const nativeTokenAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const EPS = 10e-3;
+
+export enum FeeMode {
+  FROM_SOURCE = 0,
+  FROM_DEST = 1,
+  BY_PROTOCOL = 2,
+}
 
 export const evm_snapshot = async function () {
   return await hre.network.provider.request({

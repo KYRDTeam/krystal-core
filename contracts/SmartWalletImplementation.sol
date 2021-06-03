@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 import "./interfaces/ISmartWalletImplementation.sol";
-import "./interfaces/IPancakeRouter02.sol";
 import "./SmartWalletStorage.sol";
 
 contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementation {
@@ -15,7 +14,6 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
 
     event ApprovedAllowances(IERC20Ext[] tokens, address[] spenders, bool isReset);
     event ClaimedPlatformFees(address[] wallets, IERC20Ext[] tokens, address claimer);
-    event UpdatedPancakeRouters(IPancakeRouter02[] routers, bool isSupported);
 
     constructor(address _admin) SmartWalletStorage(_admin) {}
 
@@ -65,7 +63,8 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         uint256 srcAmount,
         address[] calldata tradePath,
         uint256 platformFeeBps,
-        FeeMode feeMode
+        FeeMode feeMode,
+        bytes calldata extraArgs
     ) external view override returns (uint256 destAmount, uint256 expectedRate) {
         if (platformFeeBps >= BPS) return (0, 0); // platform fee is too high
         
@@ -73,7 +72,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             srcAmount = srcAmount * (BPS - platformFeeBps) / BPS;
         }
 
-        destAmount = swapContract.getExpectedReturn(srcAmount, tradePath, "");
+        destAmount = swapContract.getExpectedReturn(srcAmount, tradePath, extraArgs);
 
         if (feeMode == FeeMode.FROM_DEST) {
             destAmount = destAmount * (BPS - platformFeeBps) / BPS;
