@@ -1,7 +1,8 @@
 import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
-import {SmartWalletSwapImplementation, SmartWalletSwapProxy} from '../typechain';
+import {FetchTokenBalances, SmartWalletImplementation, SmartWalletProxy, UniSwap, VenusLending} from '../typechain';
+import {Contract} from '@ethersproject/contracts';
 
 const gasLimit = 700000;
 
@@ -10,152 +11,304 @@ if (!networkConfig) {
   throw new Error(`Missing deploy config for ${network.name}`);
 }
 
-export const deploy = async (
-  existingContract: Record<string, string> | undefined = undefined,
-  extraArgs: {from?: string} = {}
-): Promise<Record<string, string>> => {
-  const deployedContracts: Record<string, string> = {};
+export interface KrystalContracts {
+  smartWalletImplementation: SmartWalletImplementation;
+  smartWalletProxy: SmartWalletProxy;
+  fetchTokenBalances: FetchTokenBalances;
+  swapContracts: {
+    uniSwap?: UniSwap;
+  };
+  lendingContracts: {
+    venusLending?: VenusLending;
+  };
+}
 
-  console.log('Start deploying Krystal contracts ...');
+export const deploy = async (
+  existingContract: Record<string, any> | undefined = undefined,
+  extraArgs: {from?: string} = {}
+): Promise<KrystalContracts> => {
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
-  const deployContracts = ['SmartWalletSwapImplementation', 'SmartWalletSwapProxy', 'FetchTokenBalances'];
-  let args = [[deployerAddress], [deployerAddress, null, networkConfig.pancake.routers], [deployerAddress]];
-  let step = 0;
-  let tx;
 
-  // Deployment
-  console.log(`Deploying Contracts using ${deployerAddress}`);
-  console.log('============================\n');
-  for (let index in deployContracts) {
-    const contractName = deployContracts[index];
-
-    if (existingContract?.[contractName]) {
-      deployedContracts[contractName] = existingContract[contractName];
-
-      console.log(`   ${++step}. contract already exists, skip deploy '${contractName}'`);
-      console.log(`   contract address = ${existingContract[contractName]}`);
-      console.log('   ------------------------------------\n');
-    } else {
-      if (deployContracts[index] === 'SmartWalletSwapProxy')
-        args[index][1] = deployedContracts['SmartWalletSwapImplementation'];
-      deployedContracts[contractName] = await deployContract(++step, contractName, ...args[index]);
-      // auto verify contract on mainnet/testnet
-      if (networkConfig.autoVerifyContract) {
-        try {
-          await run('verify:verify', {
-            address: deployedContracts[contractName],
-            constructorArguments: args[index],
-          });
-        } catch (e) {
-          console.log('failed to verify contract', e);
-        }
-      }
-    }
-  }
+  log(0, 'Start deploying Krystal contracts');
+  log(0, '======================\n');
+  let deployedContracts = await deployContracts(existingContract, deployerAddress);
 
   // Initialization
-  console.log('Initializing SmartWalletSwapProxy');
-  console.log('======================\n');
+  let step = 0;
+  log(0, 'Updating proxy data');
+  log(0, '======================\n');
+  await updateProxy(deployedContracts, extraArgs);
 
-  // Original proxy instance
-  let swapProxyOrigin = (await ethers.getContractAt(
-    'SmartWalletSwapProxy',
-    deployedContracts['SmartWalletSwapProxy']
-  )) as SmartWalletSwapProxy;
+  log(0, 'Updating swaps/lendings linking');
+  log(0, '======================\n');
+  await updateChildContracts(deployedContracts, extraArgs);
 
-  // Using SwapProxy address under SmartWalletSwapImplementation logics
-  let swapProxyInstance = (await ethers.getContractAt(
-    'SmartWalletSwapImplementation',
-    deployedContracts['SmartWalletSwapProxy']
-  )) as SmartWalletSwapImplementation;
+  log(0, 'Updating uniswap/clones config');
+  log(0, '======================\n');
+  await updateUniSwap(deployedContracts.swapContracts.uniSwap, extraArgs);
 
-  // Update supported platform wallets
-  console.log(`   ${++step}.  updateSupportedPlatformWallets`);
-  console.log('   ------------------------------------');
-  const toUpdateWallets = [];
-  for (let w of networkConfig.supportedWallets) {
-    let supported = await swapProxyInstance.supportedPlatformWallets(w);
-    if (!supported) {
-      toUpdateWallets.push(w);
-    }
-  }
-  if (toUpdateWallets.length) {
-    console.log('   new wallets', toUpdateWallets);
-    tx = await swapProxyInstance.updateSupportedPlatformWallets(toUpdateWallets, true, {
-      gasLimit,
-      ...extraArgs,
-    });
-    printInfo(tx);
-    console.log('\n');
-  } else {
-    console.log(`   Nothing to update\n`);
-  }
-
-  // Update pancake routers
-  console.log(`   ${++step}.  updatePancakeRouters`);
-  console.log('   ------------------------------------');
-  const toUpdateRouters = [];
-  for (let w of networkConfig.pancake.routers) {
-    let supported = await swapProxyInstance.pancakeRouters(w);
-    if (!supported) {
-      toUpdateRouters.push(w);
-    }
-  }
-  if (toUpdateRouters.length) {
-    console.log('   new routers', toUpdateRouters);
-    tx = await swapProxyInstance.updatePancakeRouters(toUpdateRouters, true, {
-      gasLimit,
-      ...extraArgs,
-    });
-    printInfo(tx);
-    console.log('\n');
-  } else {
-    console.log(`   Nothing to update\n`);
-  }
-
-  // Link from proxy to impl contract if the addresses are different
-  console.log(`   ${++step}.  updatedImplContract`);
-  console.log('   ------------------------------------');
-
-  const currentImpleContract = await swapProxyOrigin.implementation();
-  if (currentImpleContract === deployedContracts['SmartWalletSwapImplementation']) {
-    console.log(`   Impl contract is already up-to-date at ${currentImpleContract}\n`);
-  } else {
-    tx = await swapProxyOrigin.updateNewImplementation(deployedContracts['SmartWalletSwapImplementation'], {
-      gasLimit,
-      ...extraArgs,
-    });
-    printInfo(tx);
-    console.log('\n');
-  }
+  // log(0, 'Updating compound/clones config');
+  // log(0, '======================\n');
+  // await updateVenusLending(deployedContracts.lendingContracts.venusLending);
 
   // Summary
-  console.log('Summary');
-  console.log('=======\n');
-  for (let contract of deployContracts) {
-    console.log(`   > ${contract}: ${deployedContracts[contract]}`);
-  }
+  log(0, 'Summary');
+  log(0, '=======\n');
+
+  log(0, JSON.stringify(convertToAddressObject(deployedContracts), null, 2));
 
   console.log('\nDeployment complete!');
   return deployedContracts;
 };
 
-async function deployContract(step: number, contractName: string, ...args: any[]): Promise<string> {
-  console.log(`   ${step}. Deploying '${contractName}'`);
-  console.log('   ------------------------------------');
+async function deployContracts(
+  existingContract: Record<string, any> | undefined = undefined,
+  deployerAddress: string
+): Promise<KrystalContracts> {
+  let step = 0;
+
+  const smartWalletImplementation = (await deployContract(
+    ++step,
+    networkConfig.autoVerifyContract,
+    'SmartWalletImplementation',
+    existingContract?.['smartWalletImplementation'],
+    deployerAddress
+  )) as SmartWalletImplementation;
+
+  const fetchTokenBalances = (await deployContract(
+    ++step,
+    networkConfig.autoVerifyContract,
+    'FetchTokenBalances',
+    existingContract?.['fetchTokenBalances'],
+    deployerAddress
+  )) as FetchTokenBalances;
+
+  const swapContracts = {
+    uniSwap: (!networkConfig.uniswap
+      ? undefined
+      : await deployContract(
+          ++step,
+          networkConfig.autoVerifyContract,
+          'UniSwap',
+          existingContract?.['swapContracts']?.['uniSwap'],
+          deployerAddress,
+          networkConfig.uniswap.routers
+        )) as UniSwap,
+  };
+
+  const lendingContracts = {
+    venusLending: (!networkConfig.compound
+      ? undefined
+      : await deployContract(
+          ++step,
+          networkConfig.autoVerifyContract,
+          'VenusLending',
+          existingContract?.['lendingContracts']?.['venusLending'],
+          deployerAddress
+        )) as VenusLending,
+  };
+
+  const smartWalletProxy = (await deployContract(
+    ++step,
+    networkConfig.autoVerifyContract,
+    'SmartWalletProxy',
+    existingContract?.['smartWalletProxy'],
+    deployerAddress,
+    smartWalletImplementation.address,
+    networkConfig.supportedWallets,
+    Object.values(swapContracts)
+      .filter((c) => c)
+      .map((c: Contract) => c.address),
+    Object.values(lendingContracts)
+      .filter((c) => c)
+      .map((c: Contract) => c.address)
+  )) as SmartWalletProxy;
+
+  return {
+    smartWalletImplementation,
+    smartWalletProxy,
+    fetchTokenBalances,
+    swapContracts,
+    lendingContracts,
+  };
+}
+
+async function deployContract(
+  step: number,
+  autoVerify: boolean,
+  contractName: string,
+  contractAddress: string | undefined,
+  ...args: any[]
+): Promise<Contract> {
+  log(1, `${step}. Deploying '${contractName}'`);
+  log(1, '------------------------------------');
 
   const factory = await ethers.getContractFactory(contractName);
+
+  if (contractAddress) {
+    log(2, `> contract already exists`);
+    log(2, `> address:\t${contractAddress}`);
+    return factory.attach(contractAddress);
+  }
+
   const contract = await factory.deploy(...args);
   const tx = await contract.deployed();
   printInfo(tx.deployTransaction);
-  console.log(`   > address:\t${contract.address}\n\n`);
+  log(2, `> address:\t${contract.address}`);
 
-  return contract.address;
+  if (autoVerify) {
+    try {
+      await run('verify:verify', {
+        address: contract.address,
+        constructorArguments: args,
+      });
+    } catch (e) {
+      log(2, 'failed to verify contract', e);
+    }
+  }
+
+  return contract;
+}
+
+async function updateProxy(
+  {smartWalletProxy, smartWalletImplementation, swapContracts, lendingContracts}: KrystalContracts,
+  extraArgs: {from?: string}
+) {
+  log(1, 'Update impl contract');
+  let currentImpl = await smartWalletProxy.implementation();
+  if (currentImpl === smartWalletImplementation.address) {
+    log(2, `Impl contract is already up-to-date at ${smartWalletImplementation.address}`);
+  } else {
+    const tx = await smartWalletProxy.updateNewImplementation(smartWalletImplementation.address, {
+      gasLimit,
+      ...extraArgs,
+    });
+    printInfo(tx);
+  }
+
+  log(1, 'update supported platform wallets');
+  let existing = await smartWalletProxy.getAllSupportedPlatformWallets();
+  let toBeRemoved = existing.filter((add) => !networkConfig.supportedWallets.includes(add));
+  let toBeAdded = networkConfig.supportedWallets.filter((add) => !existing.includes(add));
+  await updateAddressSet(smartWalletProxy.updateSupportedPlatformWallets, toBeRemoved, toBeAdded, extraArgs);
+
+  log(1, 'update supported swaps');
+  existing = await smartWalletProxy.getAllSupportedSwaps();
+  let swaps: string[] = Object.values(swapContracts)
+    .filter((c) => c)
+    .map((c) => c!.address);
+  toBeRemoved = existing.filter((add) => !swaps.includes(add));
+  toBeAdded = swaps.filter((add) => !existing.includes(add));
+  await updateAddressSet(smartWalletProxy.updateSupportedSwaps, toBeRemoved, toBeAdded, extraArgs);
+
+  log(1, 'update supported lendings');
+  existing = await smartWalletProxy.getAllSupportedLendings();
+  let lendings: string[] = Object.values(lendingContracts)
+    .filter((c) => c)
+    .map((c) => c!.address);
+  toBeRemoved = existing.filter((add) => !lendings.includes(add));
+  toBeAdded = lendings.filter((add) => !existing.includes(add));
+  await updateAddressSet(smartWalletProxy.updateSupportedLendings, toBeRemoved, toBeAdded, extraArgs);
+}
+
+async function updateChildContracts(
+  {smartWalletProxy, swapContracts, lendingContracts}: KrystalContracts,
+  extraArgs: {from?: string}
+) {
+  log(1, 'Linking swap contracts to proxy');
+  let merged = {...swapContracts, ...lendingContracts};
+  for (let contractName in merged) {
+    // @ts-ignore maping to UniSwap to get function list
+    let contract: UniSwap | undefined = merged[contractName];
+    if (contract) {
+      log(2, `Updating ${contractName} ${contract.address}`);
+      if ((await contract.proxyContract()) == smartWalletProxy.address) {
+        log(2, `> Proxy contract is already up-to-date at ${smartWalletProxy.address}`);
+      } else {
+        const tx = await contract.updateproxyContract(smartWalletProxy.address, {
+          gasLimit,
+          ...extraArgs,
+        });
+        log(2, `> Linking to proxy ${smartWalletProxy.address}`);
+        printInfo(tx);
+      }
+    }
+  }
+}
+
+async function updateUniSwap(uniSwap: UniSwap | undefined, extraArgs: {from?: string}) {
+  if (!uniSwap || !networkConfig.uniswap) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update supported routers');
+  let existing = await uniSwap.getAllUniRouters();
+  let toBeRemoved = existing.filter((add) => !networkConfig.uniswap!.routers.includes(add));
+  let toBeAdded = networkConfig.uniswap!.routers.filter((add) => !existing.includes(add));
+  await updateAddressSet(uniSwap.updateUniRouters, toBeRemoved, toBeAdded, extraArgs);
+}
+
+async function updateAddressSet(
+  updateFunc: any,
+  toBeRemoved: string[],
+  toBeAdded: string[],
+  extraArgs: {from?: string}
+) {
+  if (toBeRemoved.length) {
+    const tx = await updateFunc(toBeRemoved, false, {
+      gasLimit,
+      ...extraArgs,
+    });
+    log(2, '> removed wallets', toBeRemoved);
+    printInfo(tx);
+  } else {
+    log(2, '> nothing to be removed');
+  }
+  console.log('\n');
+  if (toBeAdded.length) {
+    const tx = await updateFunc(toBeAdded, true, {
+      gasLimit,
+      ...extraArgs,
+    });
+    log(2, '> added wallets', toBeAdded);
+    printInfo(tx);
+  } else {
+    log(2, '> nothing to be added');
+  }
 }
 
 function printInfo(tx: TransactionResponse) {
-  console.log(`   > tx hash:\t${tx.hash}`);
-  console.log(`   > gas price:\t${tx.gasPrice.toString()}`);
-  console.log(`   > gas limit:\t${tx.gasLimit.toString()}`);
+  log(2, `> tx hash:\t${tx.hash}`);
+  log(2, `> gas price:\t${tx.gasPrice.toString()}`);
+  log(2, `> gas limit:\t${tx.gasLimit.toString()}`);
+}
+
+export function convertToAddressObject(obj: Record<string, any> | Array<any> | Contract): any {
+  if (obj instanceof Contract) {
+    return obj.address;
+  } else if (Array.isArray(obj)) {
+    return obj.map((k) => convertToAddressObject(obj[k]));
+  } else {
+    let ret = {};
+    for (let k in obj) {
+      // @ts-ignore
+      ret[k] = convertToAddressObject(obj[k]);
+    }
+    return ret;
+  }
+}
+
+let prevLevel: number;
+function log(level: number, ...args: any[]) {
+  if (prevLevel != undefined && prevLevel > level) {
+    console.log('\n');
+  }
+  prevLevel = level;
+
+  let prefix = '';
+  for (let i = 0; i < level; i++) {
+    prefix += '    ';
+  }
+  console.log(`${prefix}`, ...args);
 }

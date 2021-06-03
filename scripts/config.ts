@@ -1,17 +1,21 @@
 export interface IConfig {
   autoVerifyContract: boolean;
 
-  busdAddress: string;
-  daiAddress: string;
-  usdcAddress: string;
-  usdtAddress: string;
-  wbnb: string;
+  tokens: Array<{
+    symbol: string;
+    address: string;
+  }>;
 
-  pancake: {
+  // wrapped native token (wEth/wBnb ..)
+  wNative: string;
+
+  // Uniswap or clones
+  uniswap?: {
     routers: string[];
   };
 
-  venus: {
+  // Compound or clones
+  compound?: {
     compTroller: string;
     vBnb: string;
     vTokens: string[];
@@ -21,22 +25,25 @@ export interface IConfig {
 }
 
 const NetworkConfig: Record<string, IConfig> = {
-  testnet: {
+  bsc_testnet: {
     autoVerifyContract: true,
 
-    busdAddress: '0xed24fc36d5ee211ea25a80239fb8c4cfd80f12ee',
-    daiAddress: '0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867',
-    usdcAddress: '0x64544969ed7ebf5f083679233325356ebe738930',
-    usdtAddress: '0x337610d27c682e347c9cd60bd4b3b107c9d34ddd',
-    wbnb: '',
+    tokens: [
+      {symbol: 'busd', address: '0xed24fc36d5ee211ea25a80239fb8c4cfd80f12ee'},
+      {symbol: 'dai', address: '0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867'},
+      {symbol: 'usdc', address: '0x64544969ed7ebf5f083679233325356ebe738930'},
+      {symbol: 'usdt', address: '0x337610d27c682e347c9cd60bd4b3b107c9d34ddd'},
+    ],
+
+    wNative: '',
 
     // Pancake
-    pancake: {
+    uniswap: {
       routers: ['0xD99D1c33F9fC3444f8101754aBC46c52416550D1'],
     },
 
     // Venus
-    venus: {
+    compound: {
       compTroller: '0x94d1820b2d1c7c7452a163983dc888cec546b77d',
       vBnb: '0x2E7222e51c0f6e98610A1543Aa3836E092CDe62c',
       vTokens: [
@@ -59,23 +66,24 @@ const NetworkConfig: Record<string, IConfig> = {
     ],
   },
 
-  mainnet: {
+  bsc_mainnet: {
     autoVerifyContract: true,
+    tokens: [
+      {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
+      {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
+      {symbol: 'usdc', address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'},
+      {symbol: 'usdt', address: '0x55d398326f99059ff775485246999027b3197955'},
+    ],
+    wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
-    busdAddress: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
-    daiAddress: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3',
-    usdcAddress: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
-    usdtAddress: '0x55d398326f99059ff775485246999027b3197955',
-    wbnb: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-
-    pancake: {
+    uniswap: {
       routers: [
         '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // v1
         '0x10ed43c718714eb63d5aa57b78b54704e256024e', // v2
       ],
     },
 
-    venus: {
+    compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
       vBnb: '0xa07c5b74c9b40447a954e1466938b865b6bbea36',
       vTokens: [
@@ -93,7 +101,7 @@ const NetworkConfig: Record<string, IConfig> = {
 };
 
 NetworkConfig.hardhat = {
-  ...NetworkConfig.mainnet,
+  ...NetworkConfig.bsc_mainnet,
   autoVerifyContract: false,
 };
 

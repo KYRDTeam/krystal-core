@@ -80,7 +80,7 @@ const config: HardhatUserConfig = {
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 if (PRIVATE_KEY != undefined) {
-  config.networks!.testnet = {
+  config.networks!.bsc_testnet = {
     url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
     chainId: 97,
     gasPrice: 20000000000,
@@ -88,7 +88,7 @@ if (PRIVATE_KEY != undefined) {
     timeout: 20000,
   };
 
-  config.networks!.mainnet = {
+  config.networks!.bsc_mainnet = {
     url: 'https://bsc-dataseed.binance.org/',
     chainId: 56,
     accounts: [PRIVATE_KEY],

@@ -1,6 +1,6 @@
 import {ethers, network} from 'hardhat';
-import {bnbAddress, bnbDecimals, evm_snapshot} from './helper';
-import {IBEP20, IPancakeRouter02, SmartWalletSwapImplementation} from '../typechain';
+import {nativeTokenAddress, nativeTokenDecimals, evm_snapshot} from './helper';
+import {IBEP20, IPancakeRouter02, SmartWalletImplementation} from '../typechain';
 import {deploy} from '../scripts/deployLogic';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import {NetworkConfig, IConfig} from '../scripts/config';
@@ -15,18 +15,18 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
 
   // Using proxy under the implementaton interface
   let swapProxyInstance = (await ethers.getContractAt(
-    'SmartWalletSwapImplementation',
-    deployedContracts['SmartWalletSwapProxy']
-  )) as SmartWalletSwapImplementation;
+    'SmartWalletImplementation',
+    deployedContracts['SmartWalletProxy']
+  )) as SmartWalletImplementation;
 
   let swapImplementationInstance = (await ethers.getContractAt(
-    'SmartWalletSwapImplementation',
-    deployedContracts['SmartWalletSwapImplementation']
-  )) as SmartWalletSwapImplementation;
+    'SmartWalletImplementation',
+    deployedContracts['SmartWalletImplementation']
+  )) as SmartWalletImplementation;
 
   let pancakeRouter = (await ethers.getContractAt(
     'IPancakeRouter02',
-    networkConfig.pancake.routers[0]
+    networkConfig.uniswap.routers[0]
   )) as IPancakeRouter02;
 
   // Fund wallet
@@ -36,12 +36,12 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
     networkConfig.daiAddress,
     networkConfig.busdAddress,
   ]) {
-    const bnbAmount = BigNumber.from(1000).mul(BigNumber.from(10).pow(bnbDecimals));
+    const bnbAmount = BigNumber.from(1000).mul(BigNumber.from(10).pow(nativeTokenDecimals));
     await swapProxyInstance.swapPancake(
-      networkConfig.pancake.routers[0],
+      networkConfig.uniswap.routers[0],
       bnbAmount,
       0,
-      [bnbAddress, tokenAddress],
+      [nativeTokenAddress, tokenAddress],
       user.address,
       0,
       networkConfig.supportedWallets[0],
@@ -74,8 +74,8 @@ export interface IInitialSetup {
   user: SignerWithAddress;
   preSetupSnapshotId: any;
   postSetupSnapshotId: any;
-  swapImplementationInstance: SmartWalletSwapImplementation;
-  swapProxyInstance: SmartWalletSwapImplementation;
+  swapImplementationInstance: SmartWalletImplementation;
+  swapProxyInstance: SmartWalletImplementation;
   pancakeRouter: IPancakeRouter02;
   network: IConfig;
 }

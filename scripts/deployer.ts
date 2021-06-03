@@ -1,4 +1,4 @@
-import {deploy} from './deployLogic';
+import {convertToAddressObject, deploy} from './deployLogic';
 import * as fs from 'fs';
 import {network} from 'hardhat';
 
@@ -15,7 +15,7 @@ try {
 deploy(contracts[network.name])
   .then((deployedContracts) => {
     // Save contracts' addresses
-    contracts[network.name] = deployedContracts;
+    contracts[network.name] = convertToAddressObject(deployedContracts);
     const json = JSON.stringify(contracts, null, 2) + '\n';
     fs.writeFileSync(contractsFile, json, 'utf8');
     process.exit(0);

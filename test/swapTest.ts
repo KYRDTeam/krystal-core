@@ -1,4 +1,4 @@
-import {bnbAddress, bnbDecimals, BPS, evm_revert, evm_snapshot} from './helper';
+import {nativeTokenAddress, nativeTokenDecimals, BPS, evm_revert} from './helper';
 import {getInitialSetup, IInitialSetup} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
@@ -27,7 +27,7 @@ describe('swap test', async () => {
       feeInSrc: boolean = true
     ): Promise<BigNumber> => {
       const data = await setup.swapProxyInstance.getExpectedReturnPancake(
-        setup.network.pancake.routers[0],
+        setup.network.uniswap.routers[0],
         srcAmount,
         tradePath,
         platformFee,
@@ -49,29 +49,29 @@ describe('swap test', async () => {
     };
 
     it('get expected rate correctly', async () => {
-      let bnbAmount = BigNumber.from(10).pow(BigNumber.from(bnbDecimals)); // one bnb
-      let tradePath = [setup.network.wbnb, tokenAddresses[0]]; // get rate needs to use wbnb
+      let bnbAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one bnb
+      let tradePath = [setup.network.wNative, tokenAddresses[0]]; // get rate needs to use wbnb
       await testGetExpectedRate(bnbAmount, tradePath, false);
       await testGetExpectedRate(bnbAmount, tradePath, true);
     });
 
     it('swap from bnb to token', async () => {
-      let bnbAmount = BigNumber.from(10).pow(BigNumber.from(bnbDecimals)); // one bnb
+      let bnbAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one bnb
 
       for (let i = 0; i < tokenAddresses.length; i++) {
         let token = tokenAddresses[i];
-        let tradePath = [setup.network.wbnb, token]; // get rate needs to use wbnb
+        let tradePath = [setup.network.wNative, token]; // get rate needs to use wbnb
 
         // Get rate
         const destAmount = await testGetExpectedRate(bnbAmount, tradePath);
 
         let minDestAmount = destAmount.mul(97).div(100);
-        tradePath[0] = bnbAddress; // trade needs to use bnb address
+        tradePath[0] = nativeTokenAddress; // trade needs to use bnb address
 
         // Send txn
         await expect(
           await setup.swapProxyInstance.swapPancake(
-            setup.network.pancake.routers[0],
+            setup.network.uniswap.routers[0],
             bnbAmount,
             minDestAmount,
             tradePath,
@@ -89,7 +89,7 @@ describe('swap test', async () => {
         // Missing value
         await expect(
           setup.swapProxyInstance.swapPancake(
-            setup.network.pancake.routers[0],
+            setup.network.uniswap.routers[0],
             bnbAmount,
             minDestAmount,
             tradePath,
@@ -111,14 +111,14 @@ describe('swap test', async () => {
         let token = (await ethers.getContractAt('IBEP20', tokenAddresses[i])) as IBEP20;
         let tokenAmount = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
 
-        for (let targetToken of [...tokenAddresses.slice(i + 1), bnbAddress]) {
+        for (let targetToken of [...tokenAddresses.slice(i + 1), nativeTokenAddress]) {
           // Approve first
           await token.approve(setup.swapProxyInstance.address, tokenAmount);
 
           // Get rate
           const destAmount = await testGetExpectedRate(tokenAmount, [
             tokenAddresses[i],
-            targetToken === bnbAddress ? setup.network.wbnb : targetToken,
+            targetToken === nativeTokenAddress ? setup.network.wNative : targetToken,
           ]);
 
           let minDestAmount = destAmount.mul(97).div(100);
@@ -126,7 +126,7 @@ describe('swap test', async () => {
           // Send txn
           await expect(() => {
             setup.swapProxyInstance.swapPancake(
-              setup.network.pancake.routers[0],
+              setup.network.uniswap.routers[0],
               tokenAmount,
               minDestAmount,
               [tokenAddresses[i], targetToken],
@@ -143,7 +143,7 @@ describe('swap test', async () => {
           // Extra value not needed
           await expect(
             setup.swapProxyInstance.swapPancake(
-              setup.network.pancake.routers[0],
+              setup.network.uniswap.routers[0],
               tokenAmount,
               minDestAmount,
               [tokenAddresses[i], targetToken],
