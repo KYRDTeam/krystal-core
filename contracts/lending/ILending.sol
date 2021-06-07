@@ -29,7 +29,8 @@ interface ILending {
         address payable onBehalfOf,
         IERC20Ext token,
         uint256 amount,
-        uint256 payAmount
+        uint256 payAmount,
+        bytes calldata extraArgs // for extra data .i.e aave rateMode
     ) external;
 
     function storeAndRetrieveUserDebtCurrent(address _reserve, address _user)

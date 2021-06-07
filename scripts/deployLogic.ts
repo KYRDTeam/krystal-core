@@ -1,7 +1,7 @@
 import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
-import {FetchTokenBalances, SmartWalletImplementation, SmartWalletProxy, UniSwap, VenusLending} from '../typechain';
+import {FetchTokenBalances, SmartWalletImplementation, SmartWalletProxy, UniSwap, CompoundLending} from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 
 const gasLimit = 700000;
@@ -19,7 +19,7 @@ export interface KrystalContracts {
     uniSwap?: UniSwap;
   };
   lendingContracts: {
-    venusLending?: VenusLending;
+    compoundLending?: CompoundLending;
   };
 }
 
@@ -48,9 +48,9 @@ export const deploy = async (
   log(0, '======================\n');
   await updateUniSwap(deployedContracts.swapContracts.uniSwap, extraArgs);
 
-  // log(0, 'Updating compound/clones config');
-  // log(0, '======================\n');
-  // await updateVenusLending(deployedContracts.lendingContracts.venusLending);
+  log(0, 'Updating compound/clones config');
+  log(0, '======================\n');
+  await updateCompoundLending(deployedContracts.lendingContracts.compoundLending, extraArgs);
 
   // Summary
   log(0, 'Summary');
@@ -98,15 +98,15 @@ async function deployContracts(
   };
 
   const lendingContracts = {
-    venusLending: (!networkConfig.compound
+    compoundLending: (!networkConfig.compound
       ? undefined
       : await deployContract(
           ++step,
           networkConfig.autoVerifyContract,
-          'VenusLending',
-          existingContract?.['lendingContracts']?.['venusLending'],
+          'CompoundLending',
+          existingContract?.['lendingContracts']?.['compoundLending'],
           deployerAddress
-        )) as VenusLending,
+        )) as CompoundLending,
   };
 
   const smartWalletProxy = (await deployContract(
@@ -247,6 +247,26 @@ async function updateUniSwap(uniSwap: UniSwap | undefined, extraArgs: {from?: st
   let toBeRemoved = existing.filter((add) => !networkConfig.uniswap!.routers.includes(add));
   let toBeAdded = networkConfig.uniswap!.routers.filter((add) => !existing.includes(add));
   await updateAddressSet(uniSwap.updateUniRouters, toBeRemoved, toBeAdded, extraArgs);
+}
+
+async function updateCompoundLending(compoundLending: CompoundLending | undefined, extraArgs: {from?: string}) {
+  if (!compoundLending || !networkConfig.compound) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+
+  log(1, 'update compound data');
+  if ((await compoundLending.getComptroller()) === networkConfig.compound.compTroller) {
+    log(2, `comptroller already up-to-date at ${networkConfig.compound.compTroller}`);
+  } else {
+    const tx = await compoundLending.updateCompoundData(
+      networkConfig.compound.compTroller,
+      networkConfig.compound.cNative,
+      networkConfig.compound.cTokens
+    );
+    log(2, '> updated compound', JSON.stringify(networkConfig.compound, null, 2));
+    printInfo(tx);
+  }
 }
 
 async function updateAddressSet(

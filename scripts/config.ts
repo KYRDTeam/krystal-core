@@ -17,8 +17,8 @@ export interface IConfig {
   // Compound or clones
   compound?: {
     compTroller: string;
-    vBnb: string;
-    vTokens: string[];
+    cNative: string;
+    cTokens: string[];
   };
 
   supportedWallets: string[];
@@ -42,11 +42,12 @@ const NetworkConfig: Record<string, IConfig> = {
       routers: ['0xD99D1c33F9fC3444f8101754aBC46c52416550D1'],
     },
 
-    // Venus
+    // Compound
     compound: {
       compTroller: '0x94d1820b2d1c7c7452a163983dc888cec546b77d',
-      vBnb: '0x2E7222e51c0f6e98610A1543Aa3836E092CDe62c',
-      vTokens: [
+      cNative: '0x2E7222e51c0f6e98610A1543Aa3836E092CDe62c',
+      // empty array for the full market data
+      cTokens: [
         '0x74469281310195A04840Daf6EdF576F559a3dE80',
         '0xD5C4C2e2facBEB59D0216D0595d63FcDc6F9A1a7',
         '0xb7526572FFE56AB9D7489838Bf2E18e3323b441A',
@@ -85,11 +86,11 @@ const NetworkConfig: Record<string, IConfig> = {
 
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
-      vBnb: '0xa07c5b74c9b40447a954e1466938b865b6bbea36',
-      vTokens: [
-        // https://api.venus.io/api/vToken
-        '0x2ff3d0f6990a40261c66e1ff2017acbc282eb6d0',
-      ],
+      // cBNB or cETH
+      cNative: '0xa07c5b74c9b40447a954e1466938b865b6bbea36',
+      // https://api.compound.io/api/cToken
+      // empty array for the full market data
+      cTokens: [],
     },
 
     supportedWallets: [

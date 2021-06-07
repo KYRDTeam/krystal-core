@@ -7,7 +7,7 @@
       "uniSwap": "0x181Cf7df196612c6cb4eCA09c257156c4CB26F1C"
     },
     "lendingContracts": {
-      "venusLending": "0x4C7A19b5191A308ca21f0aFC1Ad0828B55f7842C"
+      "compoundLending": "0x4C7A19b5191A308ca21f0aFC1Ad0828B55f7842C"
     }
   },
   "bsc_mainnet": {
