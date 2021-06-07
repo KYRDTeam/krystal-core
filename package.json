@@ -56,6 +56,8 @@
     "hardhat": "2.0.8",
     "hardhat-contract-sizer": "^2.0.3",
     "hardhat-gas-reporter": "^1.0.4",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
     "prettier": "^2.2.1",
     "prettier-plugin-solidity": "^1.0.0-beta.10",
     "solhint": "^3.3.4",
@@ -64,5 +66,16 @@
     "ts-node": "^9.1.1",
     "typechain": "^4.0.3",
     "typescript": "^4.2.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn lint:fix",
+      "git add"
+    ]
   }
 }

@@ -85,6 +85,7 @@ contract UniSwap is BaseSwap {
                 minData: minDestAmount,
                 recipient: recipient
             });
+            safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
             destAmount = doUniTrade(
                 router,
                 tradePath,

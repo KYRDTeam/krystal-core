@@ -17,7 +17,7 @@ describe('swap test', async () => {
     router: string,
     generateArgsFunc: () => string,
     platformFee: number,
-    getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<any>
+    getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>
   ) {
     const testGetExpectedRate = async (
       swapContract: string,
@@ -36,13 +36,16 @@ describe('swap test', async () => {
       assert(!data.destAmount.isZero(), 'non-zero destAmount');
       assert(!data.expectedRate.isZero(), 'non-zero expectedRate');
 
-      const actualDest = await getActualRate(srcAmount, tradePath);
-      const amountDiff = actualDest.sub(data.destAmount);
-      const actualFee = amountDiff.mul(BPS).mul(1000).div(actualDest).toNumber() / 1000;
-      assert(
-        Math.abs(actualFee - platformFee) < EPS,
-        `fee should be around ${platformFee} bps. actual fee = ${actualFee}, expected = ${platformFee}`
-      );
+      if (feeMode === FeeMode.BY_PROTOCOL) {
+        const actualDest = await getActualRate(srcAmount, tradePath);
+        assert(actualDest.eq(data.destAmount), `expected: ${actualDest}, received: ${data.destAmount}`);
+      } else if (feeMode == FeeMode.FROM_SOURCE) {
+        const actualDest = await getActualRate(srcAmount.mul(BPS.sub(platformFee)).div(BPS), tradePath);
+        assert(actualDest.eq(data.destAmount), `expected: ${actualDest}, received: ${data.destAmount}`);
+      } else if (feeMode == FeeMode.FROM_DEST) {
+        const actualDest = (await getActualRate(srcAmount, tradePath)).mul(BPS.sub(platformFee)).div(BPS);
+        assert(actualDest.eq(data.destAmount), `expected: ${actualDest}, received: ${data.destAmount}`);
+      }
 
       return data.destAmount;
     };
@@ -152,7 +155,7 @@ describe('swap test', async () => {
 
             // Extra value not needed
             await expect(
-              setup.proxyInstance.swapPancake(
+              setup.proxyInstance.swap(
                 swapContract,
                 tokenAmount,
                 minDestAmount,

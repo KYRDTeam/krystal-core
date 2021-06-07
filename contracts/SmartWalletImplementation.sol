@@ -109,7 +109,8 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
                 msg.sender, 
                 payable(address(swapContract)), 
                 IERC20Ext(tradePath[0]), 
-                srcAmount, 
+                srcAmount,
+                 
                 feeMode == FeeMode.FROM_SOURCE ? platformFeeBps : 0, 
                 platformWallet
             );
