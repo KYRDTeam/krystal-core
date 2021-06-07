@@ -55,7 +55,7 @@ contract UniSwap is BaseSwap {
         bytes calldata extraArgs
     ) external view override onlyProxyContract returns (uint256 destAmount) {
         IUniswapV2Router02 router = parseExtraArgs(extraArgs);
-        
+
         // in case pair is not supported
         try router.getAmountsOut(srcAmount, tradePath) returns (uint256[] memory amounts) {
             destAmount = amounts[tradePath.length - 1];
@@ -80,17 +80,10 @@ contract UniSwap is BaseSwap {
 
         {
             // prevent stack too deep
-            TradeInput memory tradeInput = TradeInput({
-                srcAmount: srcAmount,
-                minData: minDestAmount,
-                recipient: recipient
-            });
+            TradeInput memory tradeInput =
+                TradeInput({srcAmount: srcAmount, minData: minDestAmount, recipient: recipient});
             safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
-            destAmount = doUniTrade(
-                router,
-                tradePath,
-                tradeInput
-            );
+            destAmount = doUniTrade(router, tradePath, tradeInput);
         }
     }
 
@@ -112,7 +105,7 @@ contract UniSwap is BaseSwap {
         }
 
         uint256 destBalanceBefore = getBalance(actualDest, input.recipient);
-        
+
         if (actualSrc == ETH_TOKEN_ADDRESS) {
             // swap eth/bnb -> token
             router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: input.srcAmount}(
@@ -146,14 +139,16 @@ contract UniSwap is BaseSwap {
         destAmount = getBalance(actualDest, input.recipient).sub(destBalanceBefore);
     }
 
-    function parseExtraArgs(
-        bytes calldata extraArgs
-    ) internal view returns (IUniswapV2Router02 router) {
+    function parseExtraArgs(bytes calldata extraArgs)
+        internal
+        view
+        returns (IUniswapV2Router02 router)
+    {
         // Store address in 32 bytes
         require(extraArgs.length == 32, "invalid args");
         assembly {
             router := calldataload(extraArgs.offset)
-        } 
+        }
         require(router != IUniswapV2Router02(0), "invalid address");
         require(uniRouters.contains(address(router)), "unsupported router");
     }

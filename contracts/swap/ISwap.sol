@@ -6,9 +6,7 @@ interface ISwap {
         uint256 srcAmount,
         address[] calldata tradePath,
         bytes calldata extraArgs
-    ) external view returns (
-        uint256 destAmount
-    );
+    ) external view returns (uint256 destAmount);
 
     function swap(
         uint256 srcAmount,

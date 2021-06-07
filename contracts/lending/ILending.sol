@@ -32,15 +32,11 @@ interface ILending {
         uint256 payAmount
     ) external;
 
-    function storeAndRetrieveUserDebtCurrent(
-        address _reserve,
-        address _user
-    ) external returns (uint256 debt);
-
-    function getLendingToken(IERC20Ext token) external view returns(address);
-
-    function getUserDebtStored(address reserve, address user)
+    function storeAndRetrieveUserDebtCurrent(address _reserve, address _user)
         external
-        view
         returns (uint256 debt);
+
+    function getLendingToken(IERC20Ext token) external view returns (address);
+
+    function getUserDebtStored(address reserve, address user) external view returns (uint256 debt);
 }

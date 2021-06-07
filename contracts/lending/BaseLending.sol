@@ -14,7 +14,7 @@ abstract contract BaseLending is ILending, Withdrawable, Utils {
     address public proxyContract;
 
     event UpdatedproxyContract(address indexed _oldProxyImpl, address indexed _newProxyImpl);
-    
+
     modifier onlyProxyContract() {
         require(msg.sender == proxyContract, "only proxy impl");
         _;

@@ -8,7 +8,6 @@ import "./BaseLending.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 
-
 contract VenusLending is BaseLending {
     using SafeERC20 for IERC20Ext;
     using SafeMath for uint256;
@@ -97,10 +96,7 @@ contract VenusLending is BaseLending {
             require(IVBep20(vToken).mint(amount) == 0, "can not mint vToken");
         }
         uint256 vTokenBalanceAfter = IERC20Ext(vToken).balanceOf(address(this));
-        IERC20Ext(vToken).safeTransfer(
-            onBehalfOf,
-            vTokenBalanceAfter.sub(vTokenBalanceBefore)
-        );
+        IERC20Ext(vToken).safeTransfer(onBehalfOf, vTokenBalanceAfter.sub(vTokenBalanceBefore));
     }
 
     /// @dev withdraw from lending platforms like VENUS
@@ -116,7 +112,7 @@ contract VenusLending is BaseLending {
 
         // burn vToken to withdraw underlying token
         require(IVBep20(lendingToken).redeem(amount) == 0, "unable to redeem");
-        
+
         returnedAmount = getBalance(token, address(this)).sub(tokenBalanceBefore);
         require(returnedAmount >= minReturn, "low returned amount");
 
@@ -163,35 +159,32 @@ contract VenusLending is BaseLending {
         }
     }
 
-    function getLendingToken(IERC20Ext token)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getLendingToken(IERC20Ext token) public view override returns (address) {
         return venusData.vTokens[token];
     }
 
     /** @dev Calculate the current user debt and return
-    */
-    function storeAndRetrieveUserDebtCurrent(
-        address _reserve,
-        address _user
-    ) external override returns (uint256 debt) {
+     */
+    function storeAndRetrieveUserDebtCurrent(address _reserve, address _user)
+        external
+        override
+        returns (uint256 debt)
+    {
         IVBep20 vToken = IVBep20(venusData.vTokens[IERC20Ext(_reserve)]);
         debt = vToken.borrowBalanceCurrent(_user);
     }
 
     /** @dev Return the stored user debt from given platform
-    *   to get the latest data of user's debt for repaying, should call
-    *   storeAndRetrieveUserDebtCurrent function, esp for Venus platform
-    */
-    function getUserDebtStored(
-        address _reserve,
-        address _user
-    ) public view override returns (uint256 debt) {
+     *   to get the latest data of user's debt for repaying, should call
+     *   storeAndRetrieveUserDebtCurrent function, esp for Venus platform
+     */
+    function getUserDebtStored(address _reserve, address _user)
+        public
+        view
+        override
+        returns (uint256 debt)
+    {
         IVBep20 vToken = IVBep20(venusData.vTokens[IERC20Ext(_reserve)]);
         debt = vToken.borrowBalanceStored(_user);
     }
-
 }

@@ -5,7 +5,7 @@ import "../lending/ILending.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 
 interface ISmartWalletImplementation {
-    enum FeeMode { FROM_SOURCE, FROM_DEST, BY_PROTOCOL }
+    enum FeeMode {FROM_SOURCE, FROM_DEST, BY_PROTOCOL}
 
     event Swap(
         address indexed trader,
