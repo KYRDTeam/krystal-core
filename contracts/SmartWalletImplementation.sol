@@ -176,7 +176,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
                     platformWallet
                 );
             } else {
-                swapInternal(
+                destAmount = swapInternal(
                     swapContract,
                     srcAmount,
                     minDestAmount,
@@ -356,7 +356,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         if (feeMode == FeeMode.FROM_DEST) {
             destAmount = safeTransferWithFee(
                 address(this), 
-                msg.sender,
+                recipient,
                 tradePath[tradePath.length - 1], 
                 destAmount, 
                 platformFee, 

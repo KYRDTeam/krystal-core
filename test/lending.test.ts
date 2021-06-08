@@ -50,16 +50,31 @@ describe('lending test', async () => {
     };
 
     describe(`testing swap and deposit on ${name} with router ${router}`, async () => {
-      it('swap and deposit with errors', async () => {
+      it('swap and deposit', async () => {
         let swapContract = await getSwapContract();
         let lendingContract = await getLendingContract();
-        let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
+        const lendingContractInstance = (await ethers.getContractAt('ILending', lendingContract)) as ILending;
 
         for (let {address} of setup.network.tokens) {
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
-          let tradePath = [nativeTokenAddress, token.address];
-          let tradePathErc = [setup.network.wNative, token.address];
-          const destAmount = await testGetExpectedRate(swapContract, nativeAmount, tradePathErc, FeeMode.FROM_SOURCE);
+          let tokenAmount = BigNumber.from(10)
+            .pow(await token.decimals())
+            .mul(10); // 10 token unit
+          let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
+
+          let lendingTokenAddress = await lendingContractInstance.getLendingToken(address);
+          let lendingToken = (await ethers.getContractAt('IERC20Ext', lendingTokenAddress)) as IERC20Ext;
+
+          // approve first
+          await token.approve(setup.proxyInstance.address, tokenAmount);
+
+          const destAmount = await testGetExpectedRate(
+            swapContract,
+            nativeAmount,
+            [setup.network.wNative, token.address],
+            FeeMode.FROM_SOURCE
+          );
+
           let minDestAmount = destAmount.mul(97).div(100);
 
           // Empty tradePath
@@ -87,7 +102,7 @@ describe('lending test', async () => {
               lendingContract,
               nativeAmount,
               minDestAmount,
-              tradePath,
+              [nativeTokenAddress, token.address],
               BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
               setup.network.supportedWallets[0],
               generateArgsFunc(),
@@ -97,38 +112,16 @@ describe('lending test', async () => {
               }
             )
           ).to.be.revertedWith('wrong msg value');
-        }
-      });
 
-      it('deposit directly without swapping', async () => {
-        let swapContract = await getSwapContract();
-        let lendingContract = await getLendingContract();
-        const lendingContractInstance = (await ethers.getContractAt('ILending', lendingContract)) as ILending;
-
-        for (let {address} of setup.network.tokens) {
-          let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
-          let tokenAmount = BigNumber.from(10)
-            .pow(await token.decimals())
-            .mul(10); // 10 token unit
-
-          let lendingTokenAddress = await lendingContractInstance.getLendingToken(address);
-          let lendingToken = (await ethers.getContractAt('IERC20Ext', lendingTokenAddress)) as IERC20Ext;
-
-          // approve first
-          await token.approve(setup.proxyInstance.address, tokenAmount);
-
-          let tradePath = [token.address];
-          const destAmount = tokenAmount;
-          let minDestAmount = destAmount.mul(97).div(100);
-
+          // Case deposit directly
           let beforeCToken = await lendingToken.balanceOf(setup.user.address);
           await expect(() => {
             setup.proxyInstance.swapAndDeposit(
               swapContract,
               lendingContract,
               tokenAmount,
-              minDestAmount,
-              tradePath,
+              tokenAmount,
+              [token.address],
               BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
               setup.network.supportedWallets[0],
               generateArgsFunc(),
@@ -141,7 +134,31 @@ describe('lending test', async () => {
           let afterCToken = await lendingToken.balanceOf(setup.user.address);
           assert(
             afterCToken.gt(beforeCToken),
-            `user should receive some cToken: after ${afterCToken} vs before ${beforeCToken}`
+            `user should receive some cToken for directly swap: after ${afterCToken} vs before ${beforeCToken}`
+          );
+
+          // Case swapping then deposit
+          beforeCToken = await lendingToken.balanceOf(setup.user.address);
+          await expect(
+            await setup.proxyInstance.swapAndDeposit(
+              swapContract,
+              lendingContract,
+              nativeAmount,
+              minDestAmount,
+              [nativeTokenAddress, token.address],
+              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
+              setup.network.supportedWallets[0],
+              generateArgsFunc(),
+              {
+                from: setup.user.address,
+                value: nativeAmount,
+              }
+            )
+          ).to.changeEtherBalance(setup.user, BigNumber.from(0).sub(nativeAmount));
+          afterCToken = await lendingToken.balanceOf(setup.user.address);
+          assert(
+            afterCToken.gt(beforeCToken),
+            `user should receive some cToken for swapAndDeposit: after ${afterCToken} vs before ${beforeCToken}`
           );
         }
       });
