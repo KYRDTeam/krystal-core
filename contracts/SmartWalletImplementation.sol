@@ -165,11 +165,11 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         {
             if (tradePath.length == 1) {
                 // just collect src token, no need to swap
-                validateSourceAmount(tradePath[tradePath.length - 1], srcAmount);
+                validateSourceAmount(tradePath[0], srcAmount);
                 destAmount = safeTransferWithFee(
                     msg.sender, 
                     lendingContract, 
-                    tradePath[tradePath.length - 1], 
+                    tradePath[0], 
                     srcAmount,
                     // Not taking lending fee
                     0, 
@@ -268,11 +268,11 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             
             if (tradePath.length == 1) {
                 // just collect src token, no need to swap
-                validateSourceAmount(tradePath[tradePath.length - 1], srcAmount);
+                validateSourceAmount(tradePath[0], srcAmount);
                 destAmount = safeTransferWithFee(
                     msg.sender, 
                     lendingContract, 
-                    tradePath[tradePath.length - 1],
+                    tradePath[0],
                     srcAmount,
                     // Not taking repay fee
                     0, 
@@ -369,7 +369,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         address srcToken,
         uint256 srcAmount
     ) internal {
-        if (IERC20Ext(srcToken) == ETH_TOKEN_ADDRESS) {
+        if (srcToken == address(ETH_TOKEN_ADDRESS)) {
             require(msg.value == srcAmount, "wrong msg value");
         } else {
             require(msg.value == 0, "bad msg value");

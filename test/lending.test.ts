@@ -1,18 +1,19 @@
-import {nativeTokenAddress, nativeTokenDecimals, BPS, evm_revert, FeeMode, EPS} from './helper';
+import {nativeTokenDecimals, BPS, evm_revert, FeeMode, nativeTokenAddress} from './helper';
 import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
-import {IERC20Ext, IUniswapV2Router02} from '../typechain';
+import {IERC20Ext, ILending, IUniswapV2Router02} from '../typechain';
 import {ethers} from 'hardhat';
 import {arrayify, hexlify, zeroPad} from 'ethers/lib/utils';
 
-describe('swap test', async () => {
+describe('lending test', async () => {
   let platformFee = 8;
   let setup: IInitialSetup;
 
-  function executeSwapTest(
+  function executeLendingTest(
     name: string,
     getSwapContract: () => Promise<string>,
+    getLendingContract: () => Promise<string>,
     router: string,
     generateArgsFunc: () => string,
     platformFee: number,
@@ -48,38 +49,27 @@ describe('swap test', async () => {
       return data.destAmount;
     };
 
-    describe(`testing swap contract ${name} with router ${router}`, async () => {
-      it('get expected rate correctly', async () => {
+    describe(`testing swap and deposit on ${name} with router ${router}`, async () => {
+      it('swap and deposit with errors', async () => {
         let swapContract = await getSwapContract();
-        let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one bnb
-        for (let {address} of setup.network.tokens) {
-          let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
-          await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.BY_PROTOCOL);
-          await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.FROM_DEST);
-          await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.FROM_SOURCE);
-        }
-      });
-
-      it('swap from native to token', async () => {
-        let swapContract = await getSwapContract();
+        let lendingContract = await getLendingContract();
         let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
 
         for (let {address} of setup.network.tokens) {
-          let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
-
-          // Get rate
-          const destAmount = await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.FROM_SOURCE);
-
+          let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
+          let tradePath = [nativeTokenAddress, token.address];
+          let tradePathErc = [setup.network.wNative, token.address];
+          const destAmount = await testGetExpectedRate(swapContract, nativeAmount, tradePathErc, FeeMode.FROM_SOURCE);
           let minDestAmount = destAmount.mul(97).div(100);
-          tradePath[0] = nativeTokenAddress; // trade needs to use bnb address
 
-          // Send txn
+          // Empty tradePath
           await expect(
-            await setup.proxyInstance.swap(
+            setup.proxyInstance.swapAndDeposit(
               swapContract,
+              lendingContract,
               nativeAmount,
               minDestAmount,
-              tradePath,
+              [],
               BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
               setup.network.supportedWallets[0],
               generateArgsFunc(),
@@ -88,12 +78,13 @@ describe('swap test', async () => {
                 value: nativeAmount,
               }
             )
-          ).to.changeEtherBalance(setup.user, BigNumber.from(0).sub(nativeAmount));
+          ).to.be.revertedWith('invalid tradePath');
 
-          // Missing value
+          // wrong msg value
           await expect(
-            setup.proxyInstance.swap(
+            setup.proxyInstance.swapAndDeposit(
               swapContract,
+              lendingContract,
               nativeAmount,
               minDestAmount,
               tradePath,
@@ -109,62 +100,49 @@ describe('swap test', async () => {
         }
       });
 
-      it('swap from token to native/other tokens', async () => {
+      it('deposit directly without swapping', async () => {
         let swapContract = await getSwapContract();
+        let lendingContract = await getLendingContract();
+        const lendingContractInstance = (await ethers.getContractAt('ILending', lendingContract)) as ILending;
+
         for (let {address} of setup.network.tokens) {
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
-          let tokenAmount = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
+          let tokenAmount = BigNumber.from(10)
+            .pow(await token.decimals())
+            .mul(10); // 10 token unit
 
-          for (let targetToken of [...setup.network.tokens.map((t) => t.address), nativeTokenAddress]) {
-            if (address === targetToken) {
-              continue;
-            }
-            // Approve first
-            await token.approve(setup.proxyInstance.address, tokenAmount);
+          let lendingTokenAddress = await lendingContractInstance.getLendingToken(address);
+          let lendingToken = (await ethers.getContractAt('IERC20Ext', lendingTokenAddress)) as IERC20Ext;
 
-            // Get rate
-            const destAmount = await testGetExpectedRate(
+          // approve first
+          await token.approve(setup.proxyInstance.address, tokenAmount);
+
+          let tradePath = [token.address];
+          const destAmount = tokenAmount;
+          let minDestAmount = destAmount.mul(97).div(100);
+
+          let beforeCToken = await lendingToken.balanceOf(setup.user.address);
+          await expect(() => {
+            setup.proxyInstance.swapAndDeposit(
               swapContract,
+              lendingContract,
               tokenAmount,
-              [token.address, targetToken === nativeTokenAddress ? setup.network.wNative : targetToken],
-              FeeMode.FROM_SOURCE
+              minDestAmount,
+              tradePath,
+              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
+              setup.network.supportedWallets[0],
+              generateArgsFunc(),
+              {
+                from: setup.user.address,
+                value: 0,
+              }
             );
-
-            let minDestAmount = destAmount.mul(97).div(100);
-
-            // Send txn
-            await expect(() => {
-              setup.proxyInstance.swap(
-                swapContract,
-                tokenAmount,
-                minDestAmount,
-                [token.address, targetToken],
-                BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-                setup.network.supportedWallets[0],
-                generateArgsFunc(),
-                {
-                  from: setup.user.address,
-                }
-              );
-            }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(tokenAmount));
-
-            // Extra value not needed
-            await expect(
-              setup.proxyInstance.swap(
-                swapContract,
-                tokenAmount,
-                minDestAmount,
-                [token.address, targetToken],
-                BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-                setup.network.supportedWallets[0],
-                generateArgsFunc(),
-                {
-                  from: setup.user.address,
-                  value: BigNumber.from(1),
-                }
-              )
-            ).to.be.revertedWith('bad msg value');
-          }
+          }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(tokenAmount));
+          let afterCToken = await lendingToken.balanceOf(setup.user.address);
+          assert(
+            afterCToken.gt(beforeCToken),
+            `user should receive some cToken: after ${afterCToken} vs before ${beforeCToken}`
+          );
         }
       });
     });
@@ -175,22 +153,24 @@ describe('swap test', async () => {
   });
 
   beforeEach(async () => {
-    // let setup: IInitialSetup = await getInitialSetup("5");
     await evm_revert(setup.postSetupSnapshotId);
   });
 
   // Need at least 1 test to be recognized as the test suite
-  it('swap test should be initialized', async () => {});
+  it('lending test should be initialized', async () => {});
 
-  describe('should swap on univ2/clones', async () => {
-    if (networkSetting.uniswap) {
+  describe('should swap and do lending on univ2/clones and compound', async () => {
+    if (networkSetting.uniswap && networkSetting.compound) {
       for (let router of networkSetting.uniswap.routers) {
         const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
 
-        executeSwapTest(
-          'univ2/clones',
+        executeLendingTest(
+          'univ2/clones + compound',
           async () => {
             return setup.krystalContracts.swapContracts.uniSwap!.address;
+          },
+          async () => {
+            return setup.krystalContracts.lendingContracts.compoundLending!.address;
           },
           router,
           () => hexlify(zeroPad(arrayify(router), 32)),
