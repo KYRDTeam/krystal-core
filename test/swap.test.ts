@@ -29,8 +29,7 @@ describe('swap test', async () => {
         swapContract,
         srcAmount,
         tradePath,
-        platformFee,
-        feeMode,
+        BPS.mul(feeMode).add(platformFee),
         generateArgsFunc()
       );
       assert(!data.destAmount.isZero(), 'non-zero destAmount');
@@ -82,9 +81,8 @@ describe('swap test', async () => {
               nativeAmount,
               minDestAmount,
               tradePath,
-              platformFee,
+              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
               setup.network.supportedWallets[0],
-              FeeMode.FROM_SOURCE,
               generateArgsFunc(),
               {
                 from: setup.user.address,
@@ -100,9 +98,8 @@ describe('swap test', async () => {
               nativeAmount,
               minDestAmount,
               tradePath,
-              platformFee,
+              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
               setup.network.supportedWallets[0],
-              FeeMode.FROM_SOURCE,
               generateArgsFunc(),
               {
                 from: setup.user.address,
@@ -143,9 +140,8 @@ describe('swap test', async () => {
                 tokenAmount,
                 minDestAmount,
                 [token.address, targetToken],
-                platformFee,
+                BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
                 setup.network.supportedWallets[0],
-                FeeMode.FROM_SOURCE,
                 generateArgsFunc(),
                 {
                   from: setup.user.address,
@@ -160,9 +156,8 @@ describe('swap test', async () => {
                 tokenAmount,
                 minDestAmount,
                 [token.address, targetToken],
-                platformFee,
+                BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
                 setup.network.supportedWallets[0],
-                FeeMode.FROM_SOURCE,
                 generateArgsFunc(),
                 {
                   from: setup.user.address,

@@ -1,7 +1,5 @@
 pragma solidity 0.7.6;
 
-import "../swap/ISwap.sol";
-import "../lending/ILending.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 
 interface ISmartWalletImplementation {
@@ -13,9 +11,8 @@ interface ISmartWalletImplementation {
         address[] tradePath,
         uint256 srcAmount,
         uint256 destAmount,
-        uint256 platformFeeBps,
-        address platformWallet,
-        FeeMode feeMode
+        uint256 platformFee,
+        address platformWallet
     );
 
     event SwapAndDeposit(
@@ -25,9 +22,8 @@ interface ISmartWalletImplementation {
         address[] tradePath,
         uint256 srcAmount,
         uint256 destAmount,
-        uint256 platformFeeBps,
-        address platformWallet,
-        FeeMode feeMode
+        uint256 platformFee,
+        address platformWallet
     );
 
     event WithdrawFromLending(
@@ -52,53 +48,49 @@ interface ISmartWalletImplementation {
     );
 
     function getExpectedReturn(
-        ISwap swapContract,
+        address payable swapContract,
         uint256 srcAmount,
         address[] calldata tradePath,
-        uint256 platformFeeBps,
-        FeeMode feeMode,
+        uint256 platformFee,
         bytes calldata extraArgs
     ) external view returns (uint256 destAmount, uint256 expectedRate);
 
     function swap(
-        ISwap swapContract,
+        address payable swapContract,
         uint256 srcAmount,
         uint256 minDestAmount,
         address[] calldata tradePath,
-        uint256 platformFeeBps,
+        uint256 platformFee,
         address payable platformWallet,
-        FeeMode feeMode,
         bytes calldata extraArgs
     ) external payable returns (uint256 destAmount);
 
     function swapAndDeposit(
-        ISwap swapContract,
-        ILending lendingContract,
+        address payable swapContract,
+        address payable lendingContract,
         uint256 srcAmount,
         uint256 minDestAmount,
         address[] calldata tradePath,
-        uint256 platformFeeBps,
+        uint256 platformFee,
         address payable platformWallet,
-        FeeMode feeMode,
         bytes calldata extraArgs
     ) external payable returns (uint256 destAmount);
 
     function withdrawFromLendingPlatform(
-        ILending lendingContract,
+        address payable lendingContract,
         IERC20Ext token,
         uint256 amount,
         uint256 minReturn
     ) external returns (uint256 returnedAmount);
 
     function swapAndRepay(
-        ISwap swapContract,
-        ILending lendingContract,
+        address payable swapContract,
+        address payable lendingContract,
         uint256 srcAmount,
         uint256 payAmount,
         address[] calldata tradePath,
         uint256 feeAndRateMode,
         address payable platformWallet,
-        FeeMode feeMode,
         bytes calldata extraArgs
     ) external payable returns (uint256 destAmount);
 
