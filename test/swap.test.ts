@@ -31,8 +31,8 @@ describe('swap test', async () => {
         BPS.mul(feeMode).add(platformFee),
         generateArgsFunc()
       );
-      assert(!data.destAmount.isZero(), 'non-zero destAmount');
-      assert(!data.expectedRate.isZero(), 'non-zero expectedRate');
+      assert(!data.destAmount.isZero(), 'zero destAmount');
+      assert(!data.expectedRate.isZero(), 'zero expectedRate');
 
       if (feeMode === FeeMode.BY_PROTOCOL) {
         const actualDest = await getActualRate(srcAmount, tradePath);
@@ -48,23 +48,25 @@ describe('swap test', async () => {
       return data.destAmount;
     };
 
-    describe(`testing swap contract ${name} with router ${router}`, async () => {
-      it('get expected rate correctly', async () => {
-        let swapContract = await getSwapContract();
-        let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one bnb
-        for (let {address} of setup.network.tokens) {
+    for (let {address, symbol} of networkSetting.tokens) {
+      describe(`testing swap funtionalities on ${name} with ${symbol} token and router ${router}`, async () => {
+        beforeEach(async () => {
+          await evm_revert(setup.postSetupSnapshotId);
+        });
+
+        it('get expected rate correctly', async () => {
+          let swapContract = await getSwapContract();
+          let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one bnb
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
           await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.BY_PROTOCOL);
           await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.FROM_DEST);
           await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.FROM_SOURCE);
-        }
-      });
+        });
 
-      it('swap from native to token', async () => {
-        let swapContract = await getSwapContract();
-        let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
+        it('swap from native to token', async () => {
+          let swapContract = await getSwapContract();
+          let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
 
-        for (let {address} of setup.network.tokens) {
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
 
           // Get rate
@@ -106,12 +108,10 @@ describe('swap test', async () => {
               }
             )
           ).to.be.revertedWith('wrong msg value');
-        }
-      });
+        });
 
-      it('swap from token to native/other tokens', async () => {
-        let swapContract = await getSwapContract();
-        for (let {address} of setup.network.tokens) {
+        it('swap from token to native/other tokens', async () => {
+          let swapContract = await getSwapContract();
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
           let tokenAmount = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
 
@@ -165,42 +165,35 @@ describe('swap test', async () => {
               )
             ).to.be.revertedWith('bad msg value');
           }
-        }
+        });
       });
-    });
+    }
   }
 
   before(async () => {
     setup = await getInitialSetup();
   });
 
-  beforeEach(async () => {
-    // let setup: IInitialSetup = await getInitialSetup("5");
-    await evm_revert(setup.postSetupSnapshotId);
-  });
-
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
-  describe('should swap on univ2/clones', async () => {
-    if (networkSetting.uniswap) {
-      for (let router of networkSetting.uniswap.routers) {
-        const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+  if (networkSetting.uniswap) {
+    for (let router of networkSetting.uniswap.routers) {
+      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
 
-        executeSwapTest(
-          'univ2/clones',
-          async () => {
-            return setup.krystalContracts.swapContracts.uniSwap!.address;
-          },
-          router,
-          () => hexlify(zeroPad(arrayify(router), 32)),
-          platformFee,
-          async (sourceAmount: BigNumber, tradePath: string[]) => {
-            const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
-            return amounts[amounts.length - 1];
-          }
-        );
-      }
+      executeSwapTest(
+        'univ2/clones',
+        async () => {
+          return setup.krystalContracts.swapContracts.uniSwap!.address;
+        },
+        router,
+        () => hexlify(zeroPad(arrayify(router), 32)),
+        platformFee,
+        async (sourceAmount: BigNumber, tradePath: string[]) => {
+          const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
+          return amounts[amounts.length - 1];
+        }
+      );
     }
-  });
+  }
 });

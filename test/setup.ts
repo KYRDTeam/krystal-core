@@ -25,7 +25,7 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
 
   // Fund wallet
   for (let {symbol, address} of networkConfig.tokens) {
-    const nativeTokenAmount = BigNumber.from(1000).mul(BigNumber.from(10).pow(nativeTokenDecimals));
+    const nativeTokenAmount = BigNumber.from(30).mul(BigNumber.from(10).pow(nativeTokenDecimals));
     await uniRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
       0,
       [networkConfig.wNative, address],
@@ -71,9 +71,10 @@ export const getInitialSetup = async (): Promise<IInitialSetup> => {
   if (!initialSetup) {
     console.log('\n\n\n=== Setting initial testing contracts ===');
     let signers = await ethers.getSigners();
+    let preSetupSnapshotId = await evm_snapshot();
     let data = await setupContracts(signers);
     initialSetup = {
-      preSetupSnapshotId: await evm_snapshot(),
+      preSetupSnapshotId,
       ...data,
       network: networkSetting,
     };

@@ -208,7 +208,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     /// @param lendingContract lending contract to withdraw token
     /// @param token underlying token to withdraw, e.g ETH, USDT, DAI
     /// @param amount amount of cToken (COMPOUND) or aToken (AAVE) to withdraw
-    /// @param minReturn minimum amount of USDT tokens to return
+    /// @param minReturn minimum amount of underlying tokens to return
     /// @return returnedAmount returns the amount withdrawn to the user
     function withdrawFromLendingPlatform(
         address payable lendingContract,

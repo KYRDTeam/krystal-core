@@ -1,6 +1,7 @@
 export interface IConfig {
   autoVerifyContract: boolean;
 
+  // mostly used for testing purpose
   tokens: Array<{
     symbol: string;
     address: string;
@@ -70,10 +71,9 @@ const NetworkConfig: Record<string, IConfig> = {
   bsc_mainnet: {
     autoVerifyContract: true,
     tokens: [
+      {symbol: 'usdt', address: '0x55d398326f99059ff775485246999027b3197955'},
       {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
       {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
-      {symbol: 'usdc', address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d'},
-      {symbol: 'usdt', address: '0x55d398326f99059ff775485246999027b3197955'},
     ],
     wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 

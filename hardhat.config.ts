@@ -31,7 +31,6 @@ const config: HardhatUserConfig = {
       accounts: accounts,
       chainId: 56,
       forking: {
-        enabled: true,
         url: 'https://bsc-dataseed.binance.org/',
       },
     },

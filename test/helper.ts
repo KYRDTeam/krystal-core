@@ -5,6 +5,7 @@ export const MAX_AMOUNT = BigNumber.from(10e10);
 export const BPS = BigNumber.from(10000);
 export const nativeTokenDecimals = 18;
 export const nativeTokenAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const zeroAddress = '0x0000000000000000000000000000000000000000';
 export const EPS = 10e-2;
 
 export enum FeeMode {
@@ -24,5 +25,13 @@ export const evm_revert = async function (snapshotId: any) {
   return await hre.network.provider.request({
     method: 'evm_revert',
     params: [snapshotId],
+  });
+};
+
+export const sleep = (timeout: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('ok');
+    }, timeout);
   });
 };
