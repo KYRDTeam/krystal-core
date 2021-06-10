@@ -78,16 +78,13 @@ contract UniSwap is BaseSwap {
         IUniswapV2Router02 router = parseExtraArgs(extraArgs);
         require(tradePath.length >= 2, "invalid tradePath");
 
-        {
-            // prevent stack too deep
-            TradeInput memory tradeInput = TradeInput({
-                srcAmount: srcAmount,
-                minData: minDestAmount,
-                recipient: recipient
-            });
-            safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
-            destAmount = doUniTrade(router, tradePath, tradeInput);
-        }
+        TradeInput memory tradeInput = TradeInput({
+            srcAmount: srcAmount,
+            minData: minDestAmount,
+            recipient: recipient
+        });
+        safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
+        destAmount = doUniTrade(router, tradePath, tradeInput);
     }
 
     function doUniTrade(
