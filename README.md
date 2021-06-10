@@ -23,7 +23,6 @@ For interactions or contract deployments on public testnets / mainnet, create a 
 
 ```
 PRIVATE_KEY=0x****************************************************************
-BSCSCAN_KEY=********************************
 ```
 
 ## Testing

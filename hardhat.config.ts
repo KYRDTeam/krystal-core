@@ -10,7 +10,13 @@ import {HardhatUserConfig} from 'hardhat/types';
 import * as dotenv from 'dotenv';
 import {accounts} from './scripts/testWallet';
 
+// General config in .env
 dotenv.config();
+
+// Network specific config
+dotenv.config({path: `${__dirname}/./.env.${process.env.CHAIN}`});
+
+const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY} = process.env;
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
@@ -68,9 +74,9 @@ const config: HardhatUserConfig = {
   },
 
   etherscan: {
-    // Your API key for bscscan
+    // Your API key for bscscan / ethscan
     // Obtain one at https://bscscan.io/
-    apiKey: process.env.BSCSCAN_KEY,
+    apiKey: ETHERSCAN_KEY,
   },
 
   typechain: {
@@ -79,9 +85,7 @@ const config: HardhatUserConfig = {
   },
 };
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-
-if (PRIVATE_KEY != undefined) {
+if (PRIVATE_KEY) {
   config.networks!.bsc_testnet = {
     url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
     chainId: 97,
@@ -93,6 +97,36 @@ if (PRIVATE_KEY != undefined) {
   config.networks!.bsc_mainnet = {
     url: 'https://bsc-dataseed.binance.org/',
     chainId: 56,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+}
+
+if (PRIVATE_KEY && INFURA_API_KEY) {
+  config.networks!.eth_kovan = {
+    url: `https://kovan.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 42,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+
+  config.networks!.eth_rinkeby = {
+    url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 4,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+
+  config.networks!.eth_ropsten = {
+    url: `https://ropsten.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 3,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+
+  config.networks!.eth_mainnet = {
+    url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 1,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
   };

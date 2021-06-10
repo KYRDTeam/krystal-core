@@ -3,7 +3,8 @@ import {nativeTokenDecimals, evm_snapshot, MAX_AMOUNT} from './helper';
 import {IERC20Ext, IUniswapV2Router02, SmartWalletImplementation} from '../typechain';
 import {deploy, KrystalContracts} from '../scripts/deployLogic';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
-import {NetworkConfig, IConfig} from '../scripts/config';
+import {NetworkConfig} from '../scripts/config';
+import {IConfig} from '../scripts/config_utils';
 import {BigNumber} from '@ethersproject/bignumber';
 
 const setupContracts = async (accounts: SignerWithAddress[]) => {
