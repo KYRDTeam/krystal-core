@@ -30,12 +30,12 @@ BSCSCAN_KEY=********************************
 
 1. If contracts have not been compiled, run `yarn compile` or `yarn c`. This step can be skipped subsequently.
 2. Run `yarn test`
-3. Use `./tst.sh -f` for running a specific test file.
+3. Use `yarn test -f` for running a specific test file.
 
 ### Example Commands
 
 - `yarn test` (Runs all tests)
-- `./tst.sh -f ./test/swapTest.ts` (Test only swapTest.ts)
+- `yarn test -f ./test/swap.test.ts` (Test only swap.test.ts)
 
 ## Coverage
 
