@@ -18,13 +18,6 @@ interface ILending {
         uint256 minReturn
     ) external returns (uint256 returnedAmount);
 
-    function borrowFrom(
-        address payable onBehalfOf,
-        IERC20Ext token,
-        uint256 borrowAmount,
-        uint256 interestRateMode
-    ) external;
-
     function repayBorrowTo(
         address payable onBehalfOf,
         IERC20Ext token,

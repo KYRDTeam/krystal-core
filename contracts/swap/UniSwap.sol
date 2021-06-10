@@ -80,8 +80,11 @@ contract UniSwap is BaseSwap {
 
         {
             // prevent stack too deep
-            TradeInput memory tradeInput =
-                TradeInput({srcAmount: srcAmount, minData: minDestAmount, recipient: recipient});
+            TradeInput memory tradeInput = TradeInput({
+                srcAmount: srcAmount,
+                minData: minDestAmount,
+                recipient: recipient
+            });
             safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
             destAmount = doUniTrade(router, tradePath, tradeInput);
         }

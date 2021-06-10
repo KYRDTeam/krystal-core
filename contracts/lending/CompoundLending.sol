@@ -124,16 +124,6 @@ contract CompoundLending is BaseLending {
         transferToken(onBehalfOf, token, returnedAmount);
     }
 
-    // @dev borrowFrom is not supported on Compound
-    function borrowFrom(
-        address payable onBehalfOf,
-        IERC20Ext token,
-        uint256 borrowAmount,
-        uint256 interestRateMode
-    ) external view override onlyProxyContract {
-        require(false, "not supported");
-    }
-
     /// @dev repay borrows to lending platforms like Compound
     ///     expect amount of token should already be in the contract
     ///     if amount > payAmount, (amount - payAmount) will be sent back to user
@@ -161,6 +151,24 @@ contract CompoundLending is BaseLending {
                 ICompErc20(cToken).repayBorrowBehalf(onBehalfOf, payAmount) == 0,
                 "compound repay error"
             );
+        }
+    }
+
+    /// @dev just a convenient method to claim Comp, user can call this contract directly
+    function claimComp(
+        address[] calldata holders,
+        ICompErc20[] calldata cTokens,
+        bool borrowers,
+        bool suppliers
+    ) external {
+        require(holders.length > 0, "no holders");
+        IComptroller comptroller = IComptroller(compoundData.comptroller);
+        if (cTokens.length == 0) {
+            // claim for all markets
+            ICompErc20[] memory markets = comptroller.getAllMarkets();
+            comptroller.claimComp(holders, markets, borrowers, suppliers);
+        } else {
+            comptroller.claimComp(holders, cTokens, borrowers, suppliers);
         }
     }
 

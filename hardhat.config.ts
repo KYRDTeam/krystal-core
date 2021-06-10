@@ -63,6 +63,8 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 0,
     fullStackTrace: true,
+    parallel: false,
+    fullTrace: true,
   },
 
   etherscan: {
