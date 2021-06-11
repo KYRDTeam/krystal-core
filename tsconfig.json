@@ -1,4 +1,3 @@
-  
 {
   "compilerOptions": {
     "target": "es2018",
@@ -10,5 +9,5 @@
     "types": ["@nomiclabs/hardhat-ethers", "@nomiclabs/hardhat-waffle"]
   },
   "include": ["./test"],
-  "files": ["./hardhat.config.ts", "./scripts/IConfig.ts"]
+  "files": ["./hardhat.config.ts"]
 }

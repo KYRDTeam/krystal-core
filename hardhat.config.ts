@@ -100,6 +100,14 @@ if (MAINNET_FORK) {
 }
 
 if (PRIVATE_KEY) {
+  config.networks!.polygon_mainnet = {
+    url: 'https://rpc-mainnet.matic.network',
+    chainId: 137,
+    gasPrice: 20000000000,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+
   config.networks!.bsc_testnet = {
     url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
     chainId: 97,

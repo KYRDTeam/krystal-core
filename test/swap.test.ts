@@ -116,10 +116,7 @@ describe('swap test', async () => {
           let tokenAmount = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
 
           // Only swap to usdt & native token, as they most-likely have the pools
-          for (let targetToken of [
-            ...setup.network.tokens.filter((t) => t.symbol === 'usdt').map((t) => t.address),
-            nativeTokenAddress,
-          ]) {
+          for (let targetToken of [...setup.network.tokens.map((t) => t.address), nativeTokenAddress]) {
             if (address === targetToken) {
               continue;
             }

@@ -1,10 +1,10 @@
 #!/bin/sh
 
-usage="yarn test [-h] [-c <eth,bsc>] [-n <mainnet>] -- to run test on specific chain and network
+usage="yarn test [-h] [-c <eth,bsc,polygon>] [-n <mainnet>] -- to run test on specific chain and network
 
 where:
     -h  show this help text
-    -c  which chain to run, supported <eth,bsc>
+    -c  which chain to run, supported <eth,bsc,polygon>
     -n  which network to run, supported <mainnet>
     -f  specific test to run if any"
 
@@ -19,7 +19,7 @@ while getopts ":hc:n:f:" option; do
       exit
       ;;
     c) 
-      if [[ ! "$OPTARG" =~ ^(eth|bsc)$ ]]; then
+      if [[ ! "$OPTARG" =~ ^(eth|bsc|polygon)$ ]]; then
           printf "invalid value for -%s\n" "$option" >&2
           echo "$usage" >&2
           exit 1P
