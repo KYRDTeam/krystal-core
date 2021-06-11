@@ -12,9 +12,10 @@ where:
 CHAIN="eth"
 NETWORK="mainnet"
 
-while getopts ":h:c:n:f:" option; do
+while getopts ":hc:n:f:" option; do
   case $option in
-    h) echo "$usage"
+    h) 
+      echo "$usage"
       exit
       ;;
     c) 
