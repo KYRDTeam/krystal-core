@@ -115,7 +115,11 @@ describe('swap test', async () => {
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
           let tokenAmount = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
 
-          for (let targetToken of [...setup.network.tokens.map((t) => t.address), nativeTokenAddress]) {
+          // Only swap to usdt & native token, as they most-likely have the pools
+          for (let targetToken of [
+            ...setup.network.tokens.filter((t) => t.symbol === 'usdt').map((t) => t.address),
+            nativeTokenAddress,
+          ]) {
             if (address === targetToken) {
               continue;
             }

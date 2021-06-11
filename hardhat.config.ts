@@ -16,7 +16,18 @@ dotenv.config();
 // Network specific config
 dotenv.config({path: `${__dirname}/./.env.${process.env.CHAIN}`});
 
-const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY} = process.env;
+const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY, MAINNET_ID, MAINNET_FORK, MAINNET_FORK_BLOCK} = process.env;
+
+// custom network config for testing. See scripts/config.ts
+export const customNetworkConfig =
+  process.env.CHAIN && process.env.CHAIN ? `${process.env.CHAIN}_${process.env.NETWORK}` : undefined;
+
+console.log(
+  `--ENVS:\n--CHAIN=${process.env.CHAIN}, NETWORK=${process.env.NETWORK}, customConfig=${customNetworkConfig}`
+);
+console.log(
+  `--MAINNET_FORK=${process.env.MAINNET_FORK}, MAINNET_ID=${process.env.MAINNET_ID}, MAINNET_FORK_BLOCK=${process.env.MAINNET_FORK_BLOCK}`
+);
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
@@ -32,15 +43,7 @@ const config: HardhatUserConfig = {
     gasPrice: 100,
   },
 
-  networks: {
-    hardhat: {
-      accounts: accounts,
-      chainId: 56,
-      forking: {
-        url: 'https://bsc-dataseed.binance.org/',
-      },
-    },
-  },
+  networks: {},
 
   solidity: {
     compilers: [
@@ -84,6 +87,17 @@ const config: HardhatUserConfig = {
     target: 'ethers-v5',
   },
 };
+
+if (MAINNET_FORK) {
+  config.networks!.hardhat = {
+    accounts: accounts,
+    chainId: parseInt(MAINNET_ID ?? '') || undefined,
+    forking: {
+      url: MAINNET_FORK,
+      blockNumber: parseInt(MAINNET_FORK_BLOCK ?? '') || undefined,
+    },
+  };
+}
 
 if (PRIVATE_KEY) {
   config.networks!.bsc_testnet = {

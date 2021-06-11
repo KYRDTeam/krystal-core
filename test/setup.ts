@@ -25,6 +25,7 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
   )) as SmartWalletImplementation;
 
   // Fund wallet
+  console.log('\nStart funding...');
   for (let {symbol, address} of networkConfig.tokens) {
     const nativeTokenAmount = BigNumber.from(30).mul(BigNumber.from(10).pow(nativeTokenDecimals));
     await uniRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
@@ -70,15 +71,20 @@ let initialSetup: IInitialSetup;
 
 export const getInitialSetup = async (): Promise<IInitialSetup> => {
   if (!initialSetup) {
-    console.log('\n\n\n=== Setting initial testing contracts ===');
-    let signers = await ethers.getSigners();
-    let preSetupSnapshotId = await evm_snapshot();
-    let data = await setupContracts(signers);
-    initialSetup = {
-      preSetupSnapshotId,
-      ...data,
-      network: networkSetting,
-    };
+    try {
+      console.log('\n\n\n=== Setting initial testing contracts ===');
+      let signers = await ethers.getSigners();
+      let preSetupSnapshotId = await evm_snapshot();
+      let data = await setupContracts(signers);
+      initialSetup = {
+        preSetupSnapshotId,
+        ...data,
+        network: networkSetting,
+      };
+    } catch (e) {
+      console.log('\n\n\n=== Cannot initialize setup', e);
+      process.exit(1);
+    }
   }
   return initialSetup;
 };

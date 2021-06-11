@@ -1,6 +1,7 @@
 import {IConfig} from './config_utils';
 import {BscConfig} from './config_bsc';
 import {EthConfig} from './config_eth';
+import {customNetworkConfig} from '../hardhat.config';
 
 const NetworkConfig: Record<string, IConfig> = {
   ...BscConfig,
@@ -8,7 +9,8 @@ const NetworkConfig: Record<string, IConfig> = {
 };
 
 NetworkConfig.hardhat = {
-  ...NetworkConfig.bsc_mainnet,
+  // In case of testing, fork the config of the particular chain to hardhat
+  ...NetworkConfig[customNetworkConfig ?? 'bsc_mainnet'],
   autoVerifyContract: false,
 };
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-usage="yarn test [-h] [-c chain] -- to run test on specific chain and network
+usage="yarn test [-h] [-c <eth,bsc>] [-n <mainnet>] -- to run test on specific chain and network
 
 where:
     -h  show this help text
@@ -12,14 +12,24 @@ where:
 CHAIN="eth"
 NETWORK="mainnet"
 
-while getopts ":hcf:" option; do
+while getopts ":h:c:n:f:" option; do
   case $option in
     h) echo "$usage"
       exit
       ;;
     c) 
-      CHAIN=$OPTARG;;
+      if [[ ! "$OPTARG" =~ ^(eth|bsc)$ ]]; then
+          printf "invalid value for -%s\n" "$option" >&2
+          echo "$usage" >&2
+          exit 1P
+      fi
+      CHAIN=$OPTARG;;      
     n) 
+      if [[ ! "$OPTARG" =~ ^(mainnet)$ ]]; then
+          printf "invalid value for -%s\n" "$option" >&2
+          echo "$usage" >&2
+          exit 1
+      fi
       NETWORK=$OPTARG;;
     f) 
       FILE=$OPTARG;;
