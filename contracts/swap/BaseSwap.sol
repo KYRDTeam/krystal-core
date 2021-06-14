@@ -22,12 +22,6 @@ abstract contract BaseSwap is ISwap, Withdrawable, Utils, ReentrancyGuard {
         _;
     }
 
-    struct TradeInput {
-        uint256 srcAmount;
-        uint256 minData; // min return for Uniswap / min rate for Kyber, etc.
-        address recipient;
-    }
-
     constructor(address _admin) Withdrawable(_admin) {}
 
     receive() external payable {}

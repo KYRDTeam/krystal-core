@@ -15,6 +15,10 @@ export interface IConfig {
     routers: string[];
   };
 
+  uniswapV3?: {
+    routers: string[];
+  };
+
   // Compound or clones
   compound?: {
     compTroller: string;

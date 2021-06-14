@@ -5,9 +5,9 @@ export const EthConfig: Record<string, IConfig> = {
     autoVerifyContract: true,
 
     tokens: [
-      {symbol: 'usdt', address: '0xdac17f958d2ee523a2206206994597c13d831ec7'},
       {symbol: 'dai', address: '0x6b175474e89094c44da98b954eedeac495271d0f'},
       {symbol: 'usdc', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'},
+      {symbol: 'usdt', address: '0xdac17f958d2ee523a2206206994597c13d831ec7'},
     ],
 
     wNative: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -17,6 +17,12 @@ export const EthConfig: Record<string, IConfig> = {
       routers: [
         '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // univ2 router2
         '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f', // sushiswap
+      ],
+    },
+
+    uniswapV3: {
+      routers: [
+        '0xe592427a0aece92de3edee1f18e0157c05861564', // univ3
       ],
     },
 

@@ -16,7 +16,8 @@ describe('swap test', async () => {
     router: string,
     generateArgsFunc: () => string,
     platformFee: number,
-    getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>
+    getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>,
+    maxDiffAllowed: number = 0
   ) {
     const testGetExpectedRate = async (
       swapContract: string,
@@ -36,13 +37,25 @@ describe('swap test', async () => {
 
       if (feeMode === FeeMode.BY_PROTOCOL) {
         const actualDest = await getActualRate(srcAmount, tradePath);
-        assert(actualDest.eq(data.destAmount), `expected: ${actualDest}, received: ${data.destAmount}`);
+        const diff = data.destAmount.sub(actualDest).abs();
+        assert(
+          diff.mul(100).lte(actualDest.mul(maxDiffAllowed)),
+          `expected: ${actualDest}, received: ${data.destAmount}, srcAmt: ${srcAmount}, maxDiff: ${maxDiffAllowed}`
+        );
       } else if (feeMode == FeeMode.FROM_SOURCE) {
         const actualDest = await getActualRate(srcAmount.mul(BPS.sub(platformFee)).div(BPS), tradePath);
-        assert(actualDest.eq(data.destAmount), `expected: ${actualDest}, received: ${data.destAmount}`);
+        const diff = data.destAmount.sub(actualDest).abs();
+        assert(
+          diff.mul(100).lte(actualDest.mul(maxDiffAllowed)),
+          `expected: ${actualDest}, received: ${data.destAmount}, srcAmt: ${srcAmount}, maxDiff: ${maxDiffAllowed}`
+        );
       } else if (feeMode == FeeMode.FROM_DEST) {
         const actualDest = (await getActualRate(srcAmount, tradePath)).mul(BPS.sub(platformFee)).div(BPS);
-        assert(actualDest.eq(data.destAmount), `expected: ${actualDest}, received: ${data.destAmount}`);
+        const diff = data.destAmount.sub(actualDest).abs();
+        assert(
+          diff.mul(100).lte(actualDest.mul(maxDiffAllowed)),
+          `expected: ${actualDest}, received: ${data.destAmount}, srcAmt: ${srcAmount}, maxDiff: ${maxDiffAllowed}`
+        );
       }
 
       return data.destAmount;
@@ -178,22 +191,47 @@ describe('swap test', async () => {
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
-  if (networkSetting.uniswap) {
-    for (let router of networkSetting.uniswap.routers) {
-      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+  // if (networkSetting.uniswap) {
+  //   for (let router of networkSetting.uniswap.routers) {
+  //     const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+
+  //     executeSwapTest(
+  //       'univ2/clones',
+  //       async () => {
+  //         return setup.krystalContracts.swapContracts.uniSwap!.address;
+  //       },
+  //       router,
+  //       () => hexlify(arrayify(router)),
+  //       platformFee,
+  //       async (sourceAmount: BigNumber, tradePath: string[]) => {
+  //         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
+  //         return amounts[amounts.length - 1];
+  //       }
+  //     );
+  //   }
+  // }
+
+  if (networkSetting.uniswapV3) {
+    for (let router of networkSetting.uniswapV3.routers) {
+      // Using v2 router as a price estimate for testing
+      const routerContract = (await ethers.getContractAt(
+        'IUniswapV2Router02',
+        networkSetting.uniswap!.routers[0]
+      )) as IUniswapV2Router02;
 
       executeSwapTest(
-        'univ2/clones',
+        'uniV3',
         async () => {
-          return setup.krystalContracts.swapContracts.uniSwap!.address;
+          return setup.krystalContracts.swapContracts.uniSwapV3!.address;
         },
         router,
-        () => hexlify(zeroPad(arrayify(router), 32)),
+        () => hexlify(arrayify(router)) + '0001F4', // fee = 3000 bps
         platformFee,
         async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
-        }
+        },
+        2
       );
     }
   }

@@ -1,7 +1,14 @@
 import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
-import {FetchTokenBalances, SmartWalletImplementation, SmartWalletProxy, UniSwap, CompoundLending} from '../typechain';
+import {
+  FetchTokenBalances,
+  SmartWalletImplementation,
+  SmartWalletProxy,
+  UniSwap,
+  CompoundLending,
+  UniSwapV3,
+} from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 
 const gasLimit = 700000;
@@ -17,6 +24,7 @@ export interface KrystalContracts {
   fetchTokenBalances: FetchTokenBalances;
   swapContracts: {
     uniSwap?: UniSwap;
+    uniSwapV3?: UniSwapV3;
   };
   lendingContracts: {
     compoundLending?: CompoundLending;
@@ -47,6 +55,10 @@ export const deploy = async (
   log(0, 'Updating uniswap/clones config');
   log(0, '======================\n');
   await updateUniSwap(deployedContracts.swapContracts.uniSwap, extraArgs);
+
+  log(0, 'Updating uniswapV3/clones config');
+  log(0, '======================\n');
+  await updateUniSwapV3(deployedContracts.swapContracts.uniSwap, extraArgs);
 
   log(0, 'Updating compound/clones config');
   log(0, '======================\n');
@@ -94,6 +106,16 @@ async function deployContracts(
           existingContract?.['swapContracts']?.['uniSwap'],
           deployerAddress,
           networkConfig.uniswap.routers
+        )) as UniSwap,
+    uniSwapV3: (!networkConfig.uniswapV3
+      ? undefined
+      : await deployContract(
+          ++step,
+          networkConfig.autoVerifyContract,
+          'UniSwapV3',
+          existingContract?.['swapContracts']?.['uniSwapV3'],
+          deployerAddress,
+          networkConfig.uniswapV3.routers
         )) as UniSwap,
   };
 
@@ -238,6 +260,18 @@ async function updateChildContracts(
 }
 
 async function updateUniSwap(uniSwap: UniSwap | undefined, extraArgs: {from?: string}) {
+  if (!uniSwap || !networkConfig.uniswap) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update supported routers');
+  let existing = await uniSwap.getAllUniRouters();
+  let toBeRemoved = existing.filter((add) => !networkConfig.uniswap!.routers.includes(add));
+  let toBeAdded = networkConfig.uniswap!.routers.filter((add) => !existing.includes(add));
+  await updateAddressSet(uniSwap.updateUniRouters, toBeRemoved, toBeAdded, extraArgs);
+}
+
+async function updateUniSwapV3(uniSwap: UniSwapV3 | undefined, extraArgs: {from?: string}) {
   if (!uniSwap || !networkConfig.uniswap) {
     log(1, 'protocol not supported on this env');
     return;

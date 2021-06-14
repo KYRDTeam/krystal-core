@@ -3,6 +3,7 @@ pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
 import "./BaseSwap.sol";
+import "../libraries/BytesLib.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
@@ -15,6 +16,7 @@ contract UniSwap is BaseSwap {
     using SafeMath for uint256;
     using Address for address;
     using EnumerableSet for EnumerableSet.AddressSet;
+    using BytesLib for bytes;
 
     EnumerableSet.AddressSet private uniRouters;
 
@@ -75,80 +77,68 @@ contract UniSwap is BaseSwap {
         address recipient,
         bytes calldata extraArgs
     ) external payable override nonReentrant onlyProxyContract returns (uint256 destAmount) {
-        IUniswapV2Router02 router = parseExtraArgs(extraArgs);
         require(tradePath.length >= 2, "invalid tradePath");
 
-        TradeInput memory tradeInput = TradeInput({
-            srcAmount: srcAmount,
-            minData: minDestAmount,
-            recipient: recipient
-        });
-        safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
-        destAmount = doUniTrade(router, tradePath, tradeInput);
-    }
+        IUniswapV2Router02 router = parseExtraArgs(extraArgs);
 
-    function doUniTrade(
-        IUniswapV2Router02 router,
-        address[] memory tradePath,
-        TradeInput memory input
-    ) internal virtual returns (uint256 destAmount) {
+        safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
+
         uint256 tradeLen = tradePath.length;
         IERC20Ext actualSrc = IERC20Ext(tradePath[0]);
         IERC20Ext actualDest = IERC20Ext(tradePath[tradeLen - 1]);
 
         // convert eth/bnb -> weth/wbnb address to trade on Uni
-        if (tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
-            tradePath[0] = router.WETH();
+        address[] memory convertedTradePath = tradePath;
+        if (convertedTradePath[0] == address(ETH_TOKEN_ADDRESS)) {
+            convertedTradePath[0] = router.WETH();
         }
-        if (tradePath[tradeLen - 1] == address(ETH_TOKEN_ADDRESS)) {
-            tradePath[tradeLen - 1] = router.WETH();
+        if (convertedTradePath[tradeLen - 1] == address(ETH_TOKEN_ADDRESS)) {
+            convertedTradePath[tradeLen - 1] = router.WETH();
         }
 
-        uint256 destBalanceBefore = getBalance(actualDest, input.recipient);
+        uint256 destBalanceBefore = getBalance(actualDest, recipient);
 
         if (actualSrc == ETH_TOKEN_ADDRESS) {
             // swap eth/bnb -> token
-            router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: input.srcAmount}(
-                input.minData,
-                tradePath,
-                input.recipient,
+            router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: srcAmount}(
+                minDestAmount,
+                convertedTradePath,
+                recipient,
                 MAX_AMOUNT
             );
         } else {
             if (actualDest == ETH_TOKEN_ADDRESS) {
                 // swap token -> eth/bnb
                 router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-                    input.srcAmount,
-                    input.minData,
-                    tradePath,
-                    input.recipient,
+                    srcAmount,
+                    minDestAmount,
+                    convertedTradePath,
+                    recipient,
                     MAX_AMOUNT
                 );
             } else {
                 // swap token -> token
                 router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-                    input.srcAmount,
-                    input.minData,
-                    tradePath,
-                    input.recipient,
+                    srcAmount,
+                    minDestAmount,
+                    convertedTradePath,
+                    recipient,
                     MAX_AMOUNT
                 );
             }
         }
 
-        destAmount = getBalance(actualDest, input.recipient).sub(destBalanceBefore);
+        destAmount = getBalance(actualDest, recipient).sub(destBalanceBefore);
     }
 
+    /// @param extraArgs expecting <[20B] address router>
     function parseExtraArgs(bytes calldata extraArgs)
         internal
         view
         returns (IUniswapV2Router02 router)
     {
-        // Store address in 32 bytes
-        require(extraArgs.length == 32, "invalid args");
-        assembly {
-            router := calldataload(extraArgs.offset)
-        }
+        require(extraArgs.length == 20, "invalid args");
+        router = IUniswapV2Router02(extraArgs.toAddress(0));
         require(router != IUniswapV2Router02(0), "invalid address");
         require(uniRouters.contains(address(router)), "unsupported router");
     }

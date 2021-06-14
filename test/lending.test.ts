@@ -230,7 +230,7 @@ describe('lending test', async () => {
 
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
           let tokenUnit = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
-          let lendingTokenAddress = await lendingContractInstance.getLendingToken(address);
+          let lendingTokenAddress = await lendingContractInstance.getLendingToken(token.address);
 
           // Deposit first to get some cToken
           let depositAmount = tokenUnit.mul(10);
@@ -252,7 +252,7 @@ describe('lending test', async () => {
             );
           }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(depositAmount));
 
-          let borrowAmount = tokenUnit.mul(5);
+          let borrowAmount = tokenUnit.mul(1);
           let beforeAmt = await token.balanceOf(setup.user.address);
           await borrowFunc(lendingTokenAddress, borrowAmount);
           let afterAmt = await token.balanceOf(setup.user.address);
@@ -302,7 +302,7 @@ describe('lending test', async () => {
           return setup.krystalContracts.lendingContracts.compoundLending!.address;
         },
         router,
-        () => hexlify(zeroPad(arrayify(router), 32)),
+        () => hexlify(arrayify(router)),
         platformFee,
         // generate extraArgs
         async (sourceAmount: BigNumber, tradePath: string[]) => {
