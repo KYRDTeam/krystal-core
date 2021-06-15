@@ -176,58 +176,101 @@ contract UniSwapV3 is BaseSwap {
 
         safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
 
-        // convert eth/bnb -> weth/wbnb address to trade on Uni
-        address[] memory convertedTradePath = tradePath;
-        if (convertedTradePath[0] == address(ETH_TOKEN_ADDRESS)) {
-            convertedTradePath[0] = router.WETH9();
-        }
-        if (convertedTradePath[tradePath.length - 1] == address(ETH_TOKEN_ADDRESS)) {
-            convertedTradePath[tradePath.length - 1] = router.WETH9();
-        }
-
-        // generate path argument
-        bytes memory path = abi.encodePacked(convertedTradePath[0]);
-        for (uint256 i = 0; i < fees.length; i++) {
-            path = abi.encodePacked(path, fees[i], convertedTradePath[i + 1]);
-        }
-
         destAmount = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), recipient);
 
-        {
-            // actual swap
-            ISwapRouter.ExactInputParams memory swapData = ISwapRouter.ExactInputParams({
-                path: path,
-                recipient: recipient,
-                deadline: MAX_AMOUNT,
-                amountIn: srcAmount,
-                amountOutMinimum: minDestAmount
-            });
-
-            if (tradePath[tradePath.length - 1] == address(ETH_TOKEN_ADDRESS)) {
-                swapData.recipient = address(0);
-                bytes[] memory multicallData = new bytes[](2);
-                multicallData[0] = abi.encodeWithSelector(
-                    0xc04b8d59, // exactInput
-                    // 0x414bf389, // exactInputSingle
-                    // 0xf28c0498, // exactOutput
-                    swapData
-                );
-                multicallData[1] = abi.encodeWithSelector(
-                    0x49404b7c, // unwrapWETH9
-                    minDestAmount,
-                    recipient
-                );
-                router.multicall(multicallData);
-            } else {
-                router.exactInput{
-                    value: tradePath[0] == address(ETH_TOKEN_ADDRESS) ? srcAmount : 0
-                }(swapData);
-            }
+        // actual swap
+        if (tradePath.length == 2) {
+            swapExactInputSingle(router, srcAmount, minDestAmount, tradePath, fees, recipient);
+        } else {
+            swapExactInput(router, srcAmount, minDestAmount, tradePath, fees, recipient);
         }
 
         destAmount = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), recipient).sub(
             destAmount
         );
+    }
+
+    function swapExactInput(
+        ISwapRouterInternal router,
+        uint256 srcAmount,
+        uint256 minDestAmount,
+        address[] calldata tradePath,
+        uint24[] memory fees,
+        address recipient
+    ) internal {
+        bytes memory path = abi.encodePacked(safeWrapToken(tradePath[0], router.WETH9()));
+        for (uint256 i = 0; i < fees.length; i++) {
+            path = abi.encodePacked(
+                path,
+                fees[i],
+                safeWrapToken(tradePath[i + 1], router.WETH9())
+            );
+        }
+        ISwapRouter.ExactInputParams memory swapData = ISwapRouter.ExactInputParams({
+            path: path,
+            recipient: recipient,
+            deadline: MAX_AMOUNT,
+            amountIn: srcAmount,
+            amountOutMinimum: minDestAmount
+        });
+
+        if (tradePath[tradePath.length - 1] == address(ETH_TOKEN_ADDRESS)) {
+            swapData.recipient = address(0);
+            bytes[] memory multicallData = new bytes[](2);
+            multicallData[0] = abi.encodeWithSelector(
+                0xc04b8d59, // exactInput
+                swapData
+            );
+            multicallData[1] = abi.encodeWithSelector(
+                0x49404b7c, // unwrapWETH9
+                minDestAmount,
+                recipient
+            );
+            router.multicall(multicallData);
+        } else {
+            router.exactInput{value: tradePath[0] == address(ETH_TOKEN_ADDRESS) ? srcAmount : 0}(
+                swapData
+            );
+        }
+    }
+
+    function swapExactInputSingle(
+        ISwapRouterInternal router,
+        uint256 srcAmount,
+        uint256 minDestAmount,
+        address[] memory tradePath,
+        uint24[] memory fees,
+        address recipient
+    ) internal {
+        ISwapRouter.ExactInputSingleParams memory swapData = ISwapRouter.ExactInputSingleParams({
+            tokenIn: safeWrapToken(tradePath[0], router.WETH9()),
+            tokenOut: safeWrapToken(tradePath[1], router.WETH9()),
+            fee: fees[0],
+            recipient: recipient,
+            deadline: MAX_AMOUNT,
+            amountIn: srcAmount,
+            amountOutMinimum: minDestAmount,
+            sqrtPriceLimitX96: 0
+        });
+
+        if (tradePath[tradePath.length - 1] == address(ETH_TOKEN_ADDRESS)) {
+            swapData.recipient = address(0);
+            bytes[] memory multicallData = new bytes[](2);
+            multicallData[0] = abi.encodeWithSelector(
+                0x414bf389, // exactInputSingle
+                swapData
+            );
+            multicallData[1] = abi.encodeWithSelector(
+                0x49404b7c, // unwrapWETH9
+                minDestAmount,
+                recipient
+            );
+            router.multicall(multicallData);
+        } else {
+            router.exactInputSingle{
+                value: tradePath[0] == address(ETH_TOKEN_ADDRESS) ? srcAmount : 0
+            }(swapData);
+        }
     }
 
     /// @param extraArgs expecting <[20B] address router><[3B] uint24 poolFee1><[3B] uint24 poolFee2>...
@@ -313,5 +356,9 @@ contract UniSwapV3 is BaseSwap {
         }
 
         return uint256(-state.amountCalculated);
+    }
+
+    function safeWrapToken(address token, address wrappedToken) internal pure returns (address) {
+        return token == address(ETH_TOKEN_ADDRESS) ? wrappedToken : token;
     }
 }

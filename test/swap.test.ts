@@ -191,25 +191,25 @@ describe('swap test', async () => {
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
-  // if (networkSetting.uniswap) {
-  //   for (let router of networkSetting.uniswap.routers) {
-  //     const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+  if (networkSetting.uniswap) {
+    for (let router of networkSetting.uniswap.routers) {
+      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
 
-  //     executeSwapTest(
-  //       'univ2/clones',
-  //       async () => {
-  //         return setup.krystalContracts.swapContracts.uniSwap!.address;
-  //       },
-  //       router,
-  //       () => hexlify(arrayify(router)),
-  //       platformFee,
-  //       async (sourceAmount: BigNumber, tradePath: string[]) => {
-  //         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
-  //         return amounts[amounts.length - 1];
-  //       }
-  //     );
-  //   }
-  // }
+      executeSwapTest(
+        'univ2/clones',
+        async () => {
+          return setup.krystalContracts.swapContracts.uniSwap!.address;
+        },
+        router,
+        () => hexlify(arrayify(router)),
+        platformFee,
+        async (sourceAmount: BigNumber, tradePath: string[]) => {
+          const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
+          return amounts[amounts.length - 1];
+        }
+      );
+    }
+  }
 
   if (networkSetting.uniswapV3) {
     for (let router of networkSetting.uniswapV3.routers) {
