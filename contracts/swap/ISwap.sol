@@ -1,18 +1,30 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
 interface ISwap {
-    function getExpectedReturn(
-        uint256 srcAmount,
-        address[] calldata tradePath,
-        bytes calldata extraArgs
-    ) external view returns (uint256 destAmount);
+    struct GetExpectedReturnParams {
+        uint256 srcAmount;
+        address[] tradePath;
+        uint256 feeBps;
+        bytes extraArgs;
+    }
 
-    function swap(
-        uint256 srcAmount,
-        uint256 minDestAmount,
-        address[] calldata tradePath,
-        address recipient,
-        bytes calldata extraArgs
-    ) external payable returns (uint256 destAmount);
+    function getExpectedReturn(GetExpectedReturnParams calldata params)
+        external
+        view
+        returns (uint256 destAmount);
+
+    struct SwapParams {
+        uint256 srcAmount;
+        // min return for uni, min conversionrate for kyber, etc.
+        uint256 minDestAmount;
+        address[] tradePath;
+        address recipient;
+        uint256 feeBps;
+        address payable feeReceiver;
+        bytes extraArgs;
+    }
+
+    function swap(SwapParams calldata params) external payable returns (uint256 destAmount);
 }

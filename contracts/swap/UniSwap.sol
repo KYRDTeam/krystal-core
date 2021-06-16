@@ -51,16 +51,20 @@ contract UniSwap is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturn(
-        uint256 srcAmount,
-        address[] calldata tradePath,
-        bytes calldata extraArgs
-    ) external view override onlyProxyContract returns (uint256 destAmount) {
-        IUniswapV2Router02 router = parseExtraArgs(extraArgs);
+    function getExpectedReturn(GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 destAmount)
+    {
+        IUniswapV2Router02 router = parseExtraArgs(params.extraArgs);
 
         // in case pair is not supported
-        try router.getAmountsOut(srcAmount, tradePath) returns (uint256[] memory amounts) {
-            destAmount = amounts[tradePath.length - 1];
+        try router.getAmountsOut(params.srcAmount, params.tradePath) returns (
+            uint256[] memory amounts
+        ) {
+            destAmount = amounts[params.tradePath.length - 1];
         } catch {
             destAmount = 0;
         }
@@ -70,25 +74,26 @@ contract UniSwap is BaseSwap {
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
     /// for UniSwap, fee will be taken in src token
-    function swap(
-        uint256 srcAmount,
-        uint256 minDestAmount,
-        address[] calldata tradePath,
-        address recipient,
-        bytes calldata extraArgs
-    ) external payable override nonReentrant onlyProxyContract returns (uint256 destAmount) {
-        require(tradePath.length >= 2, "invalid tradePath");
+    function swap(SwapParams calldata params)
+        external
+        payable
+        override
+        nonReentrant
+        onlyProxyContract
+        returns (uint256 destAmount)
+    {
+        require(params.tradePath.length >= 2, "invalid tradePath");
 
-        IUniswapV2Router02 router = parseExtraArgs(extraArgs);
+        IUniswapV2Router02 router = parseExtraArgs(params.extraArgs);
 
-        safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
+        safeApproveAllowance(address(router), IERC20Ext(params.tradePath[0]));
 
-        uint256 tradeLen = tradePath.length;
-        IERC20Ext actualSrc = IERC20Ext(tradePath[0]);
-        IERC20Ext actualDest = IERC20Ext(tradePath[tradeLen - 1]);
+        uint256 tradeLen = params.tradePath.length;
+        IERC20Ext actualSrc = IERC20Ext(params.tradePath[0]);
+        IERC20Ext actualDest = IERC20Ext(params.tradePath[tradeLen - 1]);
 
         // convert eth/bnb -> weth/wbnb address to trade on Uni
-        address[] memory convertedTradePath = tradePath;
+        address[] memory convertedTradePath = params.tradePath;
         if (convertedTradePath[0] == address(ETH_TOKEN_ADDRESS)) {
             convertedTradePath[0] = router.WETH();
         }
@@ -96,39 +101,39 @@ contract UniSwap is BaseSwap {
             convertedTradePath[tradeLen - 1] = router.WETH();
         }
 
-        uint256 destBalanceBefore = getBalance(actualDest, recipient);
+        uint256 destBalanceBefore = getBalance(actualDest, params.recipient);
 
         if (actualSrc == ETH_TOKEN_ADDRESS) {
             // swap eth/bnb -> token
-            router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: srcAmount}(
-                minDestAmount,
+            router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: params.srcAmount}(
+                params.minDestAmount,
                 convertedTradePath,
-                recipient,
+                params.recipient,
                 MAX_AMOUNT
             );
         } else {
             if (actualDest == ETH_TOKEN_ADDRESS) {
                 // swap token -> eth/bnb
                 router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-                    srcAmount,
-                    minDestAmount,
+                    params.srcAmount,
+                    params.minDestAmount,
                     convertedTradePath,
-                    recipient,
+                    params.recipient,
                     MAX_AMOUNT
                 );
             } else {
                 // swap token -> token
                 router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-                    srcAmount,
-                    minDestAmount,
+                    params.srcAmount,
+                    params.minDestAmount,
                     convertedTradePath,
-                    recipient,
+                    params.recipient,
                     MAX_AMOUNT
                 );
             }
         }
 
-        destAmount = getBalance(actualDest, recipient).sub(destBalanceBefore);
+        destAmount = getBalance(actualDest, params.recipient).sub(destBalanceBefore);
     }
 
     /// @param extraArgs expecting <[20B] address router>

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
@@ -58,263 +59,211 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     }
 
     /// @dev get expected return including the fee
-    /// @param swapContract swap contract
-    /// @param srcAmount amount of src token
-    /// @param tradePath path of the trade on Uniswap
-    /// @param platformFee fee if swapping feeMode = platformFee / BPS, feeBps = platformFee % BPS
-    /// @param extraArgs extra data needed for swap on particular platforms
     /// @return destAmount expected dest amount
     /// @return expectedRate expected swap rate
     function getExpectedReturn(
-        address payable swapContract,
-        uint256 srcAmount,
-        address[] calldata tradePath,
-        uint256 platformFee,
-        bytes calldata extraArgs
+        ISmartWalletImplementation.GetExpectedReturnParams calldata params
     ) external view override returns (uint256 destAmount, uint256 expectedRate) {
-        FeeMode feeMode = FeeMode(platformFee / BPS);
-        platformFee = platformFee % BPS;
-
-        if (platformFee >= BPS) return (0, 0); // platform fee is too high
+        if (params.feeBps >= BPS) return (0, 0); // platform fee is too high
         
-        if (feeMode == FeeMode.FROM_SOURCE) {
-            srcAmount = srcAmount * (BPS - platformFee) / BPS;
-        }
+        uint256 actualSrc = (params.feeMode == FeeMode.FROM_SOURCE) 
+            ? params.srcAmount * (BPS - params.feeBps) / BPS : params.srcAmount;
 
-        destAmount = ISwap(swapContract).getExpectedReturn(srcAmount, tradePath, extraArgs);
+        destAmount = ISwap(params.swapContract).getExpectedReturn(
+            ISwap.GetExpectedReturnParams({
+                srcAmount: actualSrc, 
+                tradePath: params.tradePath,
+                feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                extraArgs: params.extraArgs
+            })
+        );
 
-        if (feeMode == FeeMode.FROM_DEST) {
-            destAmount = destAmount * (BPS - platformFee) / BPS;
+        if (params.feeMode == FeeMode.FROM_DEST) {
+            destAmount = destAmount * (BPS - params.feeBps) / BPS;
         }
 
         expectedRate = calcRateFromQty(
-            srcAmount,
+            params.srcAmount,
             destAmount,
-            getDecimals(IERC20Ext(tradePath[0])),
-            getDecimals(IERC20Ext(tradePath[tradePath.length - 1]))
+            getDecimals(IERC20Ext(params.tradePath[0])),
+            getDecimals(IERC20Ext(params.tradePath[params.tradePath.length - 1]))
         );
     }
 
     /// @dev swap using particular swap contract
-    /// @param swapContract swap contract
-    /// @param srcAmount amount of src token
-    /// @param minDestAmount minimal accepted dest amount
-    /// @param tradePath path of the trade on Uniswap
-    /// @param platformFee fee if swapping feeMode = platformFee / BPS, feeBps = platformFee % BPS
-    /// @param platformWallet wallet to receive fee
-    /// @param extraArgs extra data needed for swap on particular platforms
     /// @return destAmount actual dest amount
     function swap(
-        address payable swapContract,
-        uint256 srcAmount,
-        uint256 minDestAmount,
-        address[] calldata tradePath,
-        uint256 platformFee,
-        address payable platformWallet,
-        bytes calldata extraArgs
+        ISmartWalletImplementation.SwapParams calldata params
     ) external payable override nonReentrant returns (uint256 destAmount) {
         {   
             // prevent stack too deep
             destAmount = swapInternal(
-                swapContract,
-                srcAmount,
-                minDestAmount,
-                tradePath,
+                params.swapContract,
+                params.srcAmount,
+                params.minDestAmount,
+                params.tradePath,
                 msg.sender,
-                platformFee,
-                platformWallet,
-                extraArgs
+                params.feeMode,
+                params.feeBps,
+                params.platformWallet,
+                params.extraArgs
             );
         }
-
         emit Swap(
             msg.sender,
-            swapContract,
-            tradePath,
-            srcAmount,
+            params.swapContract,
+            params.tradePath,
+            params.srcAmount,
             destAmount,
-            platformFee,
-            platformWallet
+            params.feeBps,
+            params.platformWallet
         );
     }
 
     /// @dev swap then deposit to platform
     ///     if tradePath has only 1 token, don't need to do swap
-    /// @param swapContract swap contract
-    /// @param lendingContract lending contract
-    /// @param srcAmount amount of src token
-    /// @param minDestAmount minimal accepted dest amount
-    /// @param tradePath path of the trade on Uniswap
-    /// @param platformFee fee if swapping feeMode = platformFee / BPS, feeBps = platformFee % BPS
-    /// @param platformWallet wallet to receive fee
-    /// @param extraArgs extra data needed for swap on particular platforms
     /// @return destAmount actual dest amount
     function swapAndDeposit(
-        address payable swapContract,
-        address payable lendingContract,
-        uint256 srcAmount,
-        uint256 minDestAmount,
-        address[] calldata tradePath,
-        uint256 platformFee,
-        address payable platformWallet,
-        bytes calldata extraArgs
+        ISmartWalletImplementation.SwapAndDepositParams calldata params
     ) external payable override nonReentrant returns (uint256 destAmount) {
-        require(tradePath.length >= 1, "invalid tradePath");
-        require(supportedLendings.contains(lendingContract), "unsupported lending");
+        require(params.tradePath.length >= 1, "invalid tradePath");
+        require(supportedLendings.contains(params.lendingContract), "unsupported lending");
 
-        {
-            if (tradePath.length == 1) {
-                // just collect src token, no need to swap
-                validateSourceAmount(tradePath[0], srcAmount);
-                destAmount = safeTransferWithFee(
-                    msg.sender, 
-                    lendingContract, 
-                    tradePath[0], 
-                    srcAmount,
-                    // Not taking lending fee
-                    0, 
-                    platformWallet
-                );
-            } else {
-                destAmount = swapInternal(
-                    swapContract,
-                    srcAmount,
-                    minDestAmount,
-                    tradePath,
-                    lendingContract,
-                    platformFee,
-                    platformWallet,                    
-                    extraArgs
-                );
-            }
-
-            // eth or token already transferred to the address
-            ILending(lendingContract).depositTo(msg.sender, IERC20Ext(tradePath[tradePath.length - 1]), destAmount);
+        
+        if (params.tradePath.length == 1) {
+            // just collect src token, no need to swap
+            validateSourceAmount(params.tradePath[0], params.srcAmount);
+            destAmount = safeTransferWithFee(
+                msg.sender, 
+                params.lendingContract, 
+                params.tradePath[0], 
+                params.srcAmount,
+                // Not taking lending fee
+                0, 
+                params.platformWallet
+            );
+        } else {
+            destAmount = swapInternal(
+                params.swapContract,
+                params.srcAmount,
+                params.minDestAmount,
+                params.tradePath,
+                params.lendingContract,
+                params.feeMode,
+                params.feeBps,
+                params.platformWallet,                    
+                params.extraArgs
+            );
         }
+
+        // eth or token already transferred to the address
+        ILending(params.lendingContract).depositTo(
+            msg.sender, IERC20Ext(params.tradePath[params.tradePath.length - 1]), destAmount
+        );
     
         emit SwapAndDeposit(
             msg.sender,
-            swapContract,
-            lendingContract,
-            tradePath,
-            srcAmount,
+            params.swapContract,
+            params.lendingContract,
+            params.tradePath,
+            params.srcAmount,
             destAmount,
-            platformFee,
-            platformWallet
+            params.feeBps,
+            params.platformWallet
         );
     }
 
     /// @dev withdraw token from Lending platforms (AAVE, COMPOUND)
-    /// @param lendingContract lending contract to withdraw token
-    /// @param token underlying token to withdraw, e.g ETH, USDT, DAI
-    /// @param amount amount of cToken (COMPOUND) or aToken (AAVE) to withdraw
-    /// @param minReturn minimum amount of underlying tokens to return
+    
     /// @return returnedAmount returns the amount withdrawn to the user
     function withdrawFromLendingPlatform(
-        address payable lendingContract,
-        IERC20Ext token,
-        uint256 amount,
-        uint256 minReturn
+        ISmartWalletImplementation.WithdrawFromLendingPlatformParams calldata params
     ) external override nonReentrant returns (uint256 returnedAmount) {
-        require(supportedLendings.contains(lendingContract), "unsupported lending");
-        
-        IERC20Ext lendingToken = IERC20Ext(ILending(lendingContract).getLendingToken(token));
+        require(supportedLendings.contains(params.lendingContract), "unsupported lending");
+
+        IERC20Ext lendingToken = IERC20Ext(ILending(params.lendingContract).getLendingToken(params.token));
         require(lendingToken != IERC20Ext(0), "unsupported token");
 
         // AAVE aToken's transfer logic could have rounding errors
-        uint256 tokenBalanceBefore = lendingToken.balanceOf(lendingContract);
-        lendingToken.safeTransferFrom(msg.sender, lendingContract, amount);
-        uint256 tokenBalanceAfter = lendingToken.balanceOf(lendingContract);
+        uint256 tokenBalanceBefore = lendingToken.balanceOf(params.lendingContract);
+        lendingToken.safeTransferFrom(msg.sender, params.lendingContract, params.amount);
+        uint256 tokenBalanceAfter = lendingToken.balanceOf(params.lendingContract);
 
-        returnedAmount = ILending(lendingContract).withdrawFrom(
+        returnedAmount = ILending(params.lendingContract).withdrawFrom(
             msg.sender,
-            token,
+            params.token,
             tokenBalanceAfter.sub(tokenBalanceBefore),
-            minReturn
+            params.minReturn
         );
 
         emit WithdrawFromLending(
             msg.sender,
-            lendingContract,
-            token,
-            amount,
-            minReturn,
+            params.lendingContract,
+            params.token,
+            params.amount,
+            params.minReturn,
             returnedAmount
         );
     }
 
     /// @dev swap and repay borrow for sender
-    /// @param payAmount: amount that user wants to pay, if the dest amount (after swap) is higher,
-    ///     the remain amount will be sent back to user's wallet
-    /// @param feeAndRateMode: in case of aave v2, user needs to specify the rateMode to repay
-    ///     to prevent stack too deep, combine fee and rateMode into a single value
-    ///     rateMode: feeAndRateMode / BPS feeMode = feeAndRateMode / BPS / BPS, feeTplatformFee: feeAndRateMode % BPS
     function swapAndRepay(
-        address payable swapContract,
-        address payable lendingContract,
-        uint256 srcAmount,
-        uint256 payAmount,
-        address[] calldata tradePath,
-        uint256 feeAndRateMode,
-        address payable platformWallet,
-        bytes calldata extraArgs
+        ISmartWalletImplementation.SwapAndRepayParams calldata params
     ) external payable override nonReentrant returns (uint256 destAmount) {
-        require(tradePath.length >= 1, "invalid tradePath");
-        require(supportedLendings.contains(lendingContract), "unsupported lending");
-        {    
-            // use user debt value if debt is <= payAmount
-            // user can pay all debt by putting really high payAmount as param
-            payAmount = checkUserDebt(lendingContract, tradePath[tradePath.length - 1], payAmount);
-            
-            if (tradePath.length == 1) {
-                // just collect src token, no need to swap
-                validateSourceAmount(tradePath[0], srcAmount);
-                destAmount = safeTransferWithFee(
-                    msg.sender, 
-                    lendingContract, 
-                    tradePath[0],
-                    srcAmount,
-                    // Not taking repay fee
-                    0, 
-                    platformWallet
-                );
-            } else {
-                destAmount = swapInternal(
-                    swapContract,
-                    srcAmount,
-                    payAmount,
-                    tradePath,
-                    lendingContract,
-                    feeAndRateMode % (BPS * BPS),
-                    platformWallet,                    
-                    extraArgs
-                );
-            }
-            {
-                bytes memory lendingExtraArgs = new bytes(32);
-                assembly { 
-                    mstore(lendingExtraArgs, div(feeAndRateMode, BPS))
-                }
-                ILending(lendingContract).repayBorrowTo(
-                    msg.sender,
-                    IERC20Ext(tradePath[tradePath.length - 1]),
-                    destAmount,
-                    payAmount,
-                    lendingExtraArgs
-                );
-            }
+        require(params.tradePath.length >= 1, "invalid tradePath");
+        require(supportedLendings.contains(params.lendingContract), "unsupported lending");
+        
+        // use user debt value if debt is <= payAmount
+        // user can pay all debt by putting really high payAmount as param
+        uint256 actualPayAmount = checkUserDebt(
+            params.lendingContract, params.tradePath[params.tradePath.length - 1], params.payAmount
+        );
+        
+        if (params.tradePath.length == 1) {
+            // just collect src token, no need to swap
+            validateSourceAmount(params.tradePath[0], params.srcAmount);
+            destAmount = safeTransferWithFee(
+                msg.sender, 
+                params.lendingContract, 
+                params.tradePath[0],
+                params.srcAmount,
+                // Not taking repay fee
+                0, 
+                params.platformWallet
+            );
+        } else {
+            destAmount = swapInternal(
+                params.swapContract,
+                params.srcAmount,
+                actualPayAmount,
+                params.tradePath,
+                params.lendingContract,
+                params.feeMode,
+                params.feeBps,
+                params.platformWallet,                    
+                params.extraArgs
+            );
+        }
+        {
+            ILending(params.lendingContract).repayBorrowTo(
+                msg.sender,
+                IERC20Ext(params.tradePath[params.tradePath.length - 1]),
+                destAmount,
+                actualPayAmount,
+                abi.encodePacked(params.rateMode)
+            );
         }
 
         emit SwapAndRepay(
             msg.sender,
-            swapContract,
-            lendingContract,
-            tradePath,
-            srcAmount,
+            params.swapContract,
+            params.lendingContract,
+            params.tradePath,
+            params.srcAmount,
             destAmount,
-            payAmount,
-            feeAndRateMode,
-            platformWallet
+            actualPayAmount,
+            params.feeBps,
+            params.platformWallet
         );
     }
 
@@ -324,15 +273,13 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         uint256 minDestAmount,
         address[] calldata tradePath,
         address payable recipient,
+        FeeMode feeMode,
         uint256 platformFee,
         address payable platformWallet,
         bytes calldata extraArgs
     ) internal returns (uint256 destAmount) {
         require(supportedSwaps.contains(swapContract), "unsupported swap");
         require(tradePath.length >= 2, "invalid tradePath");
-
-        FeeMode feeMode = FeeMode(platformFee / BPS);
-        platformFee = platformFee % BPS;
         require(platformFee < BPS, "high platform fee");
 
         validateSourceAmount(tradePath[0], srcAmount);
@@ -342,7 +289,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             swapContract, 
             tradePath[0], 
             srcAmount,
-            feeMode == FeeMode.FROM_SOURCE ? platformFee : 0, 
+            feeMode == FeeMode.FROM_SOURCE ? platformFee : 0,
             platformWallet
         );
 
@@ -350,7 +297,17 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             // to avoid stack too deep
             // who will receive the swapped token
             address _recipient = feeMode == FeeMode.FROM_DEST ? address(this) : recipient;
-            destAmount = ISwap(swapContract).swap(actualSrcAmount, minDestAmount, tradePath, _recipient, extraArgs);
+            destAmount = ISwap(swapContract).swap(
+                ISwap.SwapParams({
+                    srcAmount: actualSrcAmount,
+                    minDestAmount: minDestAmount,
+                    tradePath: tradePath,
+                    recipient: _recipient,
+                    feeBps: feeMode == FeeMode.BY_PROTOCOL ? platformFee : 0,
+                    feeReceiver: platformWallet,
+                    extraArgs: extraArgs
+                })
+            );
         }
 
         if (feeMode == FeeMode.FROM_DEST) {

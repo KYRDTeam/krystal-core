@@ -26,13 +26,14 @@ describe('lending test', async () => {
       tradePath: string[],
       feeMode: FeeMode
     ): Promise<BigNumber> => {
-      const data = await setup.proxyInstance.getExpectedReturn(
+      const data = await setup.proxyInstance.getExpectedReturn({
         swapContract,
         srcAmount,
         tradePath,
-        BPS.mul(feeMode).add(platformFee),
-        generateArgsFunc()
-      );
+        feeMode,
+        feeBps: platformFee,
+        extraArgs: generateArgsFunc(),
+      });
       assert(!data.destAmount.isZero(), 'non-zero destAmount');
       assert(!data.expectedRate.isZero(), 'non-zero expectedRate');
 
@@ -83,14 +84,17 @@ describe('lending test', async () => {
           // Empty tradePath
           await expect(
             setup.proxyInstance.swapAndDeposit(
-              swapContract,
-              lendingContract,
-              nativeAmount,
-              minDestAmount,
-              [],
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
+              {
+                swapContract,
+                lendingContract,
+                srcAmount: nativeAmount,
+                minDestAmount,
+                tradePath: [],
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              },
               {
                 from: setup.user.address,
                 value: nativeAmount,
@@ -101,14 +105,17 @@ describe('lending test', async () => {
           // wrong msg value
           await expect(
             setup.proxyInstance.swapAndDeposit(
-              swapContract,
-              lendingContract,
-              nativeAmount,
-              minDestAmount,
-              [nativeTokenAddress, token.address],
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
+              {
+                swapContract,
+                lendingContract,
+                srcAmount: nativeAmount,
+                minDestAmount,
+                tradePath: [nativeTokenAddress, token.address],
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              },
               {
                 from: setup.user.address,
                 value: 0,
@@ -120,14 +127,17 @@ describe('lending test', async () => {
           let beforeCToken = await lendingToken.balanceOf(setup.user.address);
           await expect(() => {
             setup.proxyInstance.swapAndDeposit(
-              swapContract,
-              lendingContract,
-              tokenAmount,
-              tokenAmount,
-              [token.address],
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
+              {
+                swapContract,
+                lendingContract,
+                srcAmount: tokenAmount,
+                minDestAmount: tokenAmount,
+                tradePath: [token.address],
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              },
               {
                 from: setup.user.address,
                 value: 0,
@@ -144,14 +154,17 @@ describe('lending test', async () => {
           beforeCToken = await lendingToken.balanceOf(setup.user.address);
           await expect(
             await setup.proxyInstance.swapAndDeposit(
-              swapContract,
-              lendingContract,
-              nativeAmount,
-              minDestAmount,
-              [nativeTokenAddress, token.address],
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
+              {
+                swapContract,
+                lendingContract,
+                srcAmount: nativeAmount,
+                minDestAmount,
+                tradePath: [nativeTokenAddress, token.address],
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              },
               {
                 from: setup.user.address,
                 value: nativeAmount,
@@ -181,14 +194,17 @@ describe('lending test', async () => {
           let beforeCToken = await lendingToken.balanceOf(setup.user.address);
           await expect(() => {
             setup.proxyInstance.swapAndDeposit(
-              zeroAddress, // swap contract not needed
-              lendingContract,
-              tokenAmount,
-              tokenAmount,
-              [token.address],
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
+              {
+                swapContract: zeroAddress,
+                lendingContract,
+                srcAmount: tokenAmount,
+                minDestAmount: tokenAmount,
+                tradePath: [token.address],
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              },
               {
                 from: setup.user.address,
                 value: 0,
@@ -208,12 +224,12 @@ describe('lending test', async () => {
           // Assume a maximum of 10 BPS withdraw fee
           let expectedReturned = tokenAmount.mul(BPS.sub(10)).div(BPS);
           await expect(() => {
-            setup.proxyInstance.withdrawFromLendingPlatform(
+            setup.proxyInstance.withdrawFromLendingPlatform({
               lendingContract,
-              token.address,
-              cTokenAmount,
-              expectedReturned
-            );
+              token: token.address,
+              amount: cTokenAmount,
+              minReturn: expectedReturned,
+            });
           }).to.changeTokenBalance(lendingToken, setup.user, BigNumber.from(0).sub(cTokenAmount));
           let afterUnderlyingToken = await token.balanceOf(setup.user.address);
           assert(
@@ -236,20 +252,17 @@ describe('lending test', async () => {
           let depositAmount = tokenUnit.mul(10);
           await token.approve(setup.proxyInstance.address, tokenUnit.mul(10));
           await expect(() => {
-            setup.proxyInstance.swapAndDeposit(
-              zeroAddress, // swap contract not needed
+            setup.proxyInstance.swapAndDeposit({
+              swapContract: zeroAddress, // swap contract not needed
               lendingContract,
-              depositAmount,
-              depositAmount,
-              [token.address],
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
-              {
-                from: setup.user.address,
-                value: 0,
-              }
-            );
+              srcAmount: depositAmount,
+              minDestAmount: depositAmount,
+              tradePath: [token.address],
+              feeMode: FeeMode.FROM_SOURCE,
+              feeBps: platformFee,
+              platformWallet: setup.network.supportedWallets[0],
+              extraArgs: generateArgsFunc(),
+            });
           }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(depositAmount));
 
           let borrowAmount = tokenUnit.mul(1);
@@ -265,16 +278,18 @@ describe('lending test', async () => {
           let payAmount = tokenUnit.mul(1);
           await token.approve(setup.proxyInstance.address, payAmount);
           await expect(() => {
-            setup.proxyInstance.swapAndRepay(
-              zeroAddress,
+            setup.proxyInstance.swapAndRepay({
+              swapContract: zeroAddress,
               lendingContract,
-              payAmount,
-              payAmount,
-              [token.address],
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc()
-            );
+              srcAmount: payAmount,
+              payAmount: payAmount,
+              tradePath: [token.address],
+              rateMode: 0,
+              feeMode: FeeMode.FROM_SOURCE,
+              feeBps: platformFee,
+              platformWallet: setup.network.supportedWallets[0],
+              extraArgs: generateArgsFunc(),
+            });
           }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(payAmount));
         });
       });

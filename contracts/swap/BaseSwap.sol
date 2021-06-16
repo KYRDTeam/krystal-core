@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.7.6;
+pragma abicoder v2;
 
 import "@kyber.network/utils-sc/contracts/Withdrawable.sol";
 import "@kyber.network/utils-sc/contracts/Utils.sol";
@@ -26,7 +27,7 @@ abstract contract BaseSwap is ISwap, Withdrawable, Utils, ReentrancyGuard {
 
     receive() external payable {}
 
-    function updateproxyContract(address _proxyContract) external onlyAdmin {
+    function updateProxyContract(address _proxyContract) external onlyAdmin {
         require(_proxyContract != address(0), "invalid swap impl");
         emit UpdatedproxyContract(proxyContract, _proxyContract);
         proxyContract = _proxyContract;

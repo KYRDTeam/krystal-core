@@ -19,6 +19,10 @@ export interface IConfig {
     routers: string[];
   };
 
+  kyberProxy?: {
+    proxy: string;
+  };
+
   // Compound or clones
   compound?: {
     compTroller: string;

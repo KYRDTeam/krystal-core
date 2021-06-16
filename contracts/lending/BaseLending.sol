@@ -24,7 +24,7 @@ abstract contract BaseLending is ILending, Withdrawable, Utils {
 
     receive() external payable {}
 
-    function updateproxyContract(address _proxyContract) external onlyAdmin {
+    function updateProxyContract(address _proxyContract) external onlyAdmin {
         require(_proxyContract != address(0), "invalid proxy impl");
         emit UpdatedproxyContract(proxyContract, _proxyContract);
         proxyContract = _proxyContract;

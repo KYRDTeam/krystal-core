@@ -25,13 +25,14 @@ describe('swap test', async () => {
       tradePath: string[],
       feeMode: FeeMode
     ): Promise<BigNumber> => {
-      const data = await setup.proxyInstance.getExpectedReturn(
+      const data = await setup.proxyInstance.getExpectedReturn({
         swapContract,
         srcAmount,
         tradePath,
-        BPS.mul(feeMode).add(platformFee),
-        generateArgsFunc()
-      );
+        feeMode,
+        feeBps: platformFee,
+        extraArgs: generateArgsFunc(),
+      });
       assert(!data.destAmount.isZero(), 'zero destAmount');
       assert(!data.expectedRate.isZero(), 'zero expectedRate');
 
@@ -91,13 +92,16 @@ describe('swap test', async () => {
           // Send txn
           await expect(
             await setup.proxyInstance.swap(
-              swapContract,
-              nativeAmount,
-              minDestAmount,
-              tradePath,
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
+              {
+                swapContract,
+                srcAmount: nativeAmount,
+                minDestAmount,
+                tradePath,
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              },
               {
                 from: setup.user.address,
                 value: nativeAmount,
@@ -108,13 +112,16 @@ describe('swap test', async () => {
           // Missing value
           await expect(
             setup.proxyInstance.swap(
-              swapContract,
-              nativeAmount,
-              minDestAmount,
-              tradePath,
-              BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-              setup.network.supportedWallets[0],
-              generateArgsFunc(),
+              {
+                swapContract,
+                srcAmount: nativeAmount,
+                minDestAmount,
+                tradePath,
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              },
               {
                 from: setup.user.address,
                 value: 0,
@@ -149,13 +156,16 @@ describe('swap test', async () => {
             // Send txn
             await expect(() => {
               setup.proxyInstance.swap(
-                swapContract,
-                tokenAmount,
-                minDestAmount,
-                [token.address, targetToken],
-                BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-                setup.network.supportedWallets[0],
-                generateArgsFunc(),
+                {
+                  swapContract,
+                  srcAmount: tokenAmount,
+                  minDestAmount,
+                  tradePath: [token.address, targetToken],
+                  feeMode: FeeMode.FROM_SOURCE,
+                  feeBps: platformFee,
+                  platformWallet: setup.network.supportedWallets[0],
+                  extraArgs: generateArgsFunc(),
+                },
                 {
                   from: setup.user.address,
                 }
@@ -165,13 +175,16 @@ describe('swap test', async () => {
             // Extra value not needed
             await expect(
               setup.proxyInstance.swap(
-                swapContract,
-                tokenAmount,
-                minDestAmount,
-                [token.address, targetToken],
-                BPS.mul(FeeMode.FROM_SOURCE).add(platformFee),
-                setup.network.supportedWallets[0],
-                generateArgsFunc(),
+                {
+                  swapContract,
+                  srcAmount: tokenAmount,
+                  minDestAmount,
+                  tradePath: [token.address, targetToken],
+                  feeMode: FeeMode.FROM_SOURCE,
+                  feeBps: platformFee,
+                  platformWallet: setup.network.supportedWallets[0],
+                  extraArgs: generateArgsFunc(),
+                },
                 {
                   from: setup.user.address,
                   value: BigNumber.from(1),
@@ -234,5 +247,28 @@ describe('swap test', async () => {
         2
       );
     }
+  }
+
+  if (networkSetting.kyberProxy) {
+    // Using v2 router as a price estimate for testing
+    const routerContract = (await ethers.getContractAt(
+      'IUniswapV2Router02',
+      networkSetting.uniswap!.routers[0]
+    )) as IUniswapV2Router02;
+
+    executeSwapTest(
+      'kyberProxy',
+      async () => {
+        return setup.krystalContracts.swapContracts.kyberProxy!.address;
+      },
+      networkSetting.kyberProxy.proxy,
+      () => '0x', // empty hint
+      platformFee,
+      async (sourceAmount: BigNumber, tradePath: string[]) => {
+        const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
+        return amounts[amounts.length - 1];
+      },
+      2
+    );
   }
 });

@@ -26,6 +26,10 @@ export const EthConfig: Record<string, IConfig> = {
       ],
     },
 
+    kyberProxy: {
+      proxy: '0x9aab3f75489902f3a48495025729a0af77d4b11e',
+    },
+
     // Compound
     compound: {
       compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',

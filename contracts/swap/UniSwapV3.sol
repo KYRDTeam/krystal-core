@@ -139,20 +139,28 @@ contract UniSwapV3 is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturn(
-        uint256 srcAmount,
-        address[] calldata tradePath,
-        bytes calldata extraArgs
-    ) external view override onlyProxyContract returns (uint256 destAmount) {
-        require(tradePath.length >= 2, "invalid tradePath");
+    function getExpectedReturn(GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 destAmount)
+    {
+        require(params.tradePath.length >= 2, "invalid tradePath");
         (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
-            tradePath.length - 1,
-            extraArgs
+            params.tradePath.length - 1,
+            params.extraArgs
         );
 
-        destAmount = srcAmount;
-        for (uint256 i = 0; i < tradePath.length - 1; i++) {
-            destAmount = getAmountOut(router, destAmount, tradePath[i], tradePath[i + 1], fees[i]);
+        destAmount = params.srcAmount;
+        for (uint256 i = 0; i < params.tradePath.length - 1; i++) {
+            destAmount = getAmountOut(
+                router,
+                destAmount,
+                params.tradePath[i],
+                params.tradePath[i + 1],
+                fees[i]
+            );
         }
     }
 
@@ -160,34 +168,53 @@ contract UniSwapV3 is BaseSwap {
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
     /// for UniSwap, fee will be taken in src token
-    function swap(
-        uint256 srcAmount,
-        uint256 minDestAmount,
-        address[] calldata tradePath,
-        address recipient,
-        bytes calldata extraArgs
-    ) external payable override nonReentrant onlyProxyContract returns (uint256 destAmount) {
-        require(tradePath.length >= 2, "invalid tradePath");
+    function swap(SwapParams calldata params)
+        external
+        payable
+        override
+        nonReentrant
+        onlyProxyContract
+        returns (uint256 destAmount)
+    {
+        require(params.tradePath.length >= 2, "invalid tradePath");
 
         (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
-            tradePath.length - 1,
-            extraArgs
+            params.tradePath.length - 1,
+            params.extraArgs
         );
 
-        safeApproveAllowance(address(router), IERC20Ext(tradePath[0]));
+        safeApproveAllowance(address(router), IERC20Ext(params.tradePath[0]));
 
-        destAmount = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), recipient);
+        destAmount = getBalance(
+            IERC20Ext(params.tradePath[params.tradePath.length - 1]),
+            params.recipient
+        );
 
         // actual swap
-        if (tradePath.length == 2) {
-            swapExactInputSingle(router, srcAmount, minDestAmount, tradePath, fees, recipient);
+        if (params.tradePath.length == 2) {
+            swapExactInputSingle(
+                router,
+                params.srcAmount,
+                params.minDestAmount,
+                params.tradePath,
+                fees,
+                params.recipient
+            );
         } else {
-            swapExactInput(router, srcAmount, minDestAmount, tradePath, fees, recipient);
+            swapExactInput(
+                router,
+                params.srcAmount,
+                params.minDestAmount,
+                params.tradePath,
+                fees,
+                params.recipient
+            );
         }
 
-        destAmount = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), recipient).sub(
-            destAmount
-        );
+        destAmount = getBalance(
+            IERC20Ext(params.tradePath[params.tradePath.length - 1]),
+            params.recipient
+        ).sub(destAmount);
     }
 
     function swapExactInput(
