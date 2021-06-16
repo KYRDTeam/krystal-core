@@ -9,6 +9,7 @@ import {
   CompoundLending,
   UniSwapV3,
   KyberProxy,
+  KyberDmm,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 
@@ -27,6 +28,7 @@ export interface KrystalContracts {
     uniSwap?: UniSwap;
     uniSwapV3?: UniSwapV3;
     kyberProxy?: KyberProxy;
+    kyberDmm?: KyberDmm;
   };
   lendingContracts: {
     compoundLending?: CompoundLending;
@@ -65,6 +67,10 @@ export const deploy = async (
   log(0, 'Updating kyberProxy config');
   log(0, '======================\n');
   await updateKyberProxy(deployedContracts.swapContracts.kyberProxy, extraArgs);
+
+  log(0, 'Updating kyberDmm config');
+  log(0, '======================\n');
+  await updateKyberDmm(deployedContracts.swapContracts.kyberDmm, extraArgs);
 
   log(0, 'Updating compound/clones config');
   log(0, '======================\n');
@@ -133,6 +139,16 @@ async function deployContracts(
           deployerAddress,
           networkConfig.kyberProxy.proxy
         )) as KyberProxy),
+    kyberDmm: !networkConfig.kyberDmm
+      ? undefined
+      : ((await deployContract(
+          ++step,
+          networkConfig.autoVerifyContract,
+          'KyberDmm',
+          existingContract?.['swapContracts']?.['kyberDmm'],
+          deployerAddress,
+          networkConfig.kyberDmm.router
+        )) as KyberDmm),
   };
 
   const lendingContracts = {
@@ -314,6 +330,22 @@ async function updateKyberProxy(kyberProxy: KyberProxy | undefined, extraArgs: {
   } else {
     const tx = await kyberProxy.updateKyberProxy(networkConfig.kyberProxy.proxy);
     log(2, '> updated kyberProxy', JSON.stringify(networkConfig.kyberProxy, null, 2));
+    printInfo(tx);
+  }
+}
+
+async function updateKyberDmm(kyberDmm: KyberDmm | undefined, extraArgs: {from?: string}) {
+  if (!kyberDmm || !networkConfig.kyberDmm) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await kyberDmm.dmmRouter()).toLowerCase() === networkConfig.kyberDmm.router.toLowerCase()) {
+    log(2, `dmmRouter already up-to-date at ${networkConfig.kyberDmm.router}`);
+  } else {
+    const tx = await kyberDmm.updateDmmRouter(networkConfig.kyberDmm.router);
+    log(2, '> updated dmmRouter', JSON.stringify(networkConfig.kyberDmm, null, 2));
     printInfo(tx);
   }
 }

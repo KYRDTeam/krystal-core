@@ -2,19 +2,20 @@ import {nativeTokenAddress, nativeTokenDecimals, BPS, evm_revert, FeeMode, EPS} 
 import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
-import {IERC20Ext, IUniswapV2Router02} from '../typechain';
+import {IDMMFactory, IDMMRouter, IERC20Ext, IUniswapV2Router02} from '../typechain';
 import {ethers} from 'hardhat';
-import {arrayify, hexlify, zeroPad} from 'ethers/lib/utils';
+import {arrayify, hexConcat, hexlify, zeroPad} from 'ethers/lib/utils';
 
 describe('swap test', async () => {
   let platformFee = 8;
   let setup: IInitialSetup;
+  let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)).div(20); // 0.05 native amount .i.e eth/bnb
 
   function executeSwapTest(
     name: string,
     getSwapContract: () => Promise<string>,
     router: string,
-    generateArgsFunc: () => string,
+    generateArgsFunc: (tradePath: string[]) => Promise<string>,
     platformFee: number,
     getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>,
     maxDiffAllowed: number = 0
@@ -31,8 +32,9 @@ describe('swap test', async () => {
         tradePath,
         feeMode,
         feeBps: platformFee,
-        extraArgs: generateArgsFunc(),
+        extraArgs: await generateArgsFunc(tradePath),
       });
+
       assert(!data.destAmount.isZero(), 'zero destAmount');
       assert(!data.expectedRate.isZero(), 'zero expectedRate');
 
@@ -70,7 +72,6 @@ describe('swap test', async () => {
 
         it('get expected rate correctly', async () => {
           let swapContract = await getSwapContract();
-          let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one bnb
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
           await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.BY_PROTOCOL);
           await testGetExpectedRate(swapContract, nativeAmount, tradePath, FeeMode.FROM_DEST);
@@ -79,8 +80,6 @@ describe('swap test', async () => {
 
         it('swap from native to token', async () => {
           let swapContract = await getSwapContract();
-          let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
-
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
 
           // Get rate
@@ -100,7 +99,7 @@ describe('swap test', async () => {
                 feeMode: FeeMode.FROM_SOURCE,
                 feeBps: platformFee,
                 platformWallet: setup.network.supportedWallets[0],
-                extraArgs: generateArgsFunc(),
+                extraArgs: await generateArgsFunc(tradePath),
               },
               {
                 from: setup.user.address,
@@ -120,7 +119,7 @@ describe('swap test', async () => {
                 feeMode: FeeMode.FROM_SOURCE,
                 feeBps: platformFee,
                 platformWallet: setup.network.supportedWallets[0],
-                extraArgs: generateArgsFunc(),
+                extraArgs: await generateArgsFunc(tradePath),
               },
               {
                 from: setup.user.address,
@@ -140,6 +139,8 @@ describe('swap test', async () => {
             if (address === targetToken) {
               continue;
             }
+            // console.log(`testing ${token.address} -> ${targetToken}`);
+
             // Approve first
             await token.approve(setup.proxyInstance.address, tokenAmount);
 
@@ -154,7 +155,7 @@ describe('swap test', async () => {
             let minDestAmount = destAmount.mul(97).div(100);
 
             // Send txn
-            await expect(() => {
+            await expect(async () => {
               setup.proxyInstance.swap(
                 {
                   swapContract,
@@ -164,7 +165,7 @@ describe('swap test', async () => {
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: generateArgsFunc(),
+                  extraArgs: await generateArgsFunc([token.address, targetToken]),
                 },
                 {
                   from: setup.user.address,
@@ -183,7 +184,7 @@ describe('swap test', async () => {
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: generateArgsFunc(),
+                  extraArgs: await generateArgsFunc([token.address, targetToken]),
                 },
                 {
                   from: setup.user.address,
@@ -214,7 +215,7 @@ describe('swap test', async () => {
           return setup.krystalContracts.swapContracts.uniSwap!.address;
         },
         router,
-        () => hexlify(arrayify(router)),
+        async () => hexlify(arrayify(router)),
         platformFee,
         async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
@@ -238,7 +239,7 @@ describe('swap test', async () => {
           return setup.krystalContracts.swapContracts.uniSwapV3!.address;
         },
         router,
-        () => hexlify(arrayify(router)) + '0001F4', // fee = 3000 bps
+        async () => hexlify(arrayify(router)) + '0001F4', // fee = 3000 bps
         platformFee,
         async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
@@ -262,13 +263,56 @@ describe('swap test', async () => {
         return setup.krystalContracts.swapContracts.kyberProxy!.address;
       },
       networkSetting.kyberProxy.proxy,
-      () => '0x', // empty hint
+      async () => '0x', // empty hint
       platformFee,
       async (sourceAmount: BigNumber, tradePath: string[]) => {
         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
         return amounts[amounts.length - 1];
       },
       2
+    );
+  }
+
+  if (networkSetting.kyberDmm) {
+    const generatePools = async (dmmRouter: IDMMRouter, tradePath: string[]): Promise<string[]> => {
+      const dmmFactoryAddresss = await dmmRouter.factory();
+      const dmmFactory = (await ethers.getContractAt('IDMMFactory', dmmFactoryAddresss)) as IDMMFactory;
+
+      const convertedTradePath = tradePath.map((tk) =>
+        tk.toLowerCase() === nativeTokenAddress.toLowerCase() ? networkSetting.wNative : tk
+      );
+      const pools = [];
+      for (let i = 0; i < convertedTradePath.length - 1; i += 1) {
+        let availablePools = await dmmFactory.getPools(convertedTradePath[i], convertedTradePath[i + 1]);
+        if (availablePools.length == 0) {
+          console.log(`Pool not exist: ${tradePath[i]} - ${tradePath[i + 1]}`);
+          process.exit(1);
+        }
+        pools.push(availablePools[0]);
+      }
+      return pools;
+    };
+
+    executeSwapTest(
+      'kyberProxy',
+      async () => {
+        return setup.krystalContracts.swapContracts.kyberDmm!.address;
+      },
+      networkSetting.kyberDmm.router,
+      async (tradePath: string[]) => {
+        // Generate pools extraArgs for kyberDmm
+        const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
+        let pools = await generatePools(dmmRouter, tradePath);
+        return hexConcat(pools);
+      },
+      platformFee,
+      async (sourceAmount: BigNumber, tradePath: string[]) => {
+        const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
+        let pools = await generatePools(dmmRouter, tradePath);
+        const amounts = await dmmRouter.getAmountsOut(sourceAmount, pools, tradePath);
+        return amounts[amounts.length - 1];
+      },
+      0
     );
   }
 });

@@ -27,7 +27,7 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
   // Fund wallet
   console.log('\nStart funding...');
   for (let {symbol, address} of networkConfig.tokens) {
-    const nativeTokenAmount = BigNumber.from(30).mul(BigNumber.from(10).pow(nativeTokenDecimals));
+    const nativeTokenAmount = BigNumber.from(5).mul(BigNumber.from(10).pow(nativeTokenDecimals));
     await uniRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
       0,
       [networkConfig.wNative, address],

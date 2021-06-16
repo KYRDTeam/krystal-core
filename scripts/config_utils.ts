@@ -23,6 +23,10 @@ export interface IConfig {
     proxy: string;
   };
 
+  kyberDmm?: {
+    router: string;
+  };
+
   // Compound or clones
   compound?: {
     compTroller: string;
