@@ -124,7 +124,7 @@ contract KyberDmm is BaseSwap {
     /// @param extraArgs expecting <[20B] address pool1><[20B] address pool2><[20B] address pool3>...
     function parseExtraArgs(uint256 poolLength, bytes calldata extraArgs)
         internal
-        view
+        pure
         returns (address[] memory pools)
     {
         pools = new address[](poolLength);
