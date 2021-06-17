@@ -394,7 +394,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         address token,
         uint256 amount
     ) internal returns (uint256) {
-        uint256 debt = ILending(lendingContract).storeAndRetrieveUserDebtCurrent(token, msg.sender);
+        uint256 debt = ILending(lendingContract).getUserDebtCurrent(token, msg.sender);
         return debt >= amount ? amount : debt;
     }
 }

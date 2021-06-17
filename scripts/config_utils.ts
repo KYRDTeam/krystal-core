@@ -34,6 +34,21 @@ export interface IConfig {
     cTokens: string[];
   };
 
+  aaveV1?: {
+    poolV1: string;
+    poolCoreV1: string;
+    referralCode: number;
+    tokens: string[];
+  };
+
+  aaveV2?: {
+    poolV2: string;
+    provider: string;
+    weth: string;
+    referralCode: number;
+    tokens: string[];
+  };
+
   supportedWallets: string[];
 }
 

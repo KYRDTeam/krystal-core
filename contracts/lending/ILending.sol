@@ -26,11 +26,7 @@ interface ILending {
         bytes calldata extraArgs // for extra data .i.e aave rateMode
     ) external;
 
-    function storeAndRetrieveUserDebtCurrent(address _reserve, address _user)
-        external
-        returns (uint256 debt);
+    function getUserDebtCurrent(address _reserve, address _user) external returns (uint256 debt);
 
     function getLendingToken(IERC20Ext token) external view returns (address);
-
-    function getUserDebtStored(address reserve, address user) external view returns (uint256 debt);
 }

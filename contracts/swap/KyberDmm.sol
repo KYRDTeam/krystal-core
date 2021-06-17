@@ -4,11 +4,11 @@ pragma experimental ABIEncoderV2;
 
 import "./BaseSwap.sol";
 import "../interfaces/IDMMRouter.sol";
+import "../libraries/BytesLib.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
-import "@uniswap/v3-periphery/contracts/libraries/BytesLib.sol";
 
 /// General swap for uniswap and its clones
 contract KyberDmm is BaseSwap {

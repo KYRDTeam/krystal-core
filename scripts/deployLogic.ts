@@ -10,6 +10,8 @@ import {
   UniSwapV3,
   KyberProxy,
   KyberDmm,
+  AaveV1Lending,
+  AaveV2Lending,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 
@@ -32,6 +34,8 @@ export interface KrystalContracts {
   };
   lendingContracts: {
     compoundLending?: CompoundLending;
+    aaveV1?: AaveV1Lending;
+    aaveV2?: AaveV2Lending;
   };
 }
 
@@ -75,6 +79,14 @@ export const deploy = async (
   log(0, 'Updating compound/clones config');
   log(0, '======================\n');
   await updateCompoundLending(deployedContracts.lendingContracts.compoundLending, extraArgs);
+
+  log(0, 'Updating aave V1 config');
+  log(0, '======================\n');
+  await updateAaveV1Lending(deployedContracts.lendingContracts.aaveV1, extraArgs);
+
+  log(0, 'Updating aave V2 config');
+  log(0, '======================\n');
+  await updateAaveV2Lending(deployedContracts.lendingContracts.aaveV2, extraArgs);
 
   // Summary
   log(0, 'Summary');
@@ -161,6 +173,26 @@ async function deployContracts(
           existingContract?.['lendingContracts']?.['compoundLending'],
           deployerAddress
         )) as CompoundLending,
+
+    aaveV1: (!networkConfig.aaveV1
+      ? undefined
+      : await deployContract(
+          ++step,
+          networkConfig.autoVerifyContract,
+          'AaveV1Lending',
+          existingContract?.['lendingContracts']?.['aaveV1Lending'],
+          deployerAddress
+        )) as AaveV1Lending,
+
+    aaveV2: (!networkConfig.aaveV2
+      ? undefined
+      : await deployContract(
+          ++step,
+          networkConfig.autoVerifyContract,
+          'AaveV2Lending',
+          existingContract?.['lendingContracts']?.['aaveV2Lending'],
+          deployerAddress
+        )) as AaveV2Lending,
   };
 
   const smartWalletProxy = (await deployContract(
@@ -357,7 +389,10 @@ async function updateCompoundLending(compoundLending: CompoundLending | undefine
   }
 
   log(1, 'update compound data');
-  if ((await compoundLending.getComptroller()) === networkConfig.compound.compTroller) {
+  let compoundData = await compoundLending.compoundData();
+  // comptroller is at the first 20 bytes
+  let currentComptroller = '0x' + compoundData.slice(2, 40);
+  if (currentComptroller === networkConfig.compound.compTroller) {
     log(2, `comptroller already up-to-date at ${networkConfig.compound.compTroller}`);
   } else {
     const tx = await compoundLending.updateCompoundData(
@@ -368,6 +403,41 @@ async function updateCompoundLending(compoundLending: CompoundLending | undefine
     log(2, '> updated compound', JSON.stringify(networkConfig.compound, null, 2));
     printInfo(tx);
   }
+}
+
+async function updateAaveV1Lending(aaveV1Lending: AaveV1Lending | undefined, extraArgs: {from?: string}) {
+  if (!aaveV1Lending || !networkConfig.aaveV1) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+
+  log(1, 'update aave v1 data');
+  const tx = await aaveV1Lending.updateAaveData(
+    networkConfig.aaveV1.poolV1,
+    networkConfig.aaveV1.poolCoreV1,
+    networkConfig.aaveV1.referralCode,
+    networkConfig.aaveV1.tokens
+  );
+  log(2, '> updated aave v1', JSON.stringify(networkConfig.aaveV1, null, 2));
+  printInfo(tx);
+}
+
+async function updateAaveV2Lending(aaveV2Lending: AaveV2Lending | undefined, extraArgs: {from?: string}) {
+  if (!aaveV2Lending || !networkConfig.aaveV2) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+
+  log(1, 'update aave v2 data');
+  const tx = await aaveV2Lending.updateAaveData(
+    networkConfig.aaveV2.provider,
+    networkConfig.aaveV2.poolV2,
+    networkConfig.aaveV2.referralCode,
+    networkConfig.aaveV2.weth,
+    networkConfig.aaveV2.tokens
+  );
+  log(2, '> updated aave v2', JSON.stringify(networkConfig.aaveV2, null, 2));
+  printInfo(tx);
 }
 
 async function updateAddressSet(

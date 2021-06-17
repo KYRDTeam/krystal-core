@@ -48,7 +48,7 @@ interface ISmartWalletImplementation {
         uint256 srcAmount,
         uint256 destAmount,
         uint256 payAmount,
-        uint256 feeAndRateMode,
+        uint256 platformFee,
         address platformWallet
     );
 
@@ -139,7 +139,7 @@ interface ISmartWalletImplementation {
     /// @param payAmount: amount that user wants to pay, if the dest amount (after swap) is higher,
     ///     the remain amount will be sent back to user's wallet
     /// @param tradePath path of the trade on Uniswap
-    /// @param rateMode rate mode for aave
+    /// @param rateMode rate mode for aave v2
     /// @param feeMode fee mode
     /// @param feeBps fee bps
     /// @param platformWallet wallet to receive fee
@@ -150,7 +150,7 @@ interface ISmartWalletImplementation {
         uint256 srcAmount;
         uint256 payAmount;
         address[] tradePath;
-        uint256 rateMode; // for aave
+        uint256 rateMode; // for aave v2
         FeeMode feeMode;
         uint256 feeBps;
         address payable platformWallet;

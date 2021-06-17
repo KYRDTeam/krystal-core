@@ -1,6 +1,7 @@
 pragma solidity 0.7.6;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./IWeth.sol";
 
 interface IDMMFactory {
     function createPool(
@@ -15,16 +16,10 @@ interface IDMMFactory {
         returns (address[] memory _tokenPools);
 }
 
-interface IWETH is IERC20 {
-    function deposit() external payable;
-
-    function withdraw(uint256) external;
-}
-
 interface IDMMRouter {
     function factory() external pure returns (address);
 
-    function weth() external pure returns (IWETH);
+    function weth() external pure returns (IWeth);
 
     function getAmountsOut(
         uint256 amountIn,

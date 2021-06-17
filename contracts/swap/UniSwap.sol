@@ -3,12 +3,12 @@ pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
 import "./BaseSwap.sol";
+import "../libraries/BytesLib.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
-import "@uniswap/v3-periphery/contracts/libraries/BytesLib.sol";
 
 /// General swap for uniswap and its clones
 contract UniSwap is BaseSwap {
