@@ -53,7 +53,7 @@ describe('lending test', async () => {
     for (let {address, symbol} of networkSetting.tokens) {
       describe(`testing lending funtionalities on ${name} with ${symbol} token and router ${router}`, async () => {
         beforeEach(async () => {
-          await evm_revert(setup.postSetupSnapshotId);
+          // await evm_revert(setup.postSetupSnapshotId);
         });
 
         it('swap and deposit', async () => {

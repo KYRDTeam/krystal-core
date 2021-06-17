@@ -67,7 +67,7 @@ describe('swap test', async () => {
     for (let {address, symbol} of networkSetting.tokens) {
       describe(`testing swap funtionalities on ${name} with ${symbol} token and router ${router}`, async () => {
         beforeEach(async () => {
-          await evm_revert(setup.postSetupSnapshotId);
+          // await evm_revert(setup.postSetupSnapshotId);
         });
 
         it('get expected rate correctly', async () => {
