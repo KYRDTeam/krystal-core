@@ -23,19 +23,27 @@ For interactions or contract deployments on public testnets / mainnet, create a 
 
 ```
 PRIVATE_KEY=0x****************************************************************
-BSCSCAN_KEY=********************************
 ```
 
 ## Testing
 
-1. If contracts have not been compiled, run `yarn compile`. This step can be skipped subsequently.
-2. Run `yarn test`
-3. Use `./tst.sh -f` for running a specific test file.
+1. If contracts have not been compiled, run `yarn compile` or `yarn c`. This step can be skipped subsequently.
+2. Run `yarn test -h` for instruction
+
+```bash
+yarn test [-h] [-c <eth,bsc>] [-n <mainnet>] -- to run test on specific chain and network
+
+where:
+    -h  show this help text
+    -c  which chain to run, supported <eth,bsc>
+    -n  which network to run, supported <mainnet>
+    -f  specific test to run if any
+```
 
 ### Example Commands
 
 - `yarn test` (Runs all tests)
-- `./tst.sh -f ./test/swapTest.ts` (Test only swapTest.ts)
+- `yarn test -f ./test/swap.test.ts` (Test only swap.test.ts)
 
 ## Coverage
 
