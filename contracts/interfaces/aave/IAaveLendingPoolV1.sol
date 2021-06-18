@@ -37,6 +37,8 @@ interface IAaveLendingPoolV1 {
             uint256 lastUpdateTimestamp,
             bool usageAsCollateralEnabled
         );
+
+    function setUserUseReserveAsCollateral(address _reserve, bool _useAsCollateral) external;
 }
 
 interface IAToken {
