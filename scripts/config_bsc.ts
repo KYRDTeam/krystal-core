@@ -50,8 +50,8 @@ export const BscConfig: Record<string, IConfig> = {
 
     uniswap: {
       routers: [
-        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // v1
-        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // v2
+        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
+        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // panceke v2
       ],
     },
 
@@ -65,5 +65,6 @@ export const BscConfig: Record<string, IConfig> = {
     },
 
     supportedWallets: commonPlatformWallets,
+    fundedAmount: 10, // swap 5 eth each for every totken
   },
 };
