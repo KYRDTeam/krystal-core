@@ -139,16 +139,24 @@ describe('swap test', async () => {
             if (address === targetToken) {
               continue;
             }
-            // console.log(`testing ${token.address} -> ${targetToken}`);
+
+            // console.log(`swapping from ${token.address} -> ${targetToken}`);
 
             // Approve first
             await token.approve(setup.proxyInstance.address, tokenAmount);
+
+            // Trade to native token to ensure the liquidity pool
+            const tradePath =
+              // kyberProxy only take direct trade
+              name != 'kyberProxy' && token.address != nativeTokenAddress && targetToken != nativeTokenAddress
+                ? [token.address, setup.network.wNative, targetToken]
+                : [token.address, targetToken];
 
             // Get rate
             const destAmount = await testGetExpectedRate(
               swapContract,
               tokenAmount,
-              [token.address, targetToken === nativeTokenAddress ? setup.network.wNative : targetToken],
+              tradePath.map((t) => (t === nativeTokenAddress ? setup.network.wNative : t)),
               FeeMode.FROM_SOURCE
             );
 
@@ -161,11 +169,11 @@ describe('swap test', async () => {
                   swapContract,
                   srcAmount: tokenAmount,
                   minDestAmount,
-                  tradePath: [token.address, targetToken],
+                  tradePath: tradePath,
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: await generateArgsFunc([token.address, targetToken]),
+                  extraArgs: await generateArgsFunc(tradePath),
                 },
                 {
                   from: setup.user.address,
@@ -180,11 +188,11 @@ describe('swap test', async () => {
                   swapContract,
                   srcAmount: tokenAmount,
                   minDestAmount,
-                  tradePath: [token.address, targetToken],
+                  tradePath: tradePath,
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: await generateArgsFunc([token.address, targetToken]),
+                  extraArgs: await generateArgsFunc(tradePath),
                 },
                 {
                   from: setup.user.address,
@@ -239,7 +247,13 @@ describe('swap test', async () => {
           return setup.krystalContracts.swapContracts.uniSwapV3!.address;
         },
         router,
-        async () => hexlify(arrayify(router)) + '0001F4', // fee = 3000 bps
+        async (tradePath: string[]) => {
+          let extraArgs = hexlify(arrayify(router));
+          for (let i = 0; i < tradePath.length - 1; i++) {
+            extraArgs = extraArgs + '0001F4'; // fee = 3000 bps
+          }
+          return extraArgs;
+        },
         platformFee,
         async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);

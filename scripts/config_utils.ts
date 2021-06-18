@@ -50,6 +50,7 @@ export interface IConfig {
   };
 
   supportedWallets: string[];
+  fundedAmount?: number;
 }
 
 export const commonPlatformWallets = [

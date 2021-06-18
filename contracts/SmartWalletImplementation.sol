@@ -174,7 +174,6 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     }
 
     /// @dev withdraw token from Lending platforms (AAVE, COMPOUND)
-    
     /// @return returnedAmount returns the amount withdrawn to the user
     function withdrawFromLendingPlatform(
         ISmartWalletImplementation.WithdrawFromLendingPlatformParams calldata params

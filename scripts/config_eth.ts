@@ -117,5 +117,6 @@ export const EthConfig: Record<string, IConfig> = {
     },
 
     supportedWallets: commonPlatformWallets,
+    fundedAmount: 5, // swap 5 eth each for every totken
   },
 };
