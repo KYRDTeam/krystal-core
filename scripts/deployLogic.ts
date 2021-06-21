@@ -496,6 +496,7 @@ function printInfo(tx: TransactionResponse) {
 }
 
 export function convertToAddressObject(obj: Record<string, any> | Array<any> | Contract): any {
+  if (obj === undefined) return obj;
   if (obj instanceof Contract) {
     return obj.address;
   } else if (Array.isArray(obj)) {
