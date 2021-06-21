@@ -69,9 +69,7 @@ describe('lending test', async () => {
           let lendingContract = await getLendingContract();
           const lendingContractInstance = (await ethers.getContractAt('ILending', lendingContract)) as ILending;
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
-          let tokenAmount = BigNumber.from(10)
-            .pow(await token.decimals())
-            .mul(10); // 10 token unit
+          let tokenAmount = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
           let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
 
           let lendingTokenAddress = await lendingContractInstance.getLendingToken(address);
@@ -191,9 +189,7 @@ describe('lending test', async () => {
           const lendingContractInstance = (await ethers.getContractAt('ILending', lendingContract)) as ILending;
 
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
-          let tokenAmount = BigNumber.from(10)
-            .pow(await token.decimals())
-            .mul(10); // 10 token unit
+          let tokenAmount = BigNumber.from(10).pow(await token.decimals()); //1 token unit
           let lendingTokenAddress = await lendingContractInstance.getLendingToken(address);
           let lendingToken = (await ethers.getContractAt('IERC20Ext', lendingTokenAddress)) as IERC20Ext;
 
@@ -267,8 +263,8 @@ describe('lending test', async () => {
           let lendingTokenAddress = await lendingContractInstance.getLendingToken(token.address);
 
           // Deposit first to get some cToken
-          let depositAmount = tokenUnit.mul(10);
-          await token.approve(setup.proxyInstance.address, tokenUnit.mul(10));
+          let depositAmount = tokenUnit.mul(8);
+          await token.approve(setup.proxyInstance.address, depositAmount);
           await expect(() => {
             setup.proxyInstance.swapAndDeposit({
               swapContract: zeroAddress, // swap contract not needed
@@ -283,7 +279,7 @@ describe('lending test', async () => {
             });
           }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(depositAmount));
 
-          let borrowAmount = tokenUnit.mul(10);
+          let borrowAmount = tokenUnit.mul(4);
           let beforeAmt = await token.balanceOf(setup.user.address);
           await borrowFunc(lendingTokenAddress, token.address, borrowAmount, setup.user.address);
           let afterAmt = await token.balanceOf(setup.user.address);
