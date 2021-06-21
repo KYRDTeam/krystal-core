@@ -337,7 +337,7 @@ describe('lending test', async () => {
 
   if (networkSetting.uniswap && networkSetting.compound) {
     // Testing uni router v2 only to save time
-    for (let router of [networkSetting.uniswap.routers[1]]) {
+    for (let router of [networkSetting.uniswap.routers[0]]) {
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
 
       executeLendingTest(
@@ -372,7 +372,7 @@ describe('lending test', async () => {
 
   if (networkSetting.uniswap && networkSetting.aaveV1) {
     // Testing uni router v2 only to save time
-    for (let router of [networkSetting.uniswap.routers[1]]) {
+    for (let router of [networkSetting.uniswap.routers[0]]) {
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
 
       executeLendingTest(
@@ -406,7 +406,7 @@ describe('lending test', async () => {
 
   if (networkSetting.uniswap && networkSetting.aaveV2) {
     // Testing uni router v2 only to save time
-    for (let router of [networkSetting.uniswap.routers[1]]) {
+    for (let router of [networkSetting.uniswap.routers[0]]) {
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
 
       executeLendingTest(
@@ -440,7 +440,7 @@ describe('lending test', async () => {
 
   if (networkSetting.uniswap && networkSetting.aaveAMM) {
     // Testing uni router v2 only to save time
-    for (let router of [networkSetting.uniswap.routers[1]]) {
+    for (let router of [networkSetting.uniswap.routers[0]]) {
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
 
       executeLendingTest(

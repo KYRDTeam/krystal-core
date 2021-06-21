@@ -13,8 +13,8 @@ export const BscConfig: Record<string, IConfig> = {
     // Pancake swap
     uniswap: {
       routers: [
-        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
         '0x10ed43c718714eb63d5aa57b78b54704e256024e', // panceke v2
+        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
       ],
     },
 
@@ -22,7 +22,7 @@ export const BscConfig: Record<string, IConfig> = {
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
       // cBNB or cETH
-      cNative: '0xa07c5b74c9b40447a954e1466938b865b6bbea36',
+      cNative: '0xA07c5b74C9B40447a954e1466938b865b6BBea36',
       // https://api.compound.io/api/cToken
       // empty array for the full market data
       cTokens: [],
@@ -35,37 +35,21 @@ export const BscConfig: Record<string, IConfig> = {
   bsc_testnet: {
     autoVerifyContract: true,
 
-    tokens: [
-      {symbol: 'busd', address: '0xed24fc36d5ee211ea25a80239fb8c4cfd80f12ee'},
-      {symbol: 'dai', address: '0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867'},
-      {symbol: 'usdc', address: '0x64544969ed7ebf5f083679233325356ebe738930'},
-      {symbol: 'usdt', address: '0x337610d27c682e347c9cd60bd4b3b107c9d34ddd'},
-    ],
+    tokens: [{symbol: 'busd', address: '0x8301f2213c0eed49a7e28ae4c3e91722919b8b47'}],
 
-    wNative: '',
+    wNative: '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f',
 
-    // Uniswap & clones
+    // Pancake swap
     uniswap: {
       routers: ['0xD99D1c33F9fC3444f8101754aBC46c52416550D1'],
     },
 
     // Compound
     compound: {
-      compTroller: '0x94d1820b2d1c7c7452a163983dc888cec546b77d',
+      compTroller: '0x94d1820b2D1c7c7452A163983Dc888CEC546b77D',
       cNative: '0x2E7222e51c0f6e98610A1543Aa3836E092CDe62c',
       // empty array for the full market data
-      cTokens: [
-        '0x74469281310195A04840Daf6EdF576F559a3dE80',
-        '0xD5C4C2e2facBEB59D0216D0595d63FcDc6F9A1a7',
-        '0xb7526572FFE56AB9D7489838Bf2E18e3323b441A',
-        '0x08e0A5575De71037aE36AbfAfb516595fE68e5e4',
-        '0x6d6F697e34145Bb95c54E77482d97cc261Dc237E',
-        '0xb6e9322C49FD75a367Fcb17B0Fcd62C5070EbCBe',
-        '0x162D005F0Fff510E54958Cfc5CF32A3180A84aab',
-        '0xAfc13BC065ABeE838540823431055D2ea52eBA52',
-        '0x488aB2826a154da01CC4CC16A8C83d4720D3cA2C',
-        '0x37C28DE42bA3d22217995D146FC684B2326Ede64',
-      ],
+      cTokens: [],
     },
     supportedWallets: commonPlatformWallets,
   },
