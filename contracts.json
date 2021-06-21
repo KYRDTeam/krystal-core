@@ -14,5 +14,18 @@
     "SmartWalletImplementation": "0xAE0505c0C30Dc0EA077cDB4Ed1B2BB894D9c6B65",
     "SmartWalletProxy": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
     "FetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B"
+  },
+  "eth_ropsten": {
+    "smartWalletImplementation": "0x0B29C3CEd4DD3Cc34e559070cB2d4ed49a5f6b83",
+    "smartWalletProxy": "0xD9B1c826C8c290113ebB66F82A2F0f9EE4582964",
+    "fetchTokenBalances": "0xE60D933aE2Ded269FDF7A1d8EE5504bC50d8b364",
+    "swapContracts": {
+      "uniSwap": "0xb7Bc27d8EcfAdBE52AA28DDa94e0e807bA6fDF1F",
+      "uniSwapV3": "0x6c9e1226F7a0940B195FD52BD8c73B3804Ec6bD1",
+      "kyberProxy": "0xD050274563048a0bde6180214bb97382093F1418"
+    },
+    "lendingContracts": {
+      "compoundLending": "0x0c607BaDcA1B2277DbA62b7c2d7B0F128DE1Ffc1"
+    }
   }
 }
