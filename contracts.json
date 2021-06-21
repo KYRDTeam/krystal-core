@@ -1,5 +1,5 @@
 {
-  "bsc_testnet": {
+  "bsc_testnet_v1.0": {
     "smartWalletImplementation": "0xE17E0D29De09214BBAcBcf31f2F57fbd72Fa1430",
     "smartWalletProxy": "0xCc5197Dd8CdA6B1A48CD0082697Dba50753123D2",
     "fetchTokenBalances": "0x2491ae103685BbfBbcfC668c2Ec3b18bBcE3e4bD",
@@ -10,7 +10,7 @@
       "compoundLending": "0x4C7A19b5191A308ca21f0aFC1Ad0828B55f7842C"
     }
   },
-  "bsc_mainnet": {
+  "bsc_mainnet_v1.0": {
     "SmartWalletImplementation": "0xAE0505c0C30Dc0EA077cDB4Ed1B2BB894D9c6B65",
     "SmartWalletProxy": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
     "FetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B"
@@ -26,6 +26,17 @@
     },
     "lendingContracts": {
       "compoundLending": "0x0c607BaDcA1B2277DbA62b7c2d7B0F128DE1Ffc1"
+    }
+  },
+  "bsc_testnet": {
+    "smartWalletImplementation": "0x15315662e60848fb7329265EbE94967E2f97f333",
+    "smartWalletProxy": "0xEa21147D0001b0f362D05d737ce1314456070cC1",
+    "fetchTokenBalances": "0x497a5639527361349B64B8103ad18Be51639808A",
+    "swapContracts": {
+      "uniSwap": "0xb716c894e14F5890bdD39A63e220ACa78CFB6a4A"
+    },
+    "lendingContracts": {
+      "compoundLending": "0x1a56c1688d68334809a80Bf173515C96ee0B2eAF"
     }
   }
 }
