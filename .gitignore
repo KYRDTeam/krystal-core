@@ -50,9 +50,9 @@ typechain
 report
 
 .env
-.env.polygon
-.env.eth
-.env.bsc
+.env.polygon.*
+.env.eth.*
+.env.bsc.*
 
 bin/
 

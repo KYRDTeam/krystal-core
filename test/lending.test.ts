@@ -279,7 +279,7 @@ describe('lending test', async () => {
             });
           }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(depositAmount));
 
-          let borrowAmount = tokenUnit.mul(4);
+          let borrowAmount = tokenUnit.mul(10);
           let beforeAmt = await token.balanceOf(setup.user.address);
           await borrowFunc(lendingTokenAddress, token.address, borrowAmount, setup.user.address);
           let afterAmt = await token.balanceOf(setup.user.address);

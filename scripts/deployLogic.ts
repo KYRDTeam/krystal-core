@@ -15,6 +15,7 @@ import {
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
+import {sleep} from '../test/helper';
 
 const gasLimit = 700000;
 
@@ -261,10 +262,14 @@ async function deployContract(
 
   if (autoVerify) {
     try {
+      log(3, '>> sleep first, wait for contract data to be propagated');
+      await sleep(10000);
+      log(3, '>> start verifying');
       await run('verify:verify', {
         address: contract.address,
         constructorArguments: args,
       });
+      log(3, '>> done verifying');
     } catch (e) {
       log(2, 'failed to verify contract', e);
     }
