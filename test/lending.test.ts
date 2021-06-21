@@ -70,7 +70,7 @@ describe('lending test', async () => {
           const lendingContractInstance = (await ethers.getContractAt('ILending', lendingContract)) as ILending;
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
           let tokenAmount = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
-          let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb
+          let nativeAmount = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals)); // one native token .i.e eth/bnb/matic
 
           let lendingTokenAddress = await lendingContractInstance.getLendingToken(address);
           let lendingToken = (await ethers.getContractAt('IERC20Ext', lendingTokenAddress)) as IERC20Ext;
