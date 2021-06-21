@@ -16,7 +16,8 @@ interface ISmartWalletImplementation {
         address[] tradePath,
         uint256 srcAmount,
         uint256 destAmount,
-        uint256 platformFee,
+        FeeMode feeMode,
+        uint256 feeBps,
         address platformWallet
     );
 
@@ -27,7 +28,8 @@ interface ISmartWalletImplementation {
         address[] tradePath,
         uint256 srcAmount,
         uint256 destAmount,
-        uint256 platformFee,
+        FeeMode feeMode,
+        uint256 feeBps,
         address platformWallet
     );
 
@@ -48,7 +50,8 @@ interface ISmartWalletImplementation {
         uint256 srcAmount,
         uint256 destAmount,
         uint256 payAmount,
-        uint256 platformFee,
+        FeeMode feeMode,
+        uint256 feeBps,
         address platformWallet
     );
 

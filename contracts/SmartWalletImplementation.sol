@@ -95,26 +95,25 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     function swap(
         ISmartWalletImplementation.SwapParams calldata params
     ) external payable override nonReentrant returns (uint256 destAmount) {
-        {   
-            // prevent stack too deep
-            destAmount = swapInternal(
-                params.swapContract,
-                params.srcAmount,
-                params.minDestAmount,
-                params.tradePath,
-                msg.sender,
-                params.feeMode,
-                params.feeBps,
-                params.platformWallet,
-                params.extraArgs
-            );
-        }
+        destAmount = swapInternal(
+            params.swapContract,
+            params.srcAmount,
+            params.minDestAmount,
+            params.tradePath,
+            msg.sender,
+            params.feeMode,
+            params.feeBps,
+            params.platformWallet,
+            params.extraArgs
+        );
+
         emit Swap(
             msg.sender,
             params.swapContract,
             params.tradePath,
             params.srcAmount,
             destAmount,
+            params.feeMode,
             params.feeBps,
             params.platformWallet
         );
@@ -168,6 +167,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             params.tradePath,
             params.srcAmount,
             destAmount,
+            params.feeMode,
             params.feeBps,
             params.platformWallet
         );
@@ -243,15 +243,13 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
                 params.extraArgs
             );
         }
-        {
-            ILending(params.lendingContract).repayBorrowTo(
-                msg.sender,
-                IERC20Ext(params.tradePath[params.tradePath.length - 1]),
-                destAmount,
-                actualPayAmount,
-                abi.encodePacked(params.rateMode)
-            );
-        }
+        ILending(params.lendingContract).repayBorrowTo(
+            msg.sender,
+            IERC20Ext(params.tradePath[params.tradePath.length - 1]),
+            destAmount,
+            actualPayAmount,
+            abi.encodePacked(params.rateMode)
+        );
 
         emit SwapAndRepay(
             msg.sender,
@@ -261,6 +259,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             params.srcAmount,
             destAmount,
             actualPayAmount,
+            params.feeMode,
             params.feeBps,
             params.platformWallet
         );
