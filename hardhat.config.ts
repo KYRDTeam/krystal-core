@@ -91,10 +91,10 @@ const config: HardhatUserConfig = {
 if (MAINNET_FORK) {
   config.networks!.hardhat = {
     accounts: accounts,
-    chainId: parseInt(MAINNET_ID ?? '') || undefined,
+    chainId: parseInt(MAINNET_ID || '') || undefined,
     forking: {
       url: MAINNET_FORK,
-      blockNumber: parseInt(MAINNET_FORK_BLOCK ?? '') || undefined,
+      blockNumber: parseInt(MAINNET_FORK_BLOCK || '') || undefined,
     },
   };
 }

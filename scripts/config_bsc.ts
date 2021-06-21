@@ -1,6 +1,37 @@
 import {commonPlatformWallets, IConfig} from './config_utils';
 
 export const BscConfig: Record<string, IConfig> = {
+  bsc_mainnet: {
+    autoVerifyContract: true,
+    tokens: [
+      {symbol: 'usdt', address: '0x55d398326f99059ff775485246999027b3197955'},
+      {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
+      {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
+    ],
+    wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+
+    // Pancake swap
+    uniswap: {
+      routers: [
+        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
+        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // panceke v2
+      ],
+    },
+
+    // Venus protocol
+    compound: {
+      compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
+      // cBNB or cETH
+      cNative: '0xa07c5b74c9b40447a954e1466938b865b6bbea36',
+      // https://api.compound.io/api/cToken
+      // empty array for the full market data
+      cTokens: [],
+    },
+
+    supportedWallets: commonPlatformWallets,
+    fundedAmount: 10, // swap 10 bnb each for every token
+  },
+
   bsc_testnet: {
     autoVerifyContract: true,
 
@@ -37,34 +68,5 @@ export const BscConfig: Record<string, IConfig> = {
       ],
     },
     supportedWallets: commonPlatformWallets,
-  },
-
-  bsc_mainnet: {
-    autoVerifyContract: true,
-    tokens: [
-      {symbol: 'usdt', address: '0x55d398326f99059ff775485246999027b3197955'},
-      {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
-      {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
-    ],
-    wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-
-    uniswap: {
-      routers: [
-        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
-        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // panceke v2
-      ],
-    },
-
-    compound: {
-      compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
-      // cBNB or cETH
-      cNative: '0xa07c5b74c9b40447a954e1466938b865b6bbea36',
-      // https://api.compound.io/api/cToken
-      // empty array for the full market data
-      cTokens: [],
-    },
-
-    supportedWallets: commonPlatformWallets,
-    fundedAmount: 10, // swap 5 eth each for every totken
   },
 };
