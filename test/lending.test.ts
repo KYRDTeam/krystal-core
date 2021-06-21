@@ -441,4 +441,38 @@ describe('lending test', async () => {
       );
     }
   }
+
+  if (networkSetting.uniswap && networkSetting.aaveAMM) {
+    // Testing uni router v2 only to save time
+    for (let router of [networkSetting.uniswap.routers[1]]) {
+      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+
+      executeLendingTest(
+        'univ2/clones + aave AMM',
+        async () => {
+          return setup.krystalContracts.swapContracts.uniSwap!.address;
+        },
+        async () => {
+          return setup.krystalContracts.lendingContracts.aaveAMM!.address;
+        },
+        router,
+        () => hexlify(arrayify(router)),
+        platformFee,
+        // generate extraArgs
+        async (sourceAmount: BigNumber, tradePath: string[]) => {
+          const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
+          return amounts[amounts.length - 1];
+        },
+        // borrow func
+        async (_lendingToken: string, underlyingToken: string, amount: BigNumber, borrower: string) => {
+          let poolContract = (await ethers.getContractAt(
+            'IAaveLendingPoolV2',
+            networkSetting.aaveAMM!.poolV2
+          )) as IAaveLendingPoolV2;
+          await poolContract.setUserUseReserveAsCollateral(underlyingToken, true);
+          await poolContract.borrow(underlyingToken, amount, 2, networkSetting.aaveAMM!.referralCode, borrower);
+        }
+      );
+    }
+  }
 });

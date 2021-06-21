@@ -5,7 +5,8 @@ export const PolygonConfig: Record<string, IConfig> = {
     autoVerifyContract: true,
 
     tokens: [
-      {symbol: 'quick', address: '0x831753dd7087cac61ab5644b308642cc1c33dc13'},
+      // {symbol: 'quick', address: '0x831753dd7087cac61ab5644b308642cc1c33dc13'},
+      {symbol: 'uni', address: '0xb33eaad8d922b1083446dc23f610c2567fb5180f'},
       {symbol: 'dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'},
       {symbol: 'weth', address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'},
     ],
@@ -16,6 +17,7 @@ export const PolygonConfig: Record<string, IConfig> = {
     uniswap: {
       routers: [
         '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // quickswap
+        '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // sushiswap
       ],
     },
 
@@ -27,5 +29,6 @@ export const PolygonConfig: Record<string, IConfig> = {
     //   cTokens: [],
     // },
     supportedWallets: commonPlatformWallets,
+    fundedAmount: 10000, // swap some matic each for every token
   },
 };

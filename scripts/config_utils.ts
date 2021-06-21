@@ -1,3 +1,10 @@
+export interface IAaveV2Config {
+  poolV2: string;
+  provider: string;
+  weth: string;
+  referralCode: number;
+  tokens: string[];
+}
 export interface IConfig {
   autoVerifyContract: boolean;
 
@@ -41,13 +48,9 @@ export interface IConfig {
     tokens: string[];
   };
 
-  aaveV2?: {
-    poolV2: string;
-    provider: string;
-    weth: string;
-    referralCode: number;
-    tokens: string[];
-  };
+  aaveV2?: IAaveV2Config;
+
+  aaveAMM?: IAaveV2Config;
 
   supportedWallets: string[];
   fundedAmount?: number;

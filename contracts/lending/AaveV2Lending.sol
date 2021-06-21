@@ -52,14 +52,12 @@ contract AaveV2Lending is BaseLending {
         }
 
         for (uint256 i = 0; i < tokens.length; i++) {
-            address token = tokens[i] == ETH_TOKEN_ADDRESS ? address(weth) : address(tokens[i]);
             // update data for pool v2
-            try poolV2.getReserveData(token) returns (DataTypes.ReserveData memory data) {
-                if (aaveData.aTokensV2[tokens[i]] != data.aTokenAddress) {
-                    aaveData.aTokensV2[tokens[i]] = data.aTokenAddress;
-                    safeApproveAllowance(address(poolV2), tokens[i]);
-                }
-            } catch {}
+            (address aToken, , ) = provider.getReserveTokensAddresses(address(tokens[i]));
+            if (aaveData.aTokensV2[tokens[i]] != aToken) {
+                aaveData.aTokensV2[tokens[i]] = aToken;
+                safeApproveAllowance(address(poolV2), tokens[i]);
+            }
         }
     }
 

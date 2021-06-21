@@ -1,6 +1,11 @@
 pragma solidity 0.7.6;
 
 library DataTypes {
+  struct TokenData {
+    string symbol;
+    address tokenAddress;
+  }
+
   struct ReserveData {
     //stores the reserve configuration
     ReserveConfigurationMap configuration;

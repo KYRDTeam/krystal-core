@@ -14,6 +14,7 @@ import {
   AaveV2Lending,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
+import {IAaveV2Config} from './config_utils';
 
 const gasLimit = 700000;
 
@@ -36,6 +37,7 @@ export interface KrystalContracts {
     compoundLending?: CompoundLending;
     aaveV1?: AaveV1Lending;
     aaveV2?: AaveV2Lending;
+    aaveAMM?: AaveV2Lending;
   };
 }
 
@@ -86,7 +88,11 @@ export const deploy = async (
 
   log(0, 'Updating aave V2 config');
   log(0, '======================\n');
-  await updateAaveV2Lending(deployedContracts.lendingContracts.aaveV2, extraArgs);
+  await updateAaveV2Lending(deployedContracts.lendingContracts.aaveV2, networkConfig.aaveV2, extraArgs);
+
+  log(0, 'Updating aave AMM config');
+  log(0, '======================\n');
+  await updateAaveV2Lending(deployedContracts.lendingContracts.aaveAMM, networkConfig.aaveAMM, extraArgs);
 
   // Summary
   log(0, 'Summary');
@@ -191,6 +197,16 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'AaveV2Lending',
           existingContract?.['lendingContracts']?.['aaveV2Lending'],
+          deployerAddress
+        )) as AaveV2Lending,
+
+    aaveAMM: (!networkConfig.aaveAMM
+      ? undefined
+      : await deployContract(
+          ++step,
+          networkConfig.autoVerifyContract,
+          'AaveV2Lending',
+          existingContract?.['lendingContracts']?.['aaveAMMLending'],
           deployerAddress
         )) as AaveV2Lending,
   };
@@ -422,19 +438,23 @@ async function updateAaveV1Lending(aaveV1Lending: AaveV1Lending | undefined, ext
   printInfo(tx);
 }
 
-async function updateAaveV2Lending(aaveV2Lending: AaveV2Lending | undefined, extraArgs: {from?: string}) {
-  if (!aaveV2Lending || !networkConfig.aaveV2) {
+async function updateAaveV2Lending(
+  aaveV2Lending: AaveV2Lending | undefined,
+  aaveV2Config: IAaveV2Config | undefined,
+  _extraArgs: {from?: string}
+) {
+  if (!aaveV2Lending || !aaveV2Config) {
     log(1, 'protocol not supported on this env');
     return;
   }
 
   log(1, 'update aave v2 data');
   const tx = await aaveV2Lending.updateAaveData(
-    networkConfig.aaveV2.provider,
-    networkConfig.aaveV2.poolV2,
-    networkConfig.aaveV2.referralCode,
-    networkConfig.aaveV2.weth,
-    networkConfig.aaveV2.tokens
+    aaveV2Config.provider,
+    aaveV2Config.poolV2,
+    aaveV2Config.referralCode,
+    aaveV2Config.weth,
+    aaveV2Config.tokens
   );
   log(2, '> updated aave v2', JSON.stringify(networkConfig.aaveV2, null, 2));
   printInfo(tx);
