@@ -22,6 +22,8 @@ const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY, MAINNET_ID, MAINNET_FORK, MAI
 export const customNetworkConfig =
   process.env.CHAIN && process.env.CHAIN ? `${process.env.CHAIN}_${process.env.NETWORK}` : undefined;
 
+export const multisig = process.env.MULTISIG ?? undefined;
+
 console.log(
   `--ENVS:\n--CHAIN=${process.env.CHAIN}, NETWORK=${process.env.NETWORK}, customConfig=${customNetworkConfig}`
 );
@@ -142,6 +144,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 4,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
+    gasPrice: 10 * 1e9,
   };
 
   config.networks!.eth_ropsten = {

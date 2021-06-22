@@ -12,7 +12,7 @@ import {
   IAaveLendingPoolV2,
 } from '../typechain';
 import {ethers} from 'hardhat';
-import {arrayify, hexlify, zeroPad} from 'ethers/lib/utils';
+import {arrayify, hexlify} from 'ethers/lib/utils';
 
 describe('lending test', async () => {
   let platformFee = 8;
