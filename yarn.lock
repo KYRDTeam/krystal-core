@@ -600,6 +600,19 @@
     "@ethersproject/properties" "^5.3.0"
     "@ethersproject/strings" "^5.3.0"
 
+"@gnosis.pm/safe-core-sdk-types@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-core-sdk-types/-/safe-core-sdk-types-0.1.1.tgz#908c394cb4660493b4e9c8e01b5a7aa36efafd30"
+  integrity sha512-PghXGDaI5Foq37nZGmI90U2OKMeGtxh5KqkDqou9aFHwGVa/nf9HRQPxG9/XUzcyfe9OlKttDlJnR3XnC3dSDw==
+
+"@gnosis.pm/safe-core-sdk@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-core-sdk/-/safe-core-sdk-0.2.0.tgz#29439ef2520dbacf6f939140d3d1e49d985a314e"
+  integrity sha512-HofU9KvbdMyoblvVyjTAEGNjdte4CamIfbZ5VgmAZhm2j8DwVJ6kqqRjGVar36eOv3sfozuJmnZwkPMM9BaV8Q==
+  dependencies:
+    "@gnosis.pm/safe-core-sdk-types" "^0.1.1"
+    ethereumjs-util "^7.0.10"
+
 "@kyber.network/utils-sc@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@kyber.network/utils-sc/-/utils-sc-2.2.1.tgz#1864b473608a7c48aa9382ba01eea8f4cd1092bc"

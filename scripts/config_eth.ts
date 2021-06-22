@@ -298,4 +298,22 @@ export const EthConfig: Record<string, IConfig> = {
     supportedWallets: commonPlatformWallets,
     fundedAmount: 5, // swap 5 eth each for every token
   },
+
+  eth_rinkeby: {
+    autoVerifyContract: true,
+
+    tokens: [{symbol: 'dai', address: '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658'}],
+
+    wNative: '0xc778417e063141139fce010982780140aa0cd5ab',
+
+    // Uniswap & clones
+    uniswap: {
+      routers: [
+        '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // univ2 router2
+      ],
+    },
+
+    supportedWallets: commonPlatformWallets,
+    fundedAmount: 5, // swap 5 eth each for every token
+  },
 };
