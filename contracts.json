@@ -1,42 +1,36 @@
 {
-  "bsc_testnet_v1.0": {
-    "smartWalletImplementation": "0xE17E0D29De09214BBAcBcf31f2F57fbd72Fa1430",
-    "smartWalletProxy": "0xCc5197Dd8CdA6B1A48CD0082697Dba50753123D2",
-    "fetchTokenBalances": "0x2491ae103685BbfBbcfC668c2Ec3b18bBcE3e4bD",
-    "swapContracts": {
-      "uniSwap": "0x181Cf7df196612c6cb4eCA09c257156c4CB26F1C"
-    },
-    "lendingContracts": {
-      "compoundLending": "0x4C7A19b5191A308ca21f0aFC1Ad0828B55f7842C"
-    }
-  },
-  "bsc_mainnet_v1.0": {
+  "_v1.0_bsc_mainnet": {
     "SmartWalletImplementation": "0xAE0505c0C30Dc0EA077cDB4Ed1B2BB894D9c6B65",
     "SmartWalletProxy": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
     "FetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B"
   },
-  "eth_ropsten": {
-    "smartWalletImplementation": "0x0B29C3CEd4DD3Cc34e559070cB2d4ed49a5f6b83",
-    "smartWalletProxy": "0xD9B1c826C8c290113ebB66F82A2F0f9EE4582964",
-    "fetchTokenBalances": "0xE60D933aE2Ded269FDF7A1d8EE5504bC50d8b364",
-    "swapContracts": {
-      "uniSwap": "0xb7Bc27d8EcfAdBE52AA28DDa94e0e807bA6fDF1F",
-      "uniSwapV3": "0x6c9e1226F7a0940B195FD52BD8c73B3804Ec6bD1",
-      "kyberProxy": "0xD050274563048a0bde6180214bb97382093F1418"
-    },
-    "lendingContracts": {
-      "compoundLending": "0x0c607BaDcA1B2277DbA62b7c2d7B0F128DE1Ffc1"
-    }
+  "_v1.0_bsc_testnet": {
+    "SmartWalletSwapImplementation": "0xfF0A25c7E0621358b8f84771D275810e47D35b6f",
+    "SmartWalletSwapProxy": "0xE7314051BCFD832398e232f2c274278c44121a3f",
+    "FetchTokenBalances": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
   },
   "bsc_testnet": {
-    "smartWalletImplementation": "0x15315662e60848fb7329265EbE94967E2f97f333",
-    "smartWalletProxy": "0xEa21147D0001b0f362D05d737ce1314456070cC1",
-    "fetchTokenBalances": "0x497a5639527361349B64B8103ad18Be51639808A",
+    "smartWalletImplementation": "0x25750A5FED63A79ddE8E516f8A0D3C4EbA656F79",
+    "smartWalletProxy": "0xA58573970cfFAd93309071cE9aff46b8A35eC62B",
+    "fetchTokenBalances": "0xEB029e27F86D4FA920e214Cbb933924C6df91e83",
     "swapContracts": {
-      "uniSwap": "0xb716c894e14F5890bdD39A63e220ACa78CFB6a4A"
+      "uniSwap": "0xf5a40993852e6C47B4981bEAC1659BF09B83C521"
     },
     "lendingContracts": {
-      "compoundLending": "0x1a56c1688d68334809a80Bf173515C96ee0B2eAF"
+      "compoundLending": "0xb455810945407Ad3146B74Aa3773df1cDaD61b11"
+    }
+  },
+  "eth_ropsten": {
+    "smartWalletImplementation": "0x379801fabAEDFB07e43e4Eb2E76199921f08858e",
+    "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
+    "fetchTokenBalances": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
+    "swapContracts": {
+      "uniSwap": "0x0C816D6C4C37294186CBCA0E514Fc56F0c34d059",
+      "uniSwapV3": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
+      "kyberProxy": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B"
+    },
+    "lendingContracts": {
+      "compoundLending": "0x60fc810EA972809d729FCE0043B82a58766596ee"
     }
   }
 }
