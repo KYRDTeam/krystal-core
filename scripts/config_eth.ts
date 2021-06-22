@@ -174,7 +174,7 @@ export const EthConfig: Record<string, IConfig> = {
     },
 
     kyberProxy: {
-      proxy: '0x818E6FECD516Ecc3849DAf6845e3EC868087B755',
+      proxy: '0xd719c34261e099Fdb33030ac8909d5788D3039C4',
     },
 
     // kyberDmm: {
