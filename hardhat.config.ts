@@ -100,18 +100,9 @@ if (MAINNET_FORK) {
 }
 
 if (PRIVATE_KEY) {
-  config.networks!.polygon_mainnet = {
-    url: 'https://rpc-mainnet.matic.network',
-    chainId: 137,
-    gasPrice: 20000000000,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-  };
-
   config.networks!.bsc_testnet = {
     url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
     chainId: 97,
-    gasPrice: 20000000000,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
   };
@@ -125,6 +116,20 @@ if (PRIVATE_KEY) {
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
+  config.networks!.polygon_mainnet = {
+    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 137,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+
+  config.networks!.polygon_mumbai = {
+    url: `https://polygon-mumbai.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 80001,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+
   config.networks!.eth_kovan = {
     url: `https://kovan.infura.io/v3/${INFURA_API_KEY}`,
     chainId: 42,
@@ -144,6 +149,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 3,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
+    gasPrice: 20 * 1e9,
   };
 
   config.networks!.eth_mainnet = {

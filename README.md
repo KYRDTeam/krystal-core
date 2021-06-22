@@ -31,12 +31,26 @@ PRIVATE_KEY=0x****************************************************************
 2. Run `yarn test -h` for instruction
 
 ```bash
-yarn test [-h] [-c <eth,bsc>] [-n <mainnet>] -- to run test on specific chain and network
+yarn <deploy,test> [-h] [-c <eth,bsc,polygon>] [-n <mainnet,testnet,ropsten>] -- to run test on specific chain and network
 
 where:
     -h  show this help text
-    -c  which chain to run, supported <eth,bsc>
-    -n  which network to run, supported <mainnet>
+    -c  which chain to run, supported <eth,bsc,polygon>
+    -n  which network to run, supported <mainnet,testnet,ropsten,mumbai>
+    -f  specific test to run if any
+```
+
+## Deploying
+
+1. Run `yarn deploy -h` for instruction
+
+```bash
+yarn <deploy,test> [-h] [-c <eth,bsc,polygon>] [-n <mainnet,testnet,ropsten>] -- to run test on specific chain and network
+
+where:
+    -h  show this help text
+    -c  which chain to run, supported <eth,bsc,polygon>
+    -n  which network to run, supported <mainnet,testnet,ropsten,mumbai>
     -f  specific test to run if any
 ```
 
