@@ -54,6 +54,9 @@ report
 .env.eth.*
 .env.bsc.*
 
+!.env.sample
+!.env.eth.mainnet.sample
+
 bin/
 
 .vscode
