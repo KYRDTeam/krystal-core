@@ -12,6 +12,7 @@ import {
   KyberDmm,
   AaveV1Lending,
   AaveV2Lending,
+  FetchAaveDataWrapper,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -33,6 +34,7 @@ export interface KrystalContracts {
   smartWalletImplementation: SmartWalletImplementation;
   smartWalletProxy: SmartWalletProxy;
   fetchTokenBalances: FetchTokenBalances;
+  fetchAaveDataWrapper: FetchAaveDataWrapper;
   swapContracts: {
     uniSwap?: UniSwap;
     uniSwapV3?: UniSwapV3;
@@ -131,6 +133,14 @@ async function deployContracts(
     existingContract?.['fetchTokenBalances'],
     contractAdmin
   )) as FetchTokenBalances;
+
+  const fetchAaveDataWrapper = (await deployContract(
+    ++step,
+    networkConfig.autoVerifyContract,
+    'FetchAaveDataWrapper',
+    existingContract?.['fetchAaveDataWrapper'],
+    contractAdmin
+  )) as FetchAaveDataWrapper;
 
   const swapContracts = {
     uniSwap: !networkConfig.uniswap
@@ -237,6 +247,7 @@ async function deployContracts(
     smartWalletImplementation,
     smartWalletProxy,
     fetchTokenBalances,
+    fetchAaveDataWrapper,
     swapContracts,
     lendingContracts,
   };
