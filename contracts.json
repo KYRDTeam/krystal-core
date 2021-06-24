@@ -33,10 +33,12 @@
     "smartWalletImplementation": "0x379801fabAEDFB07e43e4Eb2E76199921f08858e",
     "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchTokenBalances": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
+    "fetchAaveDataWrapper": "0xD7eA9048908F5E19DCcdD9623dc820feDbb54D45",
     "swapContracts": {
       "uniSwap": "0x0C816D6C4C37294186CBCA0E514Fc56F0c34d059",
       "uniSwapV3": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
-      "kyberProxy": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B"
+      "kyberProxy": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B",
+      "kyberDmm": "0x9295A8F78540418f5Ab58Bba5879D87665C3A16C"
     },
     "lendingContracts": {
       "compoundLending": "0x60fc810EA972809d729FCE0043B82a58766596ee"

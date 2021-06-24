@@ -177,9 +177,9 @@ export const EthConfig: Record<string, IConfig> = {
       proxy: '0xd719c34261e099Fdb33030ac8909d5788D3039C4',
     },
 
-    // kyberDmm: {
-    //   router: '',
-    // },
+    kyberDmm: {
+      router: '0x96E8B9E051c81661C36a18dF64ba45F86AC80Aae',
+    },
 
     // Compound
     compound: {
