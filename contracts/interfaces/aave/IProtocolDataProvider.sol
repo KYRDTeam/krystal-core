@@ -2,8 +2,6 @@
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-import "./DataTypes.sol";
-
 interface IProtocolDataProvider {
   function getUserReserveData(address asset, address user)
     external view returns (
@@ -18,8 +16,6 @@ interface IProtocolDataProvider {
       bool usageAsCollateralEnabled
     );
   
-  function getAllATokens() external view returns (DataTypes.TokenData[] memory);
-
   function getReserveTokensAddresses(address asset)
     external view returns (
       address aTokenAddress,

@@ -1,7 +1,6 @@
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-import "./DataTypes.sol";
 import "./IProtocolDataProvider.sol";
 
 
