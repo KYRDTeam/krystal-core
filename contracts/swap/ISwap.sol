@@ -15,6 +15,18 @@ interface ISwap {
         view
         returns (uint256 destAmount);
 
+    struct GetExpectedInParams {
+        uint256 destAmount;
+        address[] tradePath;
+        uint256 feeBps;
+        bytes extraArgs;
+    }
+
+    function getExpectedIn(GetExpectedInParams calldata params)
+        external
+        view
+        returns (uint256 srcAmount);
+
     struct SwapParams {
         uint256 srcAmount;
         // min return for uni, min conversionrate for kyber, etc.

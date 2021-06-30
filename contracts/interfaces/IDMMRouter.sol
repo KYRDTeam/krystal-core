@@ -27,6 +27,12 @@ interface IDMMRouter {
         IERC20[] calldata path
     ) external view returns (uint256[] memory amounts);
 
+    function getAmountsIn(
+        uint256 amountOut,
+        address[] calldata poolsPath,
+        IERC20[] calldata path
+    ) external view returns (uint256[] memory amounts);
+
     function removeLiquidityETHSupportingFeeOnTransferTokens(
         IERC20 token,
         address pool,

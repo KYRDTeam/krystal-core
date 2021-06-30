@@ -59,15 +59,20 @@ contract UniSwap is BaseSwap {
         returns (uint256 destAmount)
     {
         IUniswapV2Router02 router = parseExtraArgs(params.extraArgs);
+        uint256[] memory amounts = router.getAmountsOut(params.srcAmount, params.tradePath);
+        destAmount = amounts[params.tradePath.length - 1];
+    }
 
-        // in case pair is not supported
-        try router.getAmountsOut(params.srcAmount, params.tradePath) returns (
-            uint256[] memory amounts
-        ) {
-            destAmount = amounts[params.tradePath.length - 1];
-        } catch {
-            destAmount = 0;
-        }
+    function getExpectedIn(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount)
+    {
+        IUniswapV2Router02 router = parseExtraArgs(params.extraArgs);
+        uint256[] memory amounts = router.getAmountsIn(params.destAmount, params.tradePath);
+        srcAmount = amounts[0];
     }
 
     /// @dev swap token via a supported UniSwap router

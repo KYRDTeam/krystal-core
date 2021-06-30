@@ -1,4 +1,4 @@
-import {nativeTokenAddress, nativeTokenDecimals, BPS, evm_revert, FeeMode, EPS} from './helper';
+import {nativeTokenAddress, nativeTokenDecimals, BPS, evm_revert, FeeMode, EPS, evm_snapshot} from './helper';
 import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
@@ -18,7 +18,8 @@ describe('swap test', async () => {
     generateArgsFunc: (tradePath: string[]) => Promise<string>,
     platformFee: number,
     getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>,
-    maxDiffAllowed: number = 0
+    maxDiffAllowed: number = 0,
+    getExpectedInSupported: boolean = false
   ) {
     const testGetExpectedRate = async (
       swapContract: string,
@@ -61,13 +62,44 @@ describe('swap test', async () => {
         );
       }
 
+      if (getExpectedInSupported) {
+        // okay, to safe time, let's just test the getExpectedIn using the above data
+        const expectedInData = await setup.proxyInstance.getExpectedIn({
+          swapContract,
+          destAmount: data.destAmount,
+          tradePath,
+          feeMode,
+          feeBps: platformFee,
+          extraArgs: await generateArgsFunc(tradePath),
+        });
+
+        const diff = expectedInData.srcAmount.sub(srcAmount).abs();
+        assert(
+          // should be less than 1bps diff due to rounding
+          diff.mul(BPS).lte(srcAmount.mul(1)),
+          `wrong getExpectedIn: originSrc=${srcAmount.toString()}, estimatedDest=${data.destAmount.toString()}, estimatedSource=${expectedInData.srcAmount.toString()}`
+        );
+      } else {
+        expect(
+          setup.proxyInstance.getExpectedIn({
+            swapContract,
+            destAmount: data.destAmount,
+            tradePath,
+            feeMode,
+            feeBps: platformFee,
+            extraArgs: await generateArgsFunc(tradePath),
+          })
+        ).to.be.revertedWith('getExpectedIn_notSupported');
+      }
+
       return data.destAmount;
     };
 
     for (let {address, symbol} of networkSetting.tokens) {
       describe(`testing swap funtionalities on ${name} with ${symbol} token and router ${router}`, async () => {
         beforeEach(async () => {
-          // await evm_revert(setup.postSetupSnapshotId);
+          await evm_revert(setup.postSetupSnapshotId);
+          setup.postSetupSnapshotId = await evm_snapshot();
         });
 
         it('get expected rate correctly', async () => {
@@ -228,7 +260,9 @@ describe('swap test', async () => {
         async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
-        }
+        },
+        0,
+        true
       );
     }
   }
@@ -259,7 +293,8 @@ describe('swap test', async () => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
         },
-        2
+        1,
+        false
       );
     }
   }
@@ -283,7 +318,8 @@ describe('swap test', async () => {
         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
         return amounts[amounts.length - 1];
       },
-      2
+      1,
+      false
     );
   }
 
@@ -326,7 +362,8 @@ describe('swap test', async () => {
         const amounts = await dmmRouter.getAmountsOut(sourceAmount, pools, tradePath);
         return amounts[amounts.length - 1];
       },
-      0
+      0,
+      true
     );
   }
 });

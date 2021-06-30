@@ -4,7 +4,6 @@ export const BscConfig: Record<string, IConfig> = {
   bsc_mainnet: {
     autoVerifyContract: true,
     tokens: [
-      {symbol: 'usdt', address: '0x55d398326f99059ff775485246999027b3197955'},
       {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
       {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
     ],

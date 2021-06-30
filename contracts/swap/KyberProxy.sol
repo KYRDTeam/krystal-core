@@ -37,26 +37,29 @@ contract KyberProxy is BaseSwap {
         returns (uint256 destAmount)
     {
         require(params.tradePath.length == 2, "kyber_invalidTradepath");
-        uint256 expectedRate;
-        try
-            kyberProxy.getExpectedRateAfterFee(
-                IERC20Ext(params.tradePath[0]),
-                IERC20Ext(params.tradePath[1]),
-                params.srcAmount,
-                params.feeBps,
-                params.extraArgs
-            )
-        returns (uint256 rate) {
-            expectedRate = rate;
-        } catch {
-            expectedRate = 0;
-        }
+        uint256 expectedRate = kyberProxy.getExpectedRateAfterFee(
+            IERC20Ext(params.tradePath[0]),
+            IERC20Ext(params.tradePath[1]),
+            params.srcAmount,
+            params.feeBps,
+            params.extraArgs
+        );
         destAmount = calcDestAmount(
             IERC20Ext(params.tradePath[0]),
             IERC20Ext(params.tradePath[1]),
             params.srcAmount,
             expectedRate
         );
+    }
+
+    function getExpectedIn(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount)
+    {
+        require(false, "getExpectedIn_notSupported");
     }
 
     /// @dev swap token
