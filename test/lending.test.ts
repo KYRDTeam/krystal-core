@@ -1,4 +1,4 @@
-import {nativeTokenDecimals, BPS, evm_revert, FeeMode, nativeTokenAddress, zeroAddress} from './helper';
+import {nativeTokenDecimals, BPS, evm_revert, FeeMode, nativeTokenAddress, zeroAddress, evm_snapshot} from './helper';
 import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
@@ -61,7 +61,9 @@ describe('lending test', async () => {
     for (let {address, symbol} of networkSetting.tokens) {
       describe(`testing lending funtionalities on ${name} with ${symbol} token and router ${router}`, async () => {
         beforeEach(async () => {
-          // await evm_revert(setup.postSetupSnapshotId);
+          setup = await getInitialSetup();
+          await evm_revert(setup.postSetupSnapshotId);
+          setup.postSetupSnapshotId = await evm_snapshot();
         });
 
         it('swap and deposit', async () => {
@@ -255,16 +257,21 @@ describe('lending test', async () => {
         });
 
         it('swap and repay', async () => {
+          // Tokens which cannot be used as collateral
+          const nonCollateralTokens = ['usdt'];
+
           let lendingContract = await getLendingContract();
           const lendingContractInstance = (await ethers.getContractAt('ILending', lendingContract)) as ILending;
 
           let token = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
           let tokenUnit = BigNumber.from(10).pow(await token.decimals()); // 1 token unit
           let lendingTokenAddress = await lendingContractInstance.getLendingToken(token.address);
+          let lendingToken = (await ethers.getContractAt('IERC20Ext', lendingTokenAddress)) as IERC20Ext;
 
           // Deposit first to get some cToken
-          let depositAmount = tokenUnit.mul(8);
+          let depositAmount = tokenUnit.mul(50);
           await token.approve(setup.proxyInstance.address, depositAmount);
+          let beforeCToken = await lendingToken.balanceOf(setup.user.address);
           await expect(() => {
             setup.proxyInstance.swapAndDeposit({
               swapContract: zeroAddress, // swap contract not needed
@@ -278,51 +285,63 @@ describe('lending test', async () => {
               extraArgs: generateArgsFunc(),
             });
           }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(depositAmount));
+          let afterCToken = await lendingToken.balanceOf(setup.user.address);
+          assert(
+            afterCToken.gt(beforeCToken),
+            `user should receive some cToken: after ${afterCToken} vs before ${beforeCToken}`
+          );
 
           let borrowAmount = tokenUnit.mul(10);
           let beforeAmt = await token.balanceOf(setup.user.address);
-          await borrowFunc(lendingTokenAddress, token.address, borrowAmount, setup.user.address);
+          try {
+            await borrowFunc(lendingTokenAddress, token.address, borrowAmount, setup.user.address);
+          } catch (e) {}
           let afterAmt = await token.balanceOf(setup.user.address);
-          assert(
-            afterAmt.sub(beforeAmt).eq(borrowAmount),
-            `failed borrow, borrow ${borrowAmount.toString()} before ${beforeAmt.toString()} after ${afterAmt.toString()}`
-          );
 
-          // Repay 1 unit directly
-          let payAmount = tokenUnit.mul(1);
-          await token.approve(setup.proxyInstance.address, payAmount);
-          await expect(() => {
-            setup.proxyInstance.swapAndRepay({
-              swapContract: zeroAddress,
-              lendingContract,
-              srcAmount: payAmount,
-              payAmount: payAmount,
-              tradePath: [token.address],
-              rateMode: 2,
-              feeMode: FeeMode.FROM_SOURCE,
-              feeBps: platformFee,
-              platformWallet: setup.network.supportedWallets[0],
-              extraArgs: generateArgsFunc(),
-            });
-          }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(payAmount));
+          if (nonCollateralTokens.includes(symbol)) {
+            assert(afterAmt.eq(beforeAmt), `token ${symbol} cannot be used as collateral, borrow should fail`);
+          } else {
+            assert(
+              afterAmt.sub(beforeAmt).eq(borrowAmount),
+              `failed borrow, borrow ${borrowAmount.toString()} before ${beforeAmt.toString()} after ${afterAmt.toString()}`
+            );
 
-          // Pay more than what needed
-          payAmount = tokenUnit.mul(1);
-          await token.approve(setup.proxyInstance.address, payAmount.mul(2));
-          await expect(() => {
-            setup.proxyInstance.swapAndRepay({
-              swapContract: zeroAddress,
-              lendingContract,
-              srcAmount: payAmount.mul(2),
-              payAmount: payAmount,
-              tradePath: [token.address],
-              rateMode: 2,
-              feeMode: FeeMode.FROM_SOURCE,
-              feeBps: platformFee,
-              platformWallet: setup.network.supportedWallets[0],
-              extraArgs: generateArgsFunc(),
-            });
-          }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(payAmount));
+            // Repay 1 unit directly
+            let payAmount = tokenUnit.mul(1);
+            await token.approve(setup.proxyInstance.address, payAmount);
+            await expect(() => {
+              setup.proxyInstance.swapAndRepay({
+                swapContract: zeroAddress,
+                lendingContract,
+                srcAmount: payAmount,
+                payAmount: payAmount,
+                tradePath: [token.address],
+                rateMode: 2,
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              });
+            }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(payAmount));
+
+            // Pay more than what needed
+            payAmount = tokenUnit.mul(1);
+            await token.approve(setup.proxyInstance.address, payAmount.mul(2));
+            await expect(() => {
+              setup.proxyInstance.swapAndRepay({
+                swapContract: zeroAddress,
+                lendingContract,
+                srcAmount: payAmount.mul(2),
+                payAmount: payAmount,
+                tradePath: [token.address],
+                rateMode: 2,
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: generateArgsFunc(),
+              });
+            }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(payAmount));
+          }
         });
       });
     }

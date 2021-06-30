@@ -29,7 +29,6 @@ contract KyberDmm is BaseSwap {
         emit UpdatedDmmRouter(dmmRouter);
     }
 
-    /// @dev get expected return and conversion rate if using a Uni router
     function getExpectedReturn(GetExpectedReturnParams calldata params)
         external
         view
@@ -42,15 +41,24 @@ contract KyberDmm is BaseSwap {
         for (uint256 i = 0; i < params.tradePath.length; i++) {
             tradePathErc[i] = IERC20(params.tradePath[i]);
         }
+        uint256[] memory amounts = dmmRouter.getAmountsOut(params.srcAmount, pools, tradePathErc);
+        destAmount = amounts[params.tradePath.length - 1];
+    }
 
-        // in case pair is not supported
-        try dmmRouter.getAmountsOut(params.srcAmount, pools, tradePathErc) returns (
-            uint256[] memory amounts
-        ) {
-            destAmount = amounts[params.tradePath.length - 1];
-        } catch {
-            destAmount = 0;
+    function getExpectedIn(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount)
+    {
+        address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
+        IERC20[] memory tradePathErc = new IERC20[](params.tradePath.length);
+        for (uint256 i = 0; i < params.tradePath.length; i++) {
+            tradePathErc[i] = IERC20(params.tradePath[i]);
         }
+        uint256[] memory amounts = dmmRouter.getAmountsIn(params.destAmount, pools, tradePathErc);
+        srcAmount = amounts[0];
     }
 
     /// @dev swap token via a supported UniSwap router

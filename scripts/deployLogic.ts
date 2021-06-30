@@ -17,7 +17,7 @@ import {
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
 import {sleep, zeroAddress} from '../test/helper';
-import {ContractFactory, PopulatedTransaction} from 'ethers';
+import {BigNumber, PopulatedTransaction} from 'ethers';
 import {TransactionRequest} from '@ethersproject/abstract-provider';
 import {multisig} from '../hardhat.config';
 import EthersSafe from '@gnosis.pm/safe-core-sdk';
@@ -273,7 +273,7 @@ async function deployContract(
 
   const contract = await factory.deploy(...args);
   const tx = await contract.deployed();
-  printInfo(tx.deployTransaction);
+  await printInfo(tx.deployTransaction);
   log(2, `> address:\t${contract.address}`);
 
   if (autoVerify) {
@@ -309,7 +309,7 @@ async function updateProxy(
         ...extraArgs,
       })
     );
-    printInfo(tx);
+    await printInfo(tx);
   }
 
   log(1, 'update supported platform wallets');
@@ -369,7 +369,7 @@ async function updateChildContracts(
           })
         );
         log(2, `> Linking to proxy ${smartWalletProxy.address}`);
-        printInfo(tx);
+        await printInfo(tx);
       }
     }
   }
@@ -413,7 +413,7 @@ async function updateKyberProxy(kyberProxy: KyberProxy | undefined, extraArgs: {
   } else {
     const tx = await executeTxn(await kyberProxy.populateTransaction.updateKyberProxy(networkConfig.kyberProxy.proxy));
     log(2, '> updated kyberProxy', JSON.stringify(networkConfig.kyberProxy, null, 2));
-    printInfo(tx);
+    await printInfo(tx);
   }
 }
 
@@ -429,7 +429,7 @@ async function updateKyberDmm(kyberDmm: KyberDmm | undefined, extraArgs: {from?:
   } else {
     const tx = await executeTxn(await kyberDmm.populateTransaction.updateDmmRouter(networkConfig.kyberDmm.router));
     log(2, '> updated dmmRouter', JSON.stringify(networkConfig.kyberDmm, null, 2));
-    printInfo(tx);
+    await printInfo(tx);
   }
 }
 
@@ -454,7 +454,7 @@ async function updateCompoundLending(compoundLending: CompoundLending | undefine
       )
     );
     log(2, '> updated compound', JSON.stringify(networkConfig.compound, null, 2));
-    printInfo(tx);
+    await printInfo(tx);
   }
 }
 
@@ -474,7 +474,7 @@ async function updateAaveV1Lending(aaveV1Lending: AaveV1Lending | undefined, ext
     )
   );
   log(2, '> updated aave v1', JSON.stringify(networkConfig.aaveV1, null, 2));
-  printInfo(tx);
+  await printInfo(tx);
 }
 
 async function updateAaveV2Lending(
@@ -498,7 +498,7 @@ async function updateAaveV2Lending(
     )
   );
   log(2, '> updated aave v2', JSON.stringify(networkConfig.aaveV2, null, 2));
-  printInfo(tx);
+  await printInfo(tx);
 }
 
 async function updateAddressSet(
@@ -515,7 +515,7 @@ async function updateAddressSet(
       })
     );
     log(2, '> removed wallets', toBeRemoved);
-    printInfo(tx);
+    await printInfo(tx);
   } else {
     log(2, '> nothing to be removed');
   }
@@ -528,16 +528,18 @@ async function updateAddressSet(
       })
     );
     log(2, '> added wallets', toBeAdded);
-    printInfo(tx);
+    await printInfo(tx);
   } else {
     log(2, '> nothing to be added');
   }
 }
 
-function printInfo(tx: TransactionResponse) {
+async function printInfo(tx: TransactionResponse) {
+  const receipt = await tx.wait(1);
+
   log(2, `> tx hash:\t${tx.hash}`);
   log(2, `> gas price:\t${tx.gasPrice.toString()}`);
-  log(2, `> gas limit:\t${tx.gasLimit.toString()}`);
+  log(2, `> gas used:\t${receipt.gasUsed.toString()}`);
 }
 
 export function convertToAddressObject(obj: Record<string, any> | Array<any> | Contract): any {
@@ -587,6 +589,5 @@ async function executeTxn(txn: TransactionRequest | PopulatedTransaction): Promi
     const signer = (await ethers.getSigners())[0];
     tx = await signer.sendTransaction(txn);
   }
-
   return tx;
 }

@@ -90,6 +90,39 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         );
     }
 
+    /// @dev get expected in amount including the fee
+    /// @return srcAmount expected aource amount
+    /// @return expectedRate expected swap rate
+    function getExpectedIn(
+        ISmartWalletImplementation.GetExpectedInParams calldata params
+    ) external view override returns (uint256 srcAmount, uint256 expectedRate) {
+        if (params.feeBps >= BPS) return (0, 0); // platform fee is too high
+        
+        uint256 actualDest = (params.feeMode == FeeMode.FROM_DEST) 
+            ? params.destAmount * (BPS + params.feeBps) / BPS : params.destAmount;
+
+        srcAmount = ISwap(params.swapContract).getExpectedIn(
+            ISwap.GetExpectedInParams({
+                destAmount: actualDest, 
+                tradePath: params.tradePath,
+                feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                extraArgs: params.extraArgs
+            })
+        );
+
+        if (params.feeMode == FeeMode.FROM_SOURCE) {
+            srcAmount = srcAmount * (BPS + params.feeBps) / BPS;
+        }
+
+        expectedRate = calcRateFromQty(
+            srcAmount,
+            params.destAmount,
+            getDecimals(IERC20Ext(params.tradePath[0])),
+            getDecimals(IERC20Ext(params.tradePath[params.tradePath.length - 1]))
+        );
+    }
+
+
     /// @dev swap using particular swap contract
     /// @return destAmount actual dest amount
     function swap(

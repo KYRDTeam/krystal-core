@@ -74,6 +74,20 @@ interface ISmartWalletImplementation {
         view
         returns (uint256 destAmount, uint256 expectedRate);
 
+    struct GetExpectedInParams {
+        address payable swapContract;
+        uint256 destAmount;
+        address[] tradePath;
+        FeeMode feeMode;
+        uint256 feeBps;
+        bytes extraArgs;
+    }
+
+    function getExpectedIn(GetExpectedInParams calldata params)
+        external
+        view
+        returns (uint256 srcAmount, uint256 expectedRate);
+
     /// @param swapContract swap contract
     /// @param srcAmount amount of src token
     /// @param minDestAmount minimal accepted dest amount
