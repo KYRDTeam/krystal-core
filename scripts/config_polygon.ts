@@ -9,7 +9,7 @@ export const PolygonConfig: Record<string, IConfig> = {
       // {symbol: 'uni', address: '0xb33eaad8d922b1083446dc23f610c2567fb5180f'},'
       // {symbol: 'aave', address: '0xd6df932a45c0f255f85145f286ea0b292b21c90b'},
       // {symbol: 'weth', address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'},
-      {symbol: 'dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'},
+      // {symbol: 'dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'},
       {symbol: 'usdc', address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'},
     ],
 
@@ -18,9 +18,13 @@ export const PolygonConfig: Record<string, IConfig> = {
     // Uniswap & clones
     uniswap: {
       routers: [
-        '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // sushiswap
         '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // quickswap
+        '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // sushiswap
       ],
+    },
+
+    kyberDmm: {
+      router: '0x546C79662E028B661dFB4767664d0273184E4dD1',
     },
 
     // Compound
