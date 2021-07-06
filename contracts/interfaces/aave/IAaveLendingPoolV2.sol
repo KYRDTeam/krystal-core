@@ -1,7 +1,6 @@
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-import "./DataTypes.sol";
 import "./IProtocolDataProvider.sol";
 
 
@@ -82,13 +81,6 @@ interface IAaveLendingPoolV2 {
         uint256 rateMode,
         address onBehalfOf
     ) external returns (uint256);
-
-    /**
-     * @dev Returns the state and configuration of the reserve
-     * @param asset The address of the underlying asset of the reserve
-     * @return The state of the reserve
-     **/
-    function getReserveData(address asset) external view returns (DataTypes.ReserveData memory);
 
     /**
     * @dev Allows depositors to enable/disable a specific deposited asset as collateral

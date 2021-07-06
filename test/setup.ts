@@ -27,7 +27,11 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
   // Fund wallet
   console.log('\nStart funding...');
   for (let {symbol, address} of networkConfig.tokens) {
-    const nativeTokenAmount = BigNumber.from(5).mul(BigNumber.from(10).pow(nativeTokenDecimals));
+    const tokenContract = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
+    const nativeTokenAmount = BigNumber.from(networkConfig.fundedAmount ?? 5).mul(
+      BigNumber.from(10).pow(nativeTokenDecimals)
+    );
+    const beforeAmount = await tokenContract.balanceOf(user.address);
     await uniRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
       0,
       [networkConfig.wNative, address],
@@ -39,12 +43,13 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
       }
     );
 
-    const tokenContract = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
+    const afterAmount = await tokenContract.balanceOf(user.address);
     console.log('Funded', {
       token: symbol,
       token_address: address,
       address: user.address,
-      new_balance: (await tokenContract.balanceOf(user.address)).toString(),
+      new_balance: afterAmount.toString(),
+      funded: afterAmount.sub(beforeAmount).toString(),
     });
   }
 

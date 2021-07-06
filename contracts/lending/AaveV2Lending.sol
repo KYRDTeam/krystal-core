@@ -52,14 +52,12 @@ contract AaveV2Lending is BaseLending {
         }
 
         for (uint256 i = 0; i < tokens.length; i++) {
-            address token = tokens[i] == ETH_TOKEN_ADDRESS ? address(weth) : address(tokens[i]);
             // update data for pool v2
-            try poolV2.getReserveData(token) returns (DataTypes.ReserveData memory data) {
-                if (aaveData.aTokensV2[tokens[i]] != data.aTokenAddress) {
-                    aaveData.aTokensV2[tokens[i]] = data.aTokenAddress;
-                    safeApproveAllowance(address(poolV2), tokens[i]);
-                }
-            } catch {}
+            (address aToken, , ) = provider.getReserveTokensAddresses(address(tokens[i]));
+            if (aaveData.aTokensV2[tokens[i]] != aToken) {
+                aaveData.aTokensV2[tokens[i]] = aToken;
+                safeApproveAllowance(address(poolV2), tokens[i]);
+            }
         }
     }
 
@@ -99,29 +97,33 @@ contract AaveV2Lending is BaseLending {
         uint256 amount,
         uint256 minReturn
     ) external override onlyProxyContract returns (uint256 returnedAmount) {
-        uint256 tokenBalanceBefore;
-        uint256 tokenBalanceAfter;
-
         if (token == ETH_TOKEN_ADDRESS) {
             // withdraw weth, then convert to eth for user
             address weth = address(aaveData.weth);
+
             // withdraw underlying token from pool
-            tokenBalanceBefore = IERC20Ext(weth).balanceOf(address(this));
-            returnedAmount = aaveData.lendingPoolV2.withdraw(weth, amount, address(this));
-            tokenBalanceAfter = IERC20Ext(weth).balanceOf(address(this));
-            require(tokenBalanceAfter.sub(tokenBalanceBefore) >= returnedAmount, "invalid return");
+            uint256 tokenBalanceBefore = IERC20Ext(weth).balanceOf(address(this));
+            uint256 expectedReturn = aaveData.lendingPoolV2.withdraw(weth, amount, address(this));
+            returnedAmount = IERC20Ext(weth).balanceOf(address(this)).sub(tokenBalanceBefore);
+
+            require(returnedAmount >= expectedReturn, "invalid return");
             require(returnedAmount >= minReturn, "low returned amount");
+
             // convert weth to eth and transfer to sender
             IWeth(weth).withdraw(returnedAmount);
             (bool success, ) = onBehalfOf.call{value: returnedAmount}("");
             require(success, "transfer eth to sender failed");
         } else {
             // withdraw token directly to user's wallet
-            tokenBalanceBefore = getBalance(token, onBehalfOf);
-            returnedAmount = aaveData.lendingPoolV2.withdraw(address(token), amount, onBehalfOf);
-            tokenBalanceAfter = getBalance(token, onBehalfOf);
-            // valid received amount in user's wallet
-            require(tokenBalanceAfter.sub(tokenBalanceBefore) >= returnedAmount, "invalid return");
+            uint256 tokenBalanceBefore = getBalance(token, onBehalfOf);
+            uint256 expectedReturn = aaveData.lendingPoolV2.withdraw(
+                address(token),
+                amount,
+                onBehalfOf
+            );
+            returnedAmount = getBalance(token, onBehalfOf).sub(tokenBalanceBefore);
+
+            require(returnedAmount >= expectedReturn, "invalid return");
             require(returnedAmount >= minReturn, "low returned amount");
         }
     }

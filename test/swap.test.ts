@@ -1,4 +1,4 @@
-import {nativeTokenAddress, nativeTokenDecimals, BPS, evm_revert, FeeMode, EPS} from './helper';
+import {nativeTokenAddress, nativeTokenDecimals, BPS, evm_revert, FeeMode, EPS, evm_snapshot} from './helper';
 import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
@@ -18,7 +18,8 @@ describe('swap test', async () => {
     generateArgsFunc: (tradePath: string[]) => Promise<string>,
     platformFee: number,
     getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>,
-    maxDiffAllowed: number = 0
+    maxDiffAllowed: number = 0,
+    getExpectedInSupported: boolean = false
   ) {
     const testGetExpectedRate = async (
       swapContract: string,
@@ -61,13 +62,44 @@ describe('swap test', async () => {
         );
       }
 
+      if (getExpectedInSupported) {
+        // okay, to safe time, let's just test the getExpectedIn using the above data
+        const expectedInData = await setup.proxyInstance.getExpectedIn({
+          swapContract,
+          destAmount: data.destAmount,
+          tradePath,
+          feeMode,
+          feeBps: platformFee,
+          extraArgs: await generateArgsFunc(tradePath),
+        });
+
+        const diff = expectedInData.srcAmount.sub(srcAmount).abs();
+        assert(
+          // should be less than 1bps diff due to rounding
+          diff.mul(BPS).lte(srcAmount.mul(1)),
+          `wrong getExpectedIn: originSrc=${srcAmount.toString()}, estimatedDest=${data.destAmount.toString()}, estimatedSource=${expectedInData.srcAmount.toString()}`
+        );
+      } else {
+        expect(
+          setup.proxyInstance.getExpectedIn({
+            swapContract,
+            destAmount: data.destAmount,
+            tradePath,
+            feeMode,
+            feeBps: platformFee,
+            extraArgs: await generateArgsFunc(tradePath),
+          })
+        ).to.be.revertedWith('getExpectedIn_notSupported');
+      }
+
       return data.destAmount;
     };
 
     for (let {address, symbol} of networkSetting.tokens) {
       describe(`testing swap funtionalities on ${name} with ${symbol} token and router ${router}`, async () => {
         beforeEach(async () => {
-          // await evm_revert(setup.postSetupSnapshotId);
+          await evm_revert(setup.postSetupSnapshotId);
+          setup.postSetupSnapshotId = await evm_snapshot();
         });
 
         it('get expected rate correctly', async () => {
@@ -139,16 +171,24 @@ describe('swap test', async () => {
             if (address === targetToken) {
               continue;
             }
-            // console.log(`testing ${token.address} -> ${targetToken}`);
+
+            // console.log(`swapping from ${token.address} -> ${targetToken}`);
 
             // Approve first
             await token.approve(setup.proxyInstance.address, tokenAmount);
+
+            // Trade to native token to ensure the liquidity pool
+            const tradePath =
+              // kyberProxy only take direct trade
+              name != 'kyberProxy' && token.address != nativeTokenAddress && targetToken != nativeTokenAddress
+                ? [token.address, setup.network.wNative, targetToken]
+                : [token.address, targetToken];
 
             // Get rate
             const destAmount = await testGetExpectedRate(
               swapContract,
               tokenAmount,
-              [token.address, targetToken === nativeTokenAddress ? setup.network.wNative : targetToken],
+              tradePath.map((t) => (t === nativeTokenAddress ? setup.network.wNative : t)),
               FeeMode.FROM_SOURCE
             );
 
@@ -161,11 +201,11 @@ describe('swap test', async () => {
                   swapContract,
                   srcAmount: tokenAmount,
                   minDestAmount,
-                  tradePath: [token.address, targetToken],
+                  tradePath: tradePath,
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: await generateArgsFunc([token.address, targetToken]),
+                  extraArgs: await generateArgsFunc(tradePath),
                 },
                 {
                   from: setup.user.address,
@@ -180,11 +220,11 @@ describe('swap test', async () => {
                   swapContract,
                   srcAmount: tokenAmount,
                   minDestAmount,
-                  tradePath: [token.address, targetToken],
+                  tradePath: tradePath,
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: await generateArgsFunc([token.address, targetToken]),
+                  extraArgs: await generateArgsFunc(tradePath),
                 },
                 {
                   from: setup.user.address,
@@ -220,7 +260,9 @@ describe('swap test', async () => {
         async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
-        }
+        },
+        0,
+        true
       );
     }
   }
@@ -239,13 +281,20 @@ describe('swap test', async () => {
           return setup.krystalContracts.swapContracts.uniSwapV3!.address;
         },
         router,
-        async () => hexlify(arrayify(router)) + '0001F4', // fee = 3000 bps
+        async (tradePath: string[]) => {
+          let extraArgs = hexlify(arrayify(router));
+          for (let i = 0; i < tradePath.length - 1; i++) {
+            extraArgs = extraArgs + '0001F4'; // fee = 3000 bps
+          }
+          return extraArgs;
+        },
         platformFee,
         async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
         },
-        2
+        1,
+        false
       );
     }
   }
@@ -269,7 +318,8 @@ describe('swap test', async () => {
         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
         return amounts[amounts.length - 1];
       },
-      2
+      1,
+      false
     );
   }
 
@@ -312,7 +362,8 @@ describe('swap test', async () => {
         const amounts = await dmmRouter.getAmountsOut(sourceAmount, pools, tradePath);
         return amounts[amounts.length - 1];
       },
-      0
+      0,
+      true
     );
   }
 });

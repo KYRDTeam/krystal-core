@@ -164,6 +164,16 @@ contract UniSwapV3 is BaseSwap {
         }
     }
 
+    function getExpectedIn(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount)
+    {
+        require(false, "getExpectedIn_notSupported");
+    }
+
     /// @dev swap token via a supported UniSwap router
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
@@ -172,7 +182,6 @@ contract UniSwapV3 is BaseSwap {
         external
         payable
         override
-        nonReentrant
         onlyProxyContract
         returns (uint256 destAmount)
     {

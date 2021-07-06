@@ -6,12 +6,12 @@
     "test": "test"
   },
   "scripts": {
-    "test": "./tst.sh",
-    "t": "./tst.sh",
+    "test": "./cmd.sh -x test",
+    "t": "yarn test",
     "compile": "export NODE_OPTIONS=--max-old-space-size=4096 && yarn hardhat compile",
     "c": "yarn compile",
     "coverage": "yarn hardhat coverage",
-    "deploy": "yarn hardhat run scripts/deployer.ts",
+    "deploy": "./cmd.sh -x deploy",
     "d": "yarn deploy",
     "prettier": "./node_modules/.bin/prettier --write",
     "size": "yarn run hardhat size-contracts",
@@ -39,6 +39,7 @@
     "solc": "0.7.6"
   },
   "devDependencies": {
+    "@gnosis.pm/safe-core-sdk": "^0.2.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
