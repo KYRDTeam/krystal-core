@@ -68,9 +68,11 @@ contract AaveV1Lending is BaseLending {
             amount,
             aaveData.referalCode
         );
-        uint256 aTokenBalanceAfter = aToken.balanceOf(address(this));
+        uint256 aTokenReceived = aToken.balanceOf(address(this)).sub(aTokenBalanceBefore);
+        require(aTokenReceived > 0, "low token received");
+
         // transfer all received aToken back to the sender
-        aToken.safeTransfer(onBehalfOf, aTokenBalanceAfter.sub(aTokenBalanceBefore));
+        aToken.safeTransfer(onBehalfOf, aTokenReceived);
     }
 
     /// @dev withdraw from lending platforms

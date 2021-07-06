@@ -92,8 +92,11 @@ contract CompoundLending is BaseLending {
         } else {
             require(ICompErc20(cToken).mint(amount) == 0, "can not mint cToken");
         }
-        uint256 cTokenBalanceAfter = IERC20Ext(cToken).balanceOf(address(this));
-        IERC20Ext(cToken).safeTransfer(onBehalfOf, cTokenBalanceAfter.sub(cTokenBalanceBefore));
+        uint256 cTokenReceived = IERC20Ext(cToken).balanceOf(address(this)).sub(
+            cTokenBalanceBefore
+        );
+        require(cTokenReceived > 0, "low token received");
+        IERC20Ext(cToken).safeTransfer(onBehalfOf, cTokenReceived);
     }
 
     /// @dev withdraw from lending platforms
