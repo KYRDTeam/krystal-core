@@ -228,6 +228,8 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             params.minReturn
         );
 
+        require(returnedAmount >= params.minReturn, "low returned amount");
+
         emit WithdrawFromLending(
             msg.sender,
             params.lendingContract,
@@ -247,9 +249,8 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         
         // use user debt value if debt is <= payAmount
         // user can pay all debt by putting really high payAmount as param
-        uint256 actualPayAmount = checkUserDebt(
-            params.lendingContract, params.tradePath[params.tradePath.length - 1], params.payAmount
-        );
+        uint256 debt = ILending(params.lendingContract).getUserDebtCurrent(params.tradePath[params.tradePath.length - 1], msg.sender);
+        uint256 actualPayAmount = debt >= params.payAmount ? params.payAmount : debt; 
         
         if (params.tradePath.length == 1) {
             // just collect src token, no need to swap
@@ -283,6 +284,9 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             actualPayAmount,
             abi.encodePacked(params.rateMode)
         );
+
+        uint256 actualDebtPaid = debt.sub(ILending(params.lendingContract).getUserDebtCurrent(params.tradePath[params.tradePath.length - 1], msg.sender));
+        require(actualDebtPaid >= actualPayAmount, "low paid amount");
 
         emit SwapAndRepay(
             msg.sender,
@@ -351,6 +355,8 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
                 platformWallet
             );         
         }
+
+        require(destAmount >= minDestAmount, "low return");
     }
 
     function validateSourceAmount(
@@ -418,14 +424,5 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             require(supportedPlatformWallets.contains(platformWallet), "unsupported platform");
             platformWalletFees[platformWallet][token] = platformWalletFees[platformWallet][token].add(amount);
         }
-    }
-
-    function checkUserDebt(
-        address payable lendingContract,
-        address token,
-        uint256 amount
-    ) internal returns (uint256) {
-        uint256 debt = ILending(lendingContract).getUserDebtCurrent(token, msg.sender);
-        return debt >= amount ? amount : debt;
     }
 }
