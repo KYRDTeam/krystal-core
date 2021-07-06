@@ -5,11 +5,10 @@ pragma abicoder v2;
 import "@kyber.network/utils-sc/contracts/Withdrawable.sol";
 import "@kyber.network/utils-sc/contracts/Utils.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "./ISwap.sol";
 
-abstract contract BaseSwap is ISwap, Withdrawable, Utils, ReentrancyGuard {
+abstract contract BaseSwap is ISwap, Withdrawable, Utils {
     using SafeERC20 for IERC20Ext;
     using SafeMath for uint256;
 

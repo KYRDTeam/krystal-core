@@ -83,9 +83,10 @@ contract AaveV1Lending is BaseLending {
     ) external override onlyProxyContract returns (uint256 returnedAmount) {
         address lendingToken = getLendingToken(token);
         uint256 tokenBalanceBefore = getBalance(token, address(this));
+
         IAToken(lendingToken).redeem(amount);
-        uint256 tokenBalanceAfter = getBalance(token, address(this));
-        returnedAmount = tokenBalanceAfter.sub(tokenBalanceBefore);
+
+        returnedAmount = getBalance(token, address(this)).sub(tokenBalanceBefore);
         require(returnedAmount >= minReturn, "low returned amount");
         // transfer token to user
         transferToken(onBehalfOf, token, returnedAmount);

@@ -182,7 +182,6 @@ contract UniSwapV3 is BaseSwap {
         external
         payable
         override
-        nonReentrant
         onlyProxyContract
         returns (uint256 destAmount)
     {
