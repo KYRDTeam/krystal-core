@@ -1,4 +1,4 @@
-import {deploy} from './deployLogic';
+import {convertToAddressObject, deploy} from './deployLogic';
 import * as fs from 'fs';
 import {network} from 'hardhat';
 
@@ -12,11 +12,21 @@ try {
   contracts = {};
 }
 
+const sortObject = (obj: Record<string, any>) => {
+  let res: Record<string, any> = {};
+  Object.keys(obj)
+    .sort((a, b) => (a > b ? 1 : -1))
+    .forEach((k: string) => {
+      res[k] = obj[k];
+    });
+  return res;
+};
+
 deploy(contracts[network.name])
   .then((deployedContracts) => {
     // Save contracts' addresses
-    contracts[network.name] = deployedContracts;
-    const json = JSON.stringify(contracts, null, 2) + '\n';
+    contracts[network.name] = convertToAddressObject(deployedContracts);
+    const json = JSON.stringify(sortObject(contracts), null, 2) + '\n';
     fs.writeFileSync(contractsFile, json, 'utf8');
     process.exit(0);
   })

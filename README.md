@@ -17,25 +17,61 @@ We use `yarn` as the package manager. You may use `npm` and `npx` instead, but c
 
 `yarn compile` to compile contracts for all solidity versions.
 
-## Contract Deployment / Interactions
+## Setting
 
-For interactions or contract deployments on public testnets / mainnet, create a `.env` file specifying your private key and infura api key, with the following format:
+Create `.env` and `.env.<chain>.<network>` following the samples in this repo.
 
+`.env` includes some common configs, such as `PRIVATE_KEY` and the common `INFURA_API_KEY`.
+Meanwhile, the `.env.<chain>.<network>` is the config the particular chain - network .i.e `ETHERSCAN_KEY`, `MULTISIGN`, etc.
+
+> `.env.sample`
 ```
-PRIVATE_KEY=0x****************************************************************
-BSCSCAN_KEY=********************************
+PRIVATE_KEY=0x          // private key to interact with blockchain
+INFURA_API_KEY=xxx
+```
+
+> `.env.eth.mainnet.sample`
+```
+ETHERSCAN_KEY=xxx
+MAINNET_FORK=https://eth-mainnet.alchemyapi.io      // archive chain url, for testing
+MAINNET_ID=1                                        // chain ID
+MAINNET_FORK_BLOCK=12644714                         // start forking from this block for testing
+MULTISIGN=0x                                        // multisign address if have, only gnosis-safe[https://gnosis-safe.io/] is supported
 ```
 
 ## Testing
 
-1. If contracts have not been compiled, run `yarn compile`. This step can be skipped subsequently.
-2. Run `yarn test`
-3. Use `./tst.sh -f` for running a specific test file.
+1. If contracts have not been compiled, run `yarn compile` or `yarn c`. This step can be skipped subsequently.
+2. Run `yarn test -h` for instruction
+
+```bash
+yarn <deploy,test> [-h] [-c <eth,bsc,polygon>] [-n <mainnet,testnet,ropsten>] -- to run test on specific chain and network
+
+where:
+    -h  show this help text
+    -c  which chain to run, supported <eth,bsc,polygon>
+    -n  which network to run, supported <mainnet,testnet,ropsten,mumbai>
+    -f  specific test to run if any
+```
+
+## Deploying
+
+1. Run `yarn deploy -h` for instruction
+
+```bash
+yarn <deploy,test> [-h] [-c <eth,bsc,polygon>] [-n <mainnet,testnet,ropsten>] -- to run test on specific chain and network
+
+where:
+    -h  show this help text
+    -c  which chain to run, supported <eth,bsc,polygon>
+    -n  which network to run, supported <mainnet,testnet,ropsten,mumbai>
+    -f  specific test to run if any
+```
 
 ### Example Commands
 
 - `yarn test` (Runs all tests)
-- `./tst.sh -f ./test/swapTest.ts` (Test only swapTest.ts)
+- `yarn test -f ./test/swap.test.ts` (Test only swap.test.ts)
 
 ## Coverage
 
