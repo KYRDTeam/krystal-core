@@ -114,6 +114,7 @@ if (PRIVATE_KEY) {
     chainId: 56,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
+    gasPrice: 5 * 1e9,
   };
 }
 

@@ -9,6 +9,18 @@
     "SmartWalletSwapProxy": "0xE7314051BCFD832398e232f2c274278c44121a3f",
     "FetchTokenBalances": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
   },
+  "bsc_mainnet": {
+    "smartWalletImplementation": "0x52643C0C0CCABd8C70baF5f1b6842886f0f8b953",
+    "smartWalletProxy": "0x051DC16b2ECB366984d1074dCC07c342a9463999",
+    "fetchTokenBalances": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
+    "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
+    "swapContracts": {
+      "uniSwap": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
+    },
+    "lendingContracts": {
+      "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
+    }
+  },
   "bsc_testnet": {
     "smartWalletImplementation": "0x25750A5FED63A79ddE8E516f8A0D3C4EbA656F79",
     "smartWalletProxy": "0xA58573970cfFAd93309071cE9aff46b8A35eC62B",
@@ -45,16 +57,16 @@
     }
   },
   "polygon_mainnet": {
-    "smartWalletImplementation": "0x60fc810EA972809d729FCE0043B82a58766596ee",
+    "smartWalletImplementation": "0xa303f067D511673832e57ACEF3d4FE6F333557e4",
     "smartWalletProxy": "0x70270c228c5b4279d1578799926873aa72446ccd",
     "fetchTokenBalances": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchAaveDataWrapper": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",
     "swapContracts": {
-      "uniSwap": "0x66f54006B47d1b381b5B933F2De9bf05a6B4Eb40",
-      "kyberDmm": "0xAE0505c0C30Dc0EA077cDB4Ed1B2BB894D9c6B65"
+      "uniSwap": "0xCD71a25dd27804dA933C0240Aa227e5Ce281Bb26",
+      "kyberDmm": "0x52643C0C0CCABd8C70baF5f1b6842886f0f8b953"
     },
     "lendingContracts": {
-      "aaveV2": "0x2bcfCaA40395F4f38Ad1aFa8915BF11d9df8Cf56"
+      "aaveV2": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868"
     }
   }
 }

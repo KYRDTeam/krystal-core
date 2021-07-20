@@ -17,7 +17,7 @@ import {
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
 import {sleep, zeroAddress} from '../test/helper';
-import {BigNumber, PopulatedTransaction} from 'ethers';
+import {PopulatedTransaction} from 'ethers';
 import {TransactionRequest} from '@ethersproject/abstract-provider';
 import {multisig} from '../hardhat.config';
 import EthersSafe from '@gnosis.pm/safe-core-sdk';
@@ -268,6 +268,7 @@ async function deployContract(
   if (contractAddress) {
     log(2, `> contract already exists`);
     log(2, `> address:\t${contractAddress}`);
+    // TODO: Transfer admin if needed
     return factory.attach(contractAddress);
   }
 
