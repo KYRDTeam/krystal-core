@@ -268,6 +268,7 @@ async function deployContract(
   if (contractAddress) {
     log(2, `> contract already exists`);
     log(2, `> address:\t${contractAddress}`);
+    // TODO: Transfer admin if needed
     return factory.attach(contractAddress);
   }
 
