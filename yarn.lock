@@ -3286,7 +3286,11 @@ css-select@^4.1.3:
     domutils "^2.6.0"
     nth-check "^2.0.0"
 
+<<<<<<< HEAD
 css-what@^5.0.0, css-what@^5.0.1:
+=======
+css-what@^5.0.0:
+>>>>>>> 52a48e54da77489dbfd17c2293180d1cf4ce90fe
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/css-what/-/css-what-5.0.1.tgz#3efa820131f4669a8ac2408f9c32e7c7de9f4cad"
   integrity sha512-FYDTSHb/7KXsWICVsxdmiExPjCfRC4qRFBdVwv7Ax9hMnvMmEjP9RfxTEZ3qPZGmADDn2vAKSo9UcN1jKVYscg==
