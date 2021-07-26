@@ -61,17 +61,21 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     /// @dev get expected return including the fee
     /// @return destAmount expected dest amount
     /// @return expectedRate expected swap rate
-    function getExpectedReturn(
-        ISmartWalletImplementation.GetExpectedReturnParams calldata params
-    ) external view override returns (uint256 destAmount, uint256 expectedRate) {
+    function getExpectedReturn(ISmartWalletImplementation.GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        returns (uint256 destAmount, uint256 expectedRate)
+    {
         if (params.feeBps >= BPS) return (0, 0); // platform fee is too high
-        
-        uint256 actualSrc = (params.feeMode == FeeMode.FROM_SOURCE) 
-            ? params.srcAmount * (BPS - params.feeBps) / BPS : params.srcAmount;
+
+        uint256 actualSrc = (params.feeMode == FeeMode.FROM_SOURCE)
+            ? (params.srcAmount * (BPS - params.feeBps)) / BPS
+            : params.srcAmount;
 
         destAmount = ISwap(params.swapContract).getExpectedReturn(
             ISwap.GetExpectedReturnParams({
-                srcAmount: actualSrc, 
+                srcAmount: actualSrc,
                 tradePath: params.tradePath,
                 feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
                 extraArgs: params.extraArgs
@@ -79,7 +83,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         );
 
         if (params.feeMode == FeeMode.FROM_DEST) {
-            destAmount = destAmount * (BPS - params.feeBps) / BPS;
+            destAmount = (destAmount * (BPS - params.feeBps)) / BPS;
         }
 
         expectedRate = calcRateFromQty(
@@ -93,25 +97,44 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     /// @dev get expected in amount including the fee
     /// @return srcAmount expected aource amount
     /// @return expectedRate expected swap rate
-    function getExpectedIn(
-        ISmartWalletImplementation.GetExpectedInParams calldata params
-    ) external view override returns (uint256 srcAmount, uint256 expectedRate) {
+    function getExpectedIn(ISmartWalletImplementation.GetExpectedInParams calldata params)
+        external
+        view
+        override
+        returns (uint256 srcAmount, uint256 expectedRate)
+    {
         if (params.feeBps >= BPS) return (0, 0); // platform fee is too high
-        
-        uint256 actualDest = (params.feeMode == FeeMode.FROM_DEST) 
-            ? params.destAmount * (BPS + params.feeBps) / BPS : params.destAmount;
 
-        srcAmount = ISwap(params.swapContract).getExpectedIn(
-            ISwap.GetExpectedInParams({
-                destAmount: actualDest, 
-                tradePath: params.tradePath,
-                feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
-                extraArgs: params.extraArgs
-            })
-        );
+        uint256 actualDest = (params.feeMode == FeeMode.FROM_DEST)
+            ? (params.destAmount * (BPS + params.feeBps)) / BPS
+            : params.destAmount;
+
+        try
+            ISwap(params.swapContract).getExpectedIn(
+                ISwap.GetExpectedInParams({
+                    destAmount: actualDest,
+                    tradePath: params.tradePath,
+                    feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                    extraArgs: params.extraArgs
+                })
+            )
+        returns (uint256 newSrcAmount) {
+            srcAmount = newSrcAmount;
+        } catch Error(string memory reason) {
+            require(compareStrings(reason, "getExpectedIn_notSupported"), reason);
+            srcAmount = defaultGetExpectedIn(
+                params.swapContract,
+                ISwap.GetExpectedInParams({
+                    destAmount: actualDest,
+                    tradePath: params.tradePath,
+                    feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                    extraArgs: params.extraArgs
+                })
+            );
+        }
 
         if (params.feeMode == FeeMode.FROM_SOURCE) {
-            srcAmount = srcAmount * (BPS + params.feeBps) / BPS;
+            srcAmount = (srcAmount * (BPS + params.feeBps)) / BPS;
         }
 
         expectedRate = calcRateFromQty(
@@ -122,12 +145,66 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         );
     }
 
+    function defaultGetExpectedIn(address swapContract, ISwap.GetExpectedInParams memory params)
+        private
+        view
+        returns (uint256 srcAmount)
+    {
+        uint8 srcDecimal = 18;
+        if (params.tradePath[0] != address(ETH_TOKEN_ADDRESS)) {
+            srcDecimal = IERC20Ext(params.tradePath[0]).decimals();
+        }
+        if (srcDecimal > 3) {
+            srcDecimal = srcDecimal - 3;
+        }
+        srcAmount = 1 * (10**srcDecimal); // Use a 0.001 as base
+        uint256 lastSrcAmount = 0;
+        uint256 destAmount = 0;
+        for (uint256 i = 0; i < 10; i++) {
+            try
+                ISwap(swapContract).getExpectedReturn(
+                    ISwap.GetExpectedReturnParams({
+                        srcAmount: srcAmount,
+                        tradePath: params.tradePath,
+                        feeBps: params.feeBps,
+                        extraArgs: params.extraArgs
+                    })
+                )
+            returns (uint256 newDestAmount) {
+                if (newDestAmount != 0) {
+                    destAmount = newDestAmount;
+                    lastSrcAmount = srcAmount;
+                    srcAmount = (srcAmount * params.destAmount) / newDestAmount;
+                    continue;
+                }
+            } catch {}
+            // If there's an error or newDestAmount == 0, try something closer to lastSrcAmount
+            uint256 newSrcAmount = (srcAmount + lastSrcAmount) / 2;
+            lastSrcAmount = srcAmount;
+            srcAmount = newSrcAmount;
+        }
+
+        // Precision check
+        uint256 diff;
+        if (destAmount > params.destAmount) {
+          diff = destAmount - params.destAmount;
+        } else {
+          diff = params.destAmount - destAmount;
+        }
+
+        // Telerate a 5% difference
+        require(diff < params.destAmount / 20, "getExpectedIn_noResult");
+    }
 
     /// @dev swap using particular swap contract
     /// @return destAmount actual dest amount
-    function swap(
-        ISmartWalletImplementation.SwapParams calldata params
-    ) external payable override nonReentrant returns (uint256 destAmount) {
+    function swap(ISmartWalletImplementation.SwapParams calldata params)
+        external
+        payable
+        override
+        nonReentrant
+        returns (uint256 destAmount)
+    {
         destAmount = swapInternal(
             params.swapContract,
             params.srcAmount,
@@ -155,23 +232,26 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     /// @dev swap then deposit to platform
     ///     if tradePath has only 1 token, don't need to do swap
     /// @return destAmount actual dest amount
-    function swapAndDeposit(
-        ISmartWalletImplementation.SwapAndDepositParams calldata params
-    ) external payable override nonReentrant returns (uint256 destAmount) {
+    function swapAndDeposit(ISmartWalletImplementation.SwapAndDepositParams calldata params)
+        external
+        payable
+        override
+        nonReentrant
+        returns (uint256 destAmount)
+    {
         require(params.tradePath.length >= 1, "invalid tradePath");
         require(supportedLendings.contains(params.lendingContract), "unsupported lending");
 
-        
         if (params.tradePath.length == 1) {
             // just collect src token, no need to swap
             validateSourceAmount(params.tradePath[0], params.srcAmount);
             destAmount = safeTransferWithFee(
-                msg.sender, 
-                params.lendingContract, 
-                params.tradePath[0], 
+                msg.sender,
+                params.lendingContract,
+                params.tradePath[0],
                 params.srcAmount,
                 // Not taking lending fee
-                0, 
+                0,
                 params.platformWallet
             );
         } else {
@@ -183,16 +263,18 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
                 params.lendingContract,
                 params.feeMode,
                 params.feeBps,
-                params.platformWallet,                    
+                params.platformWallet,
                 params.extraArgs
             );
         }
 
         // eth or token already transferred to the address
         ILending(params.lendingContract).depositTo(
-            msg.sender, IERC20Ext(params.tradePath[params.tradePath.length - 1]), destAmount
+            msg.sender,
+            IERC20Ext(params.tradePath[params.tradePath.length - 1]),
+            destAmount
         );
-    
+
         emit SwapAndDeposit(
             msg.sender,
             params.swapContract,
@@ -213,7 +295,9 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     ) external override nonReentrant returns (uint256 returnedAmount) {
         require(supportedLendings.contains(params.lendingContract), "unsupported lending");
 
-        IERC20Ext lendingToken = IERC20Ext(ILending(params.lendingContract).getLendingToken(params.token));
+        IERC20Ext lendingToken = IERC20Ext(
+            ILending(params.lendingContract).getLendingToken(params.token)
+        );
         require(lendingToken != IERC20Ext(0), "unsupported token");
 
         // AAVE aToken's transfer logic could have rounding errors
@@ -241,27 +325,34 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     }
 
     /// @dev swap and repay borrow for sender
-    function swapAndRepay(
-        ISmartWalletImplementation.SwapAndRepayParams calldata params
-    ) external payable override nonReentrant returns (uint256 destAmount) {
+    function swapAndRepay(ISmartWalletImplementation.SwapAndRepayParams calldata params)
+        external
+        payable
+        override
+        nonReentrant
+        returns (uint256 destAmount)
+    {
         require(params.tradePath.length >= 1, "invalid tradePath");
         require(supportedLendings.contains(params.lendingContract), "unsupported lending");
-        
+
         // use user debt value if debt is <= payAmount
         // user can pay all debt by putting really high payAmount as param
-        uint256 debt = ILending(params.lendingContract).getUserDebtCurrent(params.tradePath[params.tradePath.length - 1], msg.sender);
-        uint256 actualPayAmount = debt >= params.payAmount ? params.payAmount : debt; 
-        
+        uint256 debt = ILending(params.lendingContract).getUserDebtCurrent(
+            params.tradePath[params.tradePath.length - 1],
+            msg.sender
+        );
+        uint256 actualPayAmount = debt >= params.payAmount ? params.payAmount : debt;
+
         if (params.tradePath.length == 1) {
             // just collect src token, no need to swap
             validateSourceAmount(params.tradePath[0], params.srcAmount);
             destAmount = safeTransferWithFee(
-                msg.sender, 
-                params.lendingContract, 
+                msg.sender,
+                params.lendingContract,
                 params.tradePath[0],
                 params.srcAmount,
                 // Not taking repay fee
-                0, 
+                0,
                 params.platformWallet
             );
         } else {
@@ -273,7 +364,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
                 params.lendingContract,
                 params.feeMode,
                 params.feeBps,
-                params.platformWallet,                    
+                params.platformWallet,
                 params.extraArgs
             );
         }
@@ -285,7 +376,12 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             abi.encodePacked(params.rateMode)
         );
 
-        uint256 actualDebtPaid = debt.sub(ILending(params.lendingContract).getUserDebtCurrent(params.tradePath[params.tradePath.length - 1], msg.sender));
+        uint256 actualDebtPaid = debt.sub(
+            ILending(params.lendingContract).getUserDebtCurrent(
+                params.tradePath[params.tradePath.length - 1],
+                msg.sender
+            )
+        );
         require(actualDebtPaid >= actualPayAmount, "low paid amount");
 
         emit SwapAndRepay(
@@ -320,9 +416,9 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         validateSourceAmount(tradePath[0], srcAmount);
 
         uint256 actualSrcAmount = safeTransferWithFee(
-            msg.sender, 
-            swapContract, 
-            tradePath[0], 
+            msg.sender,
+            swapContract,
+            tradePath[0],
             srcAmount,
             feeMode == FeeMode.FROM_SOURCE ? platformFee : 0,
             platformWallet
@@ -347,22 +443,19 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
 
         if (feeMode == FeeMode.FROM_DEST) {
             destAmount = safeTransferWithFee(
-                address(this), 
+                address(this),
                 recipient,
-                tradePath[tradePath.length - 1], 
-                destAmount, 
-                platformFee, 
+                tradePath[tradePath.length - 1],
+                destAmount,
+                platformFee,
                 platformWallet
-            );         
+            );
         }
 
         require(destAmount >= minDestAmount, "low return");
     }
 
-    function validateSourceAmount(
-        address srcToken,
-        uint256 srcAmount
-    ) internal {
+    function validateSourceAmount(address srcToken, uint256 srcAmount) internal {
         if (srcToken == address(ETH_TOKEN_ADDRESS)) {
             require(msg.value == srcAmount, "wrong msg value");
         } else {
@@ -422,7 +515,12 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
     ) internal {
         if (amount > 0) {
             require(supportedPlatformWallets.contains(platformWallet), "unsupported platform");
-            platformWalletFees[platformWallet][token] = platformWalletFees[platformWallet][token].add(amount);
+            platformWalletFees[platformWallet][token] = platformWalletFees[platformWallet][token]
+            .add(amount);
         }
+    }
+
+    function compareStrings(string memory a, string memory b) private view returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
 }
