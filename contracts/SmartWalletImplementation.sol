@@ -173,15 +173,12 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             returns (uint256 newDestAmount) {
                 if (newDestAmount != 0) {
                     destAmount = newDestAmount;
-                    lastSrcAmount = srcAmount;
-                    srcAmount = (srcAmount * params.destAmount) / newDestAmount;
+                    (lastSrcAmount, srcAmount) = (srcAmount, (srcAmount * params.destAmount) / newDestAmount);
                     continue;
                 }
             } catch {}
             // If there's an error or newDestAmount == 0, try something closer to lastSrcAmount
-            uint256 newSrcAmount = (srcAmount + lastSrcAmount) / 2;
-            lastSrcAmount = srcAmount;
-            srcAmount = newSrcAmount;
+            (lastSrcAmount, srcAmount) = (srcAmount, (srcAmount + lastSrcAmount) / 2);
         }
 
         // Precision check
