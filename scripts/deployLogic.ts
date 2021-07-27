@@ -202,7 +202,7 @@ async function deployContracts(
           ++step,
           networkConfig.autoVerifyContract,
           'AaveV1Lending',
-          existingContract?.['lendingContracts']?.['aaveV1Lending'],
+          existingContract?.['lendingContracts']?.['aaveV1'],
           contractAdmin
         )) as AaveV1Lending,
 
@@ -212,7 +212,7 @@ async function deployContracts(
           ++step,
           networkConfig.autoVerifyContract,
           'AaveV2Lending',
-          existingContract?.['lendingContracts']?.['aaveV2Lending'],
+          existingContract?.['lendingContracts']?.['aaveV2'],
           contractAdmin
         )) as AaveV2Lending,
 
@@ -222,7 +222,7 @@ async function deployContracts(
           ++step,
           networkConfig.autoVerifyContract,
           'AaveV2Lending',
-          existingContract?.['lendingContracts']?.['aaveAMMLending'],
+          existingContract?.['lendingContracts']?.['aaveAMM'],
           contractAdmin
         )) as AaveV2Lending,
   };
@@ -443,8 +443,7 @@ async function updateCompoundLending(compoundLending: CompoundLending | undefine
   log(1, 'update compound data');
   let compoundData = await compoundLending.compoundData();
   // comptroller is at the first 20 bytes
-  let currentComptroller = '0x' + compoundData.slice(2, 40);
-  if (currentComptroller === networkConfig.compound.compTroller) {
+  if (compoundData.toLowerCase() === networkConfig.compound.compTroller.toLowerCase()) {
     log(2, `comptroller already up-to-date at ${networkConfig.compound.compTroller}`);
   } else {
     const tx = await executeTxn(
@@ -466,16 +465,21 @@ async function updateAaveV1Lending(aaveV1Lending: AaveV1Lending | undefined, ext
   }
 
   log(1, 'update aave v1 data');
-  const tx = await executeTxn(
-    await aaveV1Lending.populateTransaction.updateAaveData(
-      networkConfig.aaveV1.poolV1,
-      networkConfig.aaveV1.poolCoreV1,
-      networkConfig.aaveV1.referralCode,
-      networkConfig.aaveV1.tokens
-    )
-  );
-  log(2, '> updated aave v1', JSON.stringify(networkConfig.aaveV1, null, 2));
-  await printInfo(tx);
+  let aaveData = await aaveV1Lending.aaveData();
+  if (networkConfig.aaveV1.poolV1.toLowerCase() === aaveData.lendingPoolV1.toLowerCase()) {
+    log(2, `aave pool already up-to-date at ${networkConfig.aaveV1.poolV1}`);
+  } else {
+    const tx = await executeTxn(
+      await aaveV1Lending.populateTransaction.updateAaveData(
+        networkConfig.aaveV1.poolV1,
+        networkConfig.aaveV1.poolCoreV1,
+        networkConfig.aaveV1.referralCode,
+        networkConfig.aaveV1.tokens
+      )
+    );
+    log(2, '> updated aave v1', JSON.stringify(networkConfig.aaveV1, null, 2));
+    await printInfo(tx);
+  }
 }
 
 async function updateAaveV2Lending(
@@ -489,17 +493,25 @@ async function updateAaveV2Lending(
   }
 
   log(1, 'update aave v2 data');
-  const tx = await executeTxn(
-    await aaveV2Lending.populateTransaction.updateAaveData(
-      aaveV2Config.provider,
-      aaveV2Config.poolV2,
-      aaveV2Config.referralCode,
-      aaveV2Config.weth,
-      aaveV2Config.tokens
-    )
-  );
-  log(2, '> updated aave v2', JSON.stringify(networkConfig.aaveV2, null, 2));
-  await printInfo(tx);
+  let aaveData = await aaveV2Lending.aaveData();
+  if (
+    aaveV2Config.poolV2.toLowerCase() === aaveData.lendingPoolV2.toLowerCase() &&
+    aaveV2Config.provider.toLowerCase() === aaveData.provider.toLowerCase()
+  ) {
+    log(2, `aave pool and provider already up-to-date`);
+  } else {
+    const tx = await executeTxn(
+      await aaveV2Lending.populateTransaction.updateAaveData(
+        aaveV2Config.provider,
+        aaveV2Config.poolV2,
+        aaveV2Config.referralCode,
+        aaveV2Config.weth,
+        aaveV2Config.tokens
+      )
+    );
+    log(2, '> updated aave v2', JSON.stringify(networkConfig.aaveV2, null, 2));
+    await printInfo(tx);
+  }
 }
 
 async function updateAddressSet(

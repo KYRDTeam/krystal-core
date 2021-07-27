@@ -118,35 +118,35 @@ export const EthConfig: Record<string, IConfig> = {
       ],
     },
 
-    aaveAMM: {
-      poolV2: '0x7937d4799803fbbe595ed57278bc4ca21f3bffcb',
-      provider: '0xc443AD9DDE3cecfB9dfC5736578f447aFE3590ba',
-      weth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-      referralCode: 157,
-      tokens: [
-        '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // weth
-        '0x6B175474E89094C44Da98b954EedeAC495271d0F', // dai
-        '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // usdc
-        '0xdAC17F958D2ee523a2206206994597C13D831ec7', // usdt
-        '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // wbtc
-        '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11', // uniDaiEth
-        '0xBb2b8038a1640196FbE3e38816F3e67Cba72D940', // uniWbtcWeth
-        '0xDFC14d2Af169B0D36C4EFF567Ada9b2E0CAE044f', // uniAaveWeth
-        '0xB6909B960DbbE7392D405429eB2b3649752b4838', // uniBatWeth
-        '0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5', // uniDaiUsdc
-        '0x3dA1313aE46132A397D90d95B1424A9A7e3e0fCE', // uniCrvWeth
-        '0xa2107FA5B38d9bbd2C461D6EDf11B11A50F6b974', // uniLinkWeth
-        '0xC2aDdA861F89bBB333c90c492cB837741916A225', // uniMkrWeth
-        '0x8Bd1661Da98EBDd3BD080F0bE4e6d9bE8cE9858c', // uniRenWeth
-        '0x43AE24960e5534731Fc831386c07755A2dc33D47', // uniSnxWeth
-        '0xd3d2E2692501A5c9Ca623199D38826e513033a17', // uniUniWeth
-        '0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc', // uniUsdcWeth
-        '0x004375Dff511095CC5A197A54140a24eFEF3A416', // uniWbtcUsdc
-        '0x2fDbAdf3C4D5A8666Bc06645B8358ab803996E28', // uniYfiWeth
-        '0x1efF8aF5D577060BA4ac8A29A13525bb0Ee2A3D5', // bptWbtcWeth
-        '0x59A19D8c652FA0284f44113D0ff9aBa70bd46fB4', // bptBalWeth
-      ],
-    },
+    // aaveAMM: {
+    //   poolV2: '0x7937d4799803fbbe595ed57278bc4ca21f3bffcb',
+    //   provider: '0xc443AD9DDE3cecfB9dfC5736578f447aFE3590ba',
+    //   weth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    //   referralCode: 157,
+    //   tokens: [
+    //     '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // weth
+    //     '0x6B175474E89094C44Da98b954EedeAC495271d0F', // dai
+    //     '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // usdc
+    //     '0xdAC17F958D2ee523a2206206994597C13D831ec7', // usdt
+    //     '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // wbtc
+    //     '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11', // uniDaiEth
+    //     '0xBb2b8038a1640196FbE3e38816F3e67Cba72D940', // uniWbtcWeth
+    //     '0xDFC14d2Af169B0D36C4EFF567Ada9b2E0CAE044f', // uniAaveWeth
+    //     '0xB6909B960DbbE7392D405429eB2b3649752b4838', // uniBatWeth
+    //     '0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5', // uniDaiUsdc
+    //     '0x3dA1313aE46132A397D90d95B1424A9A7e3e0fCE', // uniCrvWeth
+    //     '0xa2107FA5B38d9bbd2C461D6EDf11B11A50F6b974', // uniLinkWeth
+    //     '0xC2aDdA861F89bBB333c90c492cB837741916A225', // uniMkrWeth
+    //     '0x8Bd1661Da98EBDd3BD080F0bE4e6d9bE8cE9858c', // uniRenWeth
+    //     '0x43AE24960e5534731Fc831386c07755A2dc33D47', // uniSnxWeth
+    //     '0xd3d2E2692501A5c9Ca623199D38826e513033a17', // uniUniWeth
+    //     '0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc', // uniUsdcWeth
+    //     '0x004375Dff511095CC5A197A54140a24eFEF3A416', // uniWbtcUsdc
+    //     '0x2fDbAdf3C4D5A8666Bc06645B8358ab803996E28', // uniYfiWeth
+    //     '0x1efF8aF5D577060BA4ac8A29A13525bb0Ee2A3D5', // bptWbtcWeth
+    //     '0x59A19D8c652FA0284f44113D0ff9aBa70bd46fB4', // bptBalWeth
+    //   ],
+    // },
 
     supportedWallets: commonPlatformWallets,
     fundedAmount: 5, // swap 5 eth each for every token
