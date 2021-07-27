@@ -294,7 +294,7 @@ describe('swap test', async () => {
           return amounts[amounts.length - 1];
         },
         1,
-        false
+        true
       );
     }
   }
@@ -319,7 +319,7 @@ describe('swap test', async () => {
         return amounts[amounts.length - 1];
       },
       1,
-      false
+      true
     );
   }
 
@@ -344,7 +344,7 @@ describe('swap test', async () => {
     };
 
     executeSwapTest(
-      'kyberProxy',
+      'kyberDmm',
       async () => {
         return setup.krystalContracts.swapContracts.kyberDmm!.address;
       },
