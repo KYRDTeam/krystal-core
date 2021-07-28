@@ -10,7 +10,7 @@
     "FetchTokenBalances": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
   },
   "bsc_mainnet": {
-    "smartWalletImplementation": "0x0cf9205d8868fF4d5d0a4d7F0a3719A6F0681B18",
+    "smartWalletImplementation": "0x95ceC39Aa053C62d1A49D88B60620a489C241F53",
     "smartWalletProxy": "0x051DC16b2ECB366984d1074dCC07c342a9463999",
     "fetchTokenBalances": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
     "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
@@ -61,7 +61,7 @@
     "lendingContracts": {}
   },
   "eth_ropsten": {
-    "smartWalletImplementation": "0xEB029e27F86D4FA920e214Cbb933924C6df91e83",
+    "smartWalletImplementation": "0x2ce6E029f52da66c95682541F3c230c28E72dF14",
     "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchTokenBalances": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
     "fetchAaveDataWrapper": "0xD7eA9048908F5E19DCcdD9623dc820feDbb54D45",
@@ -76,7 +76,6 @@
     }
   },
   "polygon_mainnet": {
-    "smartWalletImplementation": "0x33081d6CcF2a68f628E2DCa67569578a187aD826",
     "smartWalletProxy": "0x70270c228c5b4279d1578799926873aa72446ccd",
     "fetchTokenBalances": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchAaveDataWrapper": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",

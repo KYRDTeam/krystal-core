@@ -124,7 +124,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 2 * 1e9,
+    gasPrice: 5 * 1e9,
   };
 
   config.networks!.polygon_mumbai = {
@@ -163,7 +163,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 1,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 10 * 1e9,
+    gasPrice: 15 * 1e9,
   };
 }
 
