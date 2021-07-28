@@ -158,8 +158,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             srcDecimal = srcDecimal - 3;
         }
         srcAmount = 1 * (10**srcDecimal); // Use a 0.001 as base
-        uint256 lastSrcAmount = 0;
-        uint256 destAmount = 0;
+        uint256 lastGoodSrcAmount = 0;
         for (uint256 i = 0; i < 10; i++) {
             try
                 ISwap(swapContract).getExpectedReturn(
@@ -172,21 +171,31 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
                 )
             returns (uint256 newDestAmount) {
                 if (newDestAmount != 0) {
-                    destAmount = newDestAmount;
-                    (lastSrcAmount, srcAmount) = (srcAmount, (srcAmount * params.destAmount) / newDestAmount);
+                    (lastGoodSrcAmount, srcAmount) = (
+                        srcAmount,
+                        (srcAmount * params.destAmount) / newDestAmount
+                    );
                     continue;
                 }
             } catch {}
-            // If there's an error or newDestAmount == 0, try something closer to lastSrcAmount
-            (lastSrcAmount, srcAmount) = (srcAmount, (srcAmount + lastSrcAmount) / 2);
+            // If there's an error or newDestAmount == 0, try something closer to lastGoodSrcAmount
+            srcAmount = (srcAmount + lastGoodSrcAmount) / 2;
         }
 
         // Precision check
+        uint256 destAmount = ISwap(swapContract).getExpectedReturn(
+            ISwap.GetExpectedReturnParams({
+                srcAmount: srcAmount,
+                tradePath: params.tradePath,
+                feeBps: params.feeBps,
+                extraArgs: params.extraArgs
+            })
+        );
         uint256 diff;
         if (destAmount > params.destAmount) {
-          diff = destAmount - params.destAmount;
+            diff = destAmount - params.destAmount;
         } else {
-          diff = params.destAmount - destAmount;
+            diff = params.destAmount - destAmount;
         }
 
         // Telerate a 5% difference
