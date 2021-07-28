@@ -157,7 +157,7 @@ export const EthConfig: Record<string, IConfig> = {
 
     tokens: [{symbol: 'dai', address: '0xad6d458402f60fd3bd25163575031acdce07538d'}],
 
-    wNative: '0x0a180a76e4466bf68a7f86fb029bed3cccfaaac5',
+    wNative: '0xc778417e063141139fce010982780140aa0cd5ab',
 
     // Uniswap & clones
     uniswap: {
