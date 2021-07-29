@@ -87,5 +87,15 @@
     "lendingContracts": {
       "aaveV2": "0x95ceC39Aa053C62d1A49D88B60620a489C241F53"
     }
+  },
+  "polygon_mumbai": {
+    "smartWalletImplementation": "0x52643C0C0CCABd8C70baF5f1b6842886f0f8b953",
+    "smartWalletProxy": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3",
+    "fetchTokenBalances": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
+    "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
+    "swapContracts": {
+      "uniSwap": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
+    },
+    "lendingContracts": {}
   }
 }
