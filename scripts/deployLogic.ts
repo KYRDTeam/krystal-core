@@ -264,23 +264,24 @@ async function deployContract(
   log(1, '------------------------------------');
 
   const factory = await ethers.getContractFactory(contractName);
+  let contract;
 
   if (contractAddress) {
     log(2, `> contract already exists`);
     log(2, `> address:\t${contractAddress}`);
     // TODO: Transfer admin if needed
-    return factory.attach(contractAddress);
+    contract = factory.attach(contractAddress);
+  } else {
+    contract = await factory.deploy(...args);
+    const tx = await contract.deployed();
+    await printInfo(tx.deployTransaction);
+    log(2, `> address:\t${contract.address}`);
   }
-
-  const contract = await factory.deploy(...args);
-  const tx = await contract.deployed();
-  await printInfo(tx.deployTransaction);
-  log(2, `> address:\t${contract.address}`);
 
   if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
-      await sleep(10000);
+      await sleep(5000);
       log(3, '>> start verifying');
       await run('verify:verify', {
         address: contract.address,
