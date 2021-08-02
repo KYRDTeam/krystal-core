@@ -85,22 +85,22 @@ export const PolygonConfig: Record<string, IConfig> = {
     //   cTokens: [],
     // },
 
-    aaveV2: {
-      poolV2: '0x8dff5e27ea6b7ac08ebfdf9eb090f32ee9a30fcf',
-      provider: '0x7551b5D2763519d4e37e8B81929D336De671d46d',
-      weth: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', // wmatic
-      referralCode: 157,
-      // empty array for the full market data
-      tokens: [
-        '0xD6DF932A45C0f255f85145f286eA0b292B21C90B', // aave
-        '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // dai
-        '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', // usdc
-        '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', // usdt
-        '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', // wbtc
-        '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', // weth
-        '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', // wmatic
-      ],
-    },
+    // aaveV2: {
+    //   poolV2: '0x8dff5e27ea6b7ac08ebfdf9eb090f32ee9a30fcf',
+    //   provider: '0x7551b5D2763519d4e37e8B81929D336De671d46d',
+    //   weth: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', // wmatic
+    //   referralCode: 157,
+    //   // empty array for the full market data
+    //   tokens: [
+    //     '0xD6DF932A45C0f255f85145f286eA0b292B21C90B', // aave
+    //     '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // dai
+    //     '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', // usdc
+    //     '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', // usdt
+    //     '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', // wbtc
+    //     '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', // weth
+    //     '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', // wmatic
+    //   ],
+    // },
 
     supportedWallets: commonPlatformWallets,
     fundedAmount: 10000, // swap some matic each for every token

@@ -23,7 +23,7 @@ export const BscConfig: Record<string, IConfig> = {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
       // cBNB or cETH
       cNative: '0xA07c5b74C9B40447a954e1466938b865b6BBea36',
-      // https://api.compound.io/api/cToken
+      // https://api.venus.io/api/vToken
       // empty array for the full market data
       cTokens: [],
     },
