@@ -81,6 +81,7 @@ export const EthConfig: Record<string, IConfig> = {
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // weth
         '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e', // yfi
         '0xE41d2489571d322189246DaFA5ebDe1F4699F498', // zrx
+        '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03', // lend
       ],
     },
 

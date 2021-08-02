@@ -163,7 +163,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 1,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 15 * 1e9,
+    gasPrice: 25 * 1e9,
   };
 }
 
