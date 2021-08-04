@@ -342,6 +342,9 @@ contract UniSwapV3 is BaseSwap {
 
         // if tokenIn == tokenOut
         bool zeroForOne = tokenIn < tokenOut;
+        uint160 sqrtPriceLimitX96 = zeroForOne
+            ? TickMath.MIN_SQRT_RATIO + 1
+            : TickMath.MAX_SQRT_RATIO - 1;
 
         SwapState memory state;
         state.amountSpecifiedRemaining = amountIn.toInt256();
@@ -349,7 +352,7 @@ contract UniSwapV3 is BaseSwap {
         (state.sqrtPriceX96, state.tick, , , , , ) = pool.slot0();
         state.liquidity = pool.liquidity();
 
-        while (state.amountSpecifiedRemaining != 0) {
+        while (state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLimitX96) {
             StepComputations memory step;
 
             step.sqrtPriceStartX96 = state.sqrtPriceX96;
