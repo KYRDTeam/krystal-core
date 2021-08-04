@@ -23,7 +23,7 @@ import {multisig} from '../hardhat.config';
 import EthersSafe from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
 
-const gasLimit = 700000;
+const gasLimit = 200000;
 
 const networkConfig = NetworkConfig[network.name];
 if (!networkConfig) {
@@ -522,14 +522,14 @@ async function updateAddressSet(
   extraArgs: {from?: string}
 ) {
   if (toBeRemoved.length) {
-    const tx = await executeTxn(
-      await populateFunc(toBeRemoved, false, {
-        gasLimit,
-        ...extraArgs,
-      })
-    );
-    log(2, '> removed wallets', toBeRemoved);
-    await printInfo(tx);
+    // const tx = await executeTxn(
+    //   await populateFunc(toBeRemoved, false, {
+    //     gasLimit,
+    //     ...extraArgs,
+    //   })
+    // );
+    log(2, '> skip removing wallets', toBeRemoved);
+    // await printInfo(tx);
   } else {
     log(2, '> nothing to be removed');
   }
