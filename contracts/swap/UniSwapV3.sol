@@ -374,7 +374,13 @@ contract UniSwapV3 is BaseSwap {
             (state.sqrtPriceX96, step.amountIn, step.amountOut, step.feeAmount) = SwapMath
             .computeSwapStep(
                 state.sqrtPriceX96,
-                step.sqrtPriceNextX96,
+                (
+                    zeroForOne
+                        ? step.sqrtPriceNextX96 < sqrtPriceLimitX96
+                        : step.sqrtPriceNextX96 > sqrtPriceLimitX96
+                )
+                    ? sqrtPriceLimitX96
+                    : step.sqrtPriceNextX96,
                 state.liquidity,
                 state.amountSpecifiedRemaining,
                 fee
@@ -391,6 +397,9 @@ contract UniSwapV3 is BaseSwap {
                     state.liquidity = LiquidityMath.addDelta(state.liquidity, liquidityNet);
                 }
                 state.tick = zeroForOne ? step.tickNext - 1 : step.tickNext;
+            } else if (state.sqrtPriceX96 != step.sqrtPriceStartX96) {
+                // recompute unless we're on a lower tick boundary (i.e. already transitioned ticks), and haven't moved
+                state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
             }
         }
 
