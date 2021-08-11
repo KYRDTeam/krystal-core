@@ -504,7 +504,9 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             if (from != address(this)) {
                 // case transfer from another address, need to transfer fee to this proxy contract
                 tokenErc.safeTransferFrom(from, to, amountAfterFee);
-                tokenErc.safeTransferFrom(from, address(this), fee);
+                if (fee > 0) {
+                    tokenErc.safeTransferFrom(from, address(this), fee);
+                }
             } else {
                 tokenErc.safeTransfer(to, amountAfterFee);
             }
@@ -526,7 +528,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
         }
     }
 
-    function compareStrings(string memory a, string memory b) private view returns (bool) {
+    function compareStrings(string memory a, string memory b) private pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
 }
