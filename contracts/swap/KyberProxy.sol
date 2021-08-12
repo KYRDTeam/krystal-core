@@ -81,17 +81,27 @@ contract KyberProxy is BaseSwap {
         uint256 callValue = params.tradePath[0] == address(ETH_TOKEN_ADDRESS)
             ? params.srcAmount
             : 0;
+
+        // Convert minDestAmount to minConversionRate
+        uint256 minConversionRate = calcRateFromQty(
+            params.srcAmount,
+            params.minDestAmount,
+            getDecimals(IERC20Ext(params.tradePath[0])),
+            getDecimals(IERC20Ext(params.tradePath[1]))
+        );
+
         kyberProxy.tradeWithHintAndFee{value: callValue}(
             IERC20Ext(params.tradePath[0]),
             params.srcAmount,
             IERC20Ext(params.tradePath[1]),
             payable(params.recipient),
             MAX_AMOUNT,
-            params.minDestAmount,
+            minConversionRate,
             params.feeReceiver,
             params.feeBps,
             params.extraArgs
         );
+
         destAmount = getBalance(IERC20Ext(params.tradePath[1]), params.recipient).sub(
             destBalanceBefore
         );
