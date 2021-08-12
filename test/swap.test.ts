@@ -172,7 +172,7 @@ describe('swap test', async () => {
               continue;
             }
 
-            // console.log(`swapping from ${token.address} -> ${targetToken}`);
+            console.log(`swapping from ${token.address} -> ${targetToken}`);
 
             // Approve first
             await token.approve(setup.proxyInstance.address, tokenAmount);

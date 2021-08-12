@@ -29,7 +29,6 @@ interface ISwap {
 
     struct SwapParams {
         uint256 srcAmount;
-        // min return for uni, min conversionrate for kyber, etc.
         uint256 minDestAmount;
         address[] tradePath;
         address recipient;
