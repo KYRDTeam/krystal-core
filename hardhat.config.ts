@@ -155,7 +155,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 3,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 45 * 1e9,
+    gasPrice: 80 * 1e9,
   };
 
   config.networks!.eth_mainnet = {
