@@ -15,6 +15,7 @@ export const BscConfig: Record<string, IConfig> = {
         '0x10ed43c718714eb63d5aa57b78b54704e256024e', // panceke v2
         '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
         '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // sushiswap
+        '0xcF0feBd3f17CEf5b47b0cD257aCf6025c5BFf3b7', // apeswap
       ],
     },
 
