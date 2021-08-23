@@ -13,6 +13,7 @@ import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/IMulticall.sol";
 import "@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
+import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/libraries/BitMath.sol";
 import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
 import "@uniswap/v3-core/contracts/libraries/SwapMath.sol";
@@ -164,6 +165,39 @@ contract UniSwapV3 is BaseSwap {
         }
     }
 
+    /// @dev get expected return and conversion rate if using a Uni router
+    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 destAmount, uint256 priceImpact)
+    {
+        require(params.tradePath.length >= 2, "invalid tradePath");
+        (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
+            params.tradePath.length - 1,
+            params.extraArgs
+        );
+
+        destAmount = params.srcAmount;
+        uint256 quote = params.srcAmount;
+        for (uint256 i = 0; i < params.tradePath.length - 1; i++) {
+            destAmount = getAmountOut(
+                router,
+                destAmount,
+                params.tradePath[i],
+                params.tradePath[i + 1],
+                fees[i]
+            );
+            quote = getQuote(router, quote, params.tradePath[i], params.tradePath[i + 1], fees[i]);
+        }
+        if (quote <= destAmount) {
+            priceImpact = 0;
+        } else {
+            priceImpact = quote.sub(destAmount).mul(BPS) / quote;
+        }
+    }
+
     function getExpectedIn(GetExpectedInParams calldata params)
         external
         view
@@ -171,7 +205,56 @@ contract UniSwapV3 is BaseSwap {
         onlyProxyContract
         returns (uint256 srcAmount)
     {
-        require(false, "getExpectedIn_notSupported");
+        require(params.tradePath.length >= 2, "invalid tradePath");
+        (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
+            params.tradePath.length - 1,
+            params.extraArgs
+        );
+
+        srcAmount = params.destAmount;
+        for (uint256 i = params.tradePath.length - 1; i > 0; i--) {
+            srcAmount = getAmountIn(
+                router,
+                srcAmount,
+                params.tradePath[i - 1],
+                params.tradePath[i],
+                fees[i - 1]
+            );
+        }
+    }
+
+    function getExpectedInWithImpact(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount, uint256 priceImpact)
+    {
+        require(params.tradePath.length >= 2, "invalid tradePath");
+        (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
+            params.tradePath.length - 1,
+            params.extraArgs
+        );
+
+        srcAmount = params.destAmount;
+        for (uint256 i = params.tradePath.length - 1; i > 0; i--) {
+            srcAmount = getAmountIn(
+                router,
+                srcAmount,
+                params.tradePath[i - 1],
+                params.tradePath[i],
+                fees[i - 1]
+            );
+        }
+        uint256 quote = srcAmount;
+        for (uint256 i = 0; i < params.tradePath.length - 1; i++) {
+            quote = getQuote(router, quote, params.tradePath[i], params.tradePath[i + 1], fees[i]);
+        }
+        if (quote <= params.destAmount) {
+            priceImpact = 0;
+        } else {
+            priceImpact = quote.sub(params.destAmount).mul(BPS) / quote;
+        }
     }
 
     /// @dev swap token via a supported UniSwap router
@@ -330,7 +413,27 @@ contract UniSwapV3 is BaseSwap {
         address tokenIn,
         address tokenOut,
         uint24 fee
-    ) internal view returns (uint256) {
+    ) private view returns (uint256 amountOut) {
+        return getAmount(router, amountIn.toInt256(), tokenIn, tokenOut, fee);
+    }
+
+    function getAmountIn(
+        ISwapRouterInternal router,
+        uint256 amountOut,
+        address tokenIn,
+        address tokenOut,
+        uint24 fee
+    ) private view returns (uint256 amountIn) {
+        return getAmount(router, -amountOut.toInt256(), tokenIn, tokenOut, fee);
+    }
+
+    function getAmount(
+        ISwapRouterInternal router,
+        int256 amountSpecified,
+        address tokenIn,
+        address tokenOut,
+        uint24 fee
+    ) private view returns (uint256 amountOut) {
         IUniswapV3Pool pool = IUniswapV3Pool(
             PoolAddress.computeAddress(
                 router.factory(),
@@ -347,10 +450,11 @@ contract UniSwapV3 is BaseSwap {
             : TickMath.MAX_SQRT_RATIO - 1;
 
         SwapState memory state;
-        state.amountSpecifiedRemaining = amountIn.toInt256();
+        state.amountSpecifiedRemaining = amountSpecified;
         state.amountCalculated = 0;
         (state.sqrtPriceX96, state.tick, , , , , ) = pool.slot0();
         state.liquidity = pool.liquidity();
+        bool exactInput = amountSpecified > 0;
 
         while (state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLimitX96) {
             StepComputations memory step;
@@ -386,8 +490,15 @@ contract UniSwapV3 is BaseSwap {
                 fee
             );
 
-            state.amountSpecifiedRemaining -= (step.amountIn + step.feeAmount).toInt256();
-            state.amountCalculated = state.amountCalculated.sub(step.amountOut.toInt256());
+            if (exactInput) {
+                state.amountSpecifiedRemaining -= (step.amountIn + step.feeAmount).toInt256();
+                state.amountCalculated = state.amountCalculated.sub(step.amountOut.toInt256());
+            } else {
+                state.amountSpecifiedRemaining += step.amountOut.toInt256();
+                state.amountCalculated = state.amountCalculated.add(
+                    (step.amountIn + step.feeAmount).toInt256()
+                );
+            }
 
             if (state.sqrtPriceX96 == step.sqrtPriceNextX96) {
                 if (step.initialized) {
@@ -403,7 +514,35 @@ contract UniSwapV3 is BaseSwap {
             }
         }
 
-        return uint256(-state.amountCalculated);
+        if (state.amountCalculated < 0) {
+            return uint256(-state.amountCalculated);
+        }
+        return uint256(state.amountCalculated);
+    }
+
+    function getQuote(
+        ISwapRouterInternal router,
+        uint256 quote,
+        address tokenIn,
+        address tokenOut,
+        uint24 fee
+    ) internal view returns (uint256 quoteOut) {
+        IUniswapV3Pool pool = IUniswapV3Pool(
+            PoolAddress.computeAddress(
+                router.factory(),
+                PoolAddress.getPoolKey(tokenIn, tokenOut, fee)
+            )
+        );
+
+        // if tokenIn == tokenOut
+        bool zeroForOne = tokenIn < tokenOut;
+        SwapState memory state;
+        (state.sqrtPriceX96, state.tick, , , , , ) = pool.slot0();
+        uint160 sqrtPriceX96 = zeroForOne
+            ? state.sqrtPriceX96
+            : TickMath.getSqrtRatioAtTick(-state.tick);
+        quoteOut = quote.mul(sqrtPriceX96) >> 96;
+        quoteOut = quoteOut.mul(sqrtPriceX96) >> 96;
     }
 
     function safeWrapToken(address token, address wrappedToken) internal pure returns (address) {

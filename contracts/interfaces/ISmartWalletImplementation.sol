@@ -74,6 +74,15 @@ interface ISmartWalletImplementation {
         view
         returns (uint256 destAmount, uint256 expectedRate);
 
+    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
+        external
+        view
+        returns (
+            uint256 destAmount,
+            uint256 expectedRate,
+            uint256 priceImpact
+        ); // in BPS
+
     struct GetExpectedInParams {
         address payable swapContract;
         uint256 destAmount;
@@ -87,6 +96,15 @@ interface ISmartWalletImplementation {
         external
         view
         returns (uint256 srcAmount, uint256 expectedRate);
+
+    function getExpectedInWithImpact(GetExpectedInParams calldata params)
+        external
+        view
+        returns (
+            uint256 srcAmount,
+            uint256 expectedRate,
+            uint256 priceImpact
+        );
 
     /// @param swapContract swap contract
     /// @param srcAmount amount of src token

@@ -11,7 +11,17 @@ import {
 import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
-import {IDMMFactory, IDMMRouter, IERC20Ext, IUniswapV2Router02} from '../typechain';
+import {
+  IDMMFactory,
+  IDMMRouter,
+  IERC20Ext,
+  IUniswapV2Router02,
+  IUniswapV2Factory,
+  IUniswapV2Pair,
+  ISwapRouterInternal,
+  IUniswapV3Factory,
+  IUniswapV3Pool,
+} from '../typechain';
 import {ethers} from 'hardhat';
 import {arrayify, hexConcat, hexlify} from 'ethers/lib/utils';
 import axios from 'axios';
@@ -34,8 +44,56 @@ describe('swap test', async () => {
     platformFee: number,
     getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>,
     maxDiffAllowed: number = 0,
-    getExpectedInSupported: boolean = false
+    getExpectedInSupported: boolean = false,
+    expectedPriceImpactFn: ((srcAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>) | null | undefined
   ) {
+    const testGetPriceImpact = async (
+      swapContract: string,
+      srcAmount: BigNumber,
+      tradePath: string[],
+      feeMode: FeeMode
+    ): Promise<void> => {
+      const extraArgs = await generateArgsFunc(tradePath, srcAmount, feeMode);
+      const data = await setup.proxyInstance.getExpectedReturnWithImpact({
+        swapContract,
+        srcAmount,
+        tradePath,
+        feeMode,
+        feeBps: platformFee,
+        extraArgs: extraArgs,
+      });
+
+      assert(!data.destAmount.isZero(), 'zero destAmount');
+      assert(!data.expectedRate.isZero(), 'zero expectedRate');
+      assert(data.priceImpact.gte(0), 'priceImpact must be >= 0');
+      assert(data.priceImpact.lte(10000), 'priceImpact must be <= 10000');
+      console.log('tradePath: ', tradePath, 'srcAmount: ', srcAmount.toString());
+      console.log('priceImpact: ', data.priceImpact.toString());
+      if (expectedPriceImpactFn != null) {
+        const expectedPriceImpact = await expectedPriceImpactFn(srcAmount, tradePath);
+        console.log('expectedPriceImpact: ', expectedPriceImpact.toString());
+        assert(data.priceImpact.sub(expectedPriceImpact).abs().lt(BigNumber.from(5)));
+      }
+      if (getExpectedInSupported) {
+        // okay, to safe time, let's just test the getExpectedIn using the above data
+        const expectedInData = await setup.proxyInstance.getExpectedInWithImpact({
+          swapContract,
+          destAmount: data.destAmount,
+          tradePath,
+          feeMode,
+          feeBps: platformFee,
+          extraArgs: await generateArgsFunc(tradePath, srcAmount, feeMode),
+        });
+        if (expectedPriceImpactFn != null) {
+          const expectedPriceImpact = await expectedPriceImpactFn(srcAmount, tradePath);
+          console.log('tradePath: ', tradePath, 'srcAmount: ', srcAmount.toString());
+          console.log('priceImpact: ', data.priceImpact.toString());
+          console.log('expectedPriceImpact: ', expectedPriceImpact.toString());
+          assert(data.priceImpact.sub(expectedPriceImpact).abs().lt(BigNumber.from(5)));
+        }
+      }
+    };
+
     const testGetExpectedRate = async (
       swapContract: string,
       srcAmount: BigNumber,
@@ -45,13 +103,14 @@ describe('swap test', async () => {
       if (name == '1inch') {
         return BigNumber.from(100);
       }
+      const extraArgs = await generateArgsFunc(tradePath, srcAmount, feeMode);
       const data = await setup.proxyInstance.getExpectedReturn({
         swapContract,
         srcAmount,
         tradePath,
         feeMode,
         feeBps: platformFee,
-        extraArgs: await generateArgsFunc(tradePath, srcAmount, feeMode),
+        extraArgs: extraArgs,
       });
 
       assert(!data.destAmount.isZero(), 'zero destAmount');
@@ -129,6 +188,16 @@ describe('swap test', async () => {
           await testGetExpectedRate(swapContract, nativeAmount10, tradePath, FeeMode.BY_PROTOCOL);
           await testGetExpectedRate(swapContract, nativeAmount10, tradePath, FeeMode.FROM_DEST);
           await testGetExpectedRate(swapContract, nativeAmount10, tradePath, FeeMode.FROM_SOURCE);
+        });
+
+        it('get price impact correctly', async () => {
+          if (name === '1inch') {
+            return;
+          }
+          let swapContract = await getSwapContract();
+          let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
+          let amount = nativeAmount10.mul(100000); // Big amount to have high price impact
+          await testGetPriceImpact(swapContract, amount, tradePath, FeeMode.FROM_SOURCE);
         });
 
         it('swap from native to token', async () => {
@@ -298,6 +367,8 @@ describe('swap test', async () => {
   if (networkSetting.uniswap) {
     for (let router of networkSetting.uniswap.routers) {
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+      const factoryAddr = await routerContract.factory();
+      const factoryContract = (await ethers.getContractAt('IUniswapV2Factory', factoryAddr)) as IUniswapV2Factory;
 
       executeSwapTest(
         'univ2/clones',
@@ -312,7 +383,26 @@ describe('swap test', async () => {
           return amounts[amounts.length - 1];
         },
         0,
-        true
+        true,
+        async (srcAmount: BigNumber, tradePath: string[]) => {
+          let amountsOut = await routerContract.getAmountsOut(srcAmount, tradePath);
+          let amountOut = amountsOut[amountsOut.length - 1];
+          let quote = srcAmount;
+          let reserve1: BigNumber;
+          for (let i = 0; i < tradePath.length - 1; i++) {
+            const pair = await factoryContract.getPair(tradePath[i], tradePath[i + 1]);
+            const pairContract = (await ethers.getContractAt('IUniswapV2Pair', pair)) as IUniswapV2Pair;
+            const token0 = await pairContract.token0();
+            let [r0, r1] = await pairContract.getReserves();
+            if (token0.toLowerCase() !== tradePath[i].toLowerCase()) {
+              [r0, r1] = [r1, r0];
+            }
+            reserve1 = r1;
+
+            quote = quote.mul(997).mul(r1).div(r0).div(1000);
+          }
+          return quote.sub(amountOut).mul(BPS).div(quote);
+        }
       );
     }
   }
@@ -320,11 +410,13 @@ describe('swap test', async () => {
   if (networkSetting.uniswapV3) {
     for (let router of networkSetting.uniswapV3.routers) {
       // Using v2 router as a price estimate for testing
-      const routerContract = (await ethers.getContractAt(
+      const routerContractV2 = (await ethers.getContractAt(
         'IUniswapV2Router02',
         networkSetting.uniswap!.routers[0]
       )) as IUniswapV2Router02;
-
+      const routerContractV3 = (await ethers.getContractAt('ISwapRouterInternal', router)) as ISwapRouterInternal;
+      const factoryAddr = await routerContractV3.factory();
+      const factory = (await ethers.getContractAt('IUniswapV3Factory', factoryAddr)) as IUniswapV3Factory;
       executeSwapTest(
         'uniV3',
         async () => {
@@ -340,11 +432,12 @@ describe('swap test', async () => {
         },
         platformFee,
         async (sourceAmount: BigNumber, tradePath: string[]) => {
-          const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
+          const amounts = await routerContractV2.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
         },
         1,
-        true
+        true,
+        null
       );
     }
   }
@@ -369,7 +462,8 @@ describe('swap test', async () => {
         return amounts[amounts.length - 1];
       },
       1,
-      true
+      true,
+      null
     );
   }
 
@@ -413,7 +507,8 @@ describe('swap test', async () => {
         return amounts[amounts.length - 1];
       },
       0,
-      true
+      true,
+      null
     );
   }
   */
@@ -444,7 +539,8 @@ describe('swap test', async () => {
         return BigNumber.from(0);
       },
       0,
-      false
+      false,
+      null
     );
   }
 });

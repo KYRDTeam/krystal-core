@@ -36,12 +36,32 @@ contract OneInch is BaseSwap {
         require(false, "getExpectedReturn_notSupported");
     }
 
+    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 destAmount, uint256 priceImpact)
+    {
+        require(false, "getExpectedReturn_notSupported");
+    }
+
     function getExpectedIn(GetExpectedInParams calldata params)
         external
         view
         override
         onlyProxyContract
         returns (uint256 srcAmount)
+    {
+        require(false, "getExpectedIn_notSupported");
+    }
+
+    function getExpectedInWithImpact(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount, uint256 priceImpact)
     {
         require(false, "getExpectedIn_notSupported");
     }

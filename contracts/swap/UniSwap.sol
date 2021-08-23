@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "../libraries/UniswapV2Library.sol";
 
 /// General swap for uniswap and its clones
 contract UniSwap is BaseSwap {
@@ -83,6 +84,28 @@ contract UniSwap is BaseSwap {
         destAmount = amounts[params.tradePath.length - 1];
     }
 
+    /// @dev get expected return and conversion rate if using a Uni router
+    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 destAmount, uint256 priceImpact)
+    {
+        address router = parseExtraArgs(params.extraArgs);
+        uint256[] memory amounts = IUniswapV2Router02(router).getAmountsOut(
+            params.srcAmount,
+            params.tradePath
+        );
+        destAmount = amounts[params.tradePath.length - 1];
+        priceImpact = getPriceImpact(
+            params.srcAmount,
+            destAmount,
+            IUniswapV2Router02(router).factory(),
+            params.tradePath
+        );
+    }
+
     function getExpectedIn(GetExpectedInParams calldata params)
         external
         view
@@ -96,6 +119,50 @@ contract UniSwap is BaseSwap {
             params.tradePath
         );
         srcAmount = amounts[0];
+    }
+
+    function getExpectedInWithImpact(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount, uint256 priceImpact)
+    {
+        address router = parseExtraArgs(params.extraArgs);
+        uint256[] memory amounts = IUniswapV2Router02(router).getAmountsIn(
+            params.destAmount,
+            params.tradePath
+        );
+        srcAmount = amounts[0];
+        priceImpact = getPriceImpact(
+            srcAmount,
+            params.destAmount,
+            IUniswapV2Router02(router).factory(),
+            params.tradePath
+        );
+    }
+
+    function getPriceImpact(
+        uint256 srcAmount,
+        uint256 destAmount,
+        address factory,
+        address[] memory path
+    ) private view returns (uint256 priceImpact) {
+        uint256 quote = srcAmount;
+        for (uint256 i; i < path.length - 1; i++) {
+            (uint256 reserveIn, uint256 reserveOut) = UniswapV2Library.getReserves(
+                factory,
+                path[i],
+                path[i + 1]
+            );
+            quote = UniswapV2Library.quote(quote.mul(997).div(1000), reserveIn, reserveOut);
+        }
+
+        if (quote <= destAmount) {
+            priceImpact = 0;
+        } else {
+            priceImpact = quote.sub(destAmount).mul(BPS).div(quote);
+        }
     }
 
     /// @dev swap token via a supported UniSwap router
