@@ -15,6 +15,11 @@ interface ISwap {
         view
         returns (uint256 destAmount);
 
+    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
+        external
+        view
+        returns (uint256 destAmount, uint256 priceImpact);
+
     struct GetExpectedInParams {
         uint256 destAmount;
         address[] tradePath;
@@ -26,6 +31,11 @@ interface ISwap {
         external
         view
         returns (uint256 srcAmount);
+
+    function getExpectedInWithImpact(GetExpectedInParams calldata params)
+        external
+        view
+        returns (uint256 srcAmount, uint256 priceImpact);
 
     struct SwapParams {
         uint256 srcAmount;
