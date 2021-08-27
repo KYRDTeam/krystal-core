@@ -27,7 +27,7 @@ import {EthersAdapter} from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
 import Safe from '@gnosis.pm/safe-core-sdk';
 
-const gasLimit = 200000;
+const gasLimit = 300000;
 
 const networkConfig = NetworkConfig[network.name];
 if (!networkConfig) {
@@ -366,7 +366,7 @@ async function deployContract(
     // if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
-      await sleep(5000);
+      await sleep(2000);
       log(3, '>> start verifying');
       await run('verify:verify', {
         address: contract.address,
