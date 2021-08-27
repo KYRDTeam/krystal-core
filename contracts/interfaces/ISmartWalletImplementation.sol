@@ -18,7 +18,8 @@ interface ISmartWalletImplementation {
         uint256 destAmount,
         FeeMode feeMode,
         uint256 feeBps,
-        address platformWallet
+        address platformWallet,
+        bytes extraArgs
     );
 
     event SwapAndDeposit(
@@ -30,7 +31,8 @@ interface ISmartWalletImplementation {
         uint256 destAmount,
         FeeMode feeMode,
         uint256 feeBps,
-        address platformWallet
+        address platformWallet,
+        bytes extraArgs
     );
 
     event WithdrawFromLending(
@@ -52,7 +54,8 @@ interface ISmartWalletImplementation {
         uint256 payAmount,
         FeeMode feeMode,
         uint256 feeBps,
-        address platformWallet
+        address platformWallet,
+        bytes extraArgs
     );
 
     /// @param swapContract swap contract
