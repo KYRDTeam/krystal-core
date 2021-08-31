@@ -275,8 +275,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             destAmount,
             params.feeMode,
             params.feeBps,
-            params.platformWallet,
-            params.extraArgs
+            params.platformWallet
         );
     }
 
@@ -335,8 +334,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             destAmount,
             params.feeMode,
             params.feeBps,
-            params.platformWallet,
-            params.extraArgs
+            params.platformWallet
         );
     }
 
@@ -428,15 +426,13 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             abi.encodePacked(params.rateMode)
         );
 
-        {
-            uint256 actualDebtPaid = debt.sub(
-                ILending(params.lendingContract).getUserDebtCurrent(
-                    params.tradePath[params.tradePath.length - 1],
-                    msg.sender
-                )
-            );
-            require(actualDebtPaid >= actualPayAmount, "low paid amount");
-        }
+        uint256 actualDebtPaid = debt.sub(
+            ILending(params.lendingContract).getUserDebtCurrent(
+                params.tradePath[params.tradePath.length - 1],
+                msg.sender
+            )
+        );
+        require(actualDebtPaid >= actualPayAmount, "low paid amount");
 
         emit SwapAndRepay(
             msg.sender,
@@ -448,8 +444,7 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
             actualPayAmount,
             params.feeMode,
             params.feeBps,
-            params.platformWallet,
-            params.extraArgs
+            params.platformWallet
         );
     }
 
