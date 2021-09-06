@@ -19,6 +19,10 @@ export const BscConfig: Record<string, IConfig> = {
       ],
     },
 
+    kyberDmm: {
+      router: '0x78df70615ffc8066cc0887917f2Cd72092C86409',
+    },
+
     // Venus protocol
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
@@ -43,6 +47,10 @@ export const BscConfig: Record<string, IConfig> = {
     // Pancake swap
     uniswap: {
       routers: ['0xD99D1c33F9fC3444f8101754aBC46c52416550D1'],
+    },
+
+    kyberDmm: {
+      router: '0x19395624C030A11f58e820C3AeFb1f5960d9742a',
     },
 
     // Compound

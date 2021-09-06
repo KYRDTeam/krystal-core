@@ -15,7 +15,8 @@
     "fetchTokenBalances": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
     "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
     "swapContracts": {
-      "uniSwap": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
+      "uniSwap": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e",
+      "kyberDmm": "0xb455810945407Ad3146B74Aa3773df1cDaD61b11"
     },
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
@@ -27,7 +28,8 @@
     "fetchTokenBalances": "0xEB029e27F86D4FA920e214Cbb933924C6df91e83",
     "fetchAaveDataWrapper": "0x9e81428F5672EDCea83F5bf58b6B2cD968df8EE6",
     "swapContracts": {
-      "uniSwap": "0xf5a40993852e6C47B4981bEAC1659BF09B83C521"
+      "uniSwap": "0xf5a40993852e6C47B4981bEAC1659BF09B83C521",
+      "kyberDmm": "0x029B41cD39Ccb4131807AaB24C2ae5c948Da56f9"
     },
     "lendingContracts": {
       "compoundLending": "0xb455810945407Ad3146B74Aa3773df1cDaD61b11"
