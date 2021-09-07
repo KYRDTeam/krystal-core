@@ -13,6 +13,8 @@ import {
   AaveV1Lending,
   AaveV2Lending,
   FetchAaveDataWrapper,
+  KrystalCollectibles,
+  KrystalCollectiblesImpl,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -47,6 +49,9 @@ export interface KrystalContracts {
     aaveV2?: AaveV2Lending;
     aaveAMM?: AaveV2Lending;
   };
+
+  nft?: KrystalCollectibles;
+  nftImplementation?: KrystalCollectiblesImpl;
 }
 
 export const deploy = async (
@@ -101,6 +106,10 @@ export const deploy = async (
   log(0, 'Updating aave AMM config');
   log(0, '======================\n');
   await updateAaveV2Lending(deployedContracts.lendingContracts.aaveAMM, networkConfig.aaveAMM, extraArgs);
+
+  log(0, 'Updating NFT proxy data');
+  log(0, '======================\n');
+  await updateNftProxy(deployedContracts, extraArgs);
 
   // Summary
   log(0, 'Summary');
@@ -243,6 +252,29 @@ async function deployContracts(
       .map((c: Contract) => c.address)
   )) as SmartWalletProxy;
 
+  let nft, nftImplementation;
+  if (networkConfig.nft?.enabled) {
+    nftImplementation = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalCollectiblesImpl',
+      existingContract?.['nftImplementation']
+    )) as KrystalCollectiblesImpl;
+
+    nft = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalCollectibles',
+      existingContract?.['nft'],
+      nftImplementation.address,
+      contractAdmin,
+      '0x',
+      networkConfig.nft.uri,
+      networkConfig.nft.name,
+      networkConfig.nft.symbol
+    )) as KrystalCollectibles;
+  }
+
   return {
     smartWalletImplementation,
     smartWalletProxy,
@@ -250,6 +282,8 @@ async function deployContracts(
     fetchAaveDataWrapper,
     swapContracts,
     lendingContracts,
+    nft,
+    nftImplementation,
   };
 }
 
@@ -278,7 +312,8 @@ async function deployContract(
     log(2, `> address:\t${contract.address}`);
   }
 
-  if (autoVerify) {
+  // Only verify new contract to save time
+  if (autoVerify && !contractAddress) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
       await sleep(5000);
@@ -302,7 +337,7 @@ async function updateProxy(
 ) {
   log(1, 'Update impl contract');
   let currentImpl = await smartWalletProxy.implementation();
-  if (currentImpl === smartWalletImplementation.address) {
+  if (currentImpl.toLowerCase() === smartWalletImplementation.address.toLowerCase()) {
     log(2, `Impl contract is already up-to-date at ${smartWalletImplementation.address}`);
   } else {
     const tx = await executeTxn(
@@ -312,6 +347,7 @@ async function updateProxy(
       })
     );
     await printInfo(tx);
+    log(2, `Impl contract is updated from ${currentImpl} to  ${smartWalletImplementation.address}`);
   }
 
   log(1, 'update supported platform wallets');
@@ -348,6 +384,35 @@ async function updateProxy(
     toBeAdded,
     extraArgs
   );
+}
+
+async function updateNftProxy({nft, nftImplementation}: KrystalContracts, extraArgs: {from?: string}) {
+  log(1, 'Update impl contract');
+  if (!nft || !nftImplementation) {
+    log(2, `NFT not supported`);
+    return;
+  }
+
+  // Read directly from the slots. Pls refer to TransparentUpgradeableProxy
+  let currentImpl = await ethers.provider.getStorageAt(
+    nft.address,
+    '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
+  );
+  // bytes32 to address
+  currentImpl = '0x' + currentImpl.slice(26, 66);
+
+  if (currentImpl.toLowerCase() === nftImplementation.address.toLowerCase()) {
+    log(2, `Impl contract is already up-to-date at ${nftImplementation.address}`);
+  } else {
+    const tx = await executeTxn(
+      await nft.populateTransaction.upgradeTo(nftImplementation.address, {
+        gasLimit,
+        ...extraArgs,
+      })
+    );
+    await printInfo(tx);
+    log(2, `Impl contract is updated from ${currentImpl} to  ${nftImplementation.address}`);
+  }
 }
 
 async function updateChildContracts(

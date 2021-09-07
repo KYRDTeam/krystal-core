@@ -54,6 +54,13 @@ export interface IConfig {
 
   supportedWallets: string[];
   fundedAmount?: number;
+
+  nft?: {
+    enabled?: boolean;
+    name: string;
+    symbol: string;
+    uri: string;
+  };
 }
 
 export const commonPlatformWallets = [
@@ -61,3 +68,10 @@ export const commonPlatformWallets = [
   '0x5250b8202AEBca35328E2c217C687E894d70Cd31', // ios
   '0x168E4c3AC8d89B00958B6bE6400B066f0347DDc9', // web
 ];
+
+export const commonNftConfig = {
+  enabled: true,
+  name: 'Krystal Collectibles',
+  symbol: 'KRYS',
+  uri: 'https://api.krystal.app/ethereum/nft/',
+};
