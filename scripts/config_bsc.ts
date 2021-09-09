@@ -41,6 +41,8 @@ export const BscConfig: Record<string, IConfig> = {
       uri: 'https://api.krystal.app/bsc/nft/',
       name: 'Krystal Collectibles',
     },
+
+    proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
   },
 
   bsc_testnet: {
@@ -73,5 +75,8 @@ export const BscConfig: Record<string, IConfig> = {
       uri: 'https://staging-krystal-api.knstats.com/bsc/nft/',
       name: 'Krystal Collectibles Test',
     },
+
+    // This is the mainnet one as gnosis doesnt support bsc-testnet, but it doesnt matter on testnet anw
+    proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
   },
 };

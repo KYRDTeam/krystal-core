@@ -22,8 +22,9 @@ import {sleep, zeroAddress} from '../test/helper';
 import {PopulatedTransaction} from 'ethers';
 import {TransactionRequest} from '@ethersproject/abstract-provider';
 import {multisig} from '../hardhat.config';
-import EthersSafe from '@gnosis.pm/safe-core-sdk';
+import {EthersAdapter} from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
+import Safe from '@gnosis.pm/safe-core-sdk';
 
 const gasLimit = 200000;
 
@@ -132,6 +133,7 @@ async function deployContracts(
     networkConfig.autoVerifyContract,
     'SmartWalletImplementation',
     existingContract?.['smartWalletImplementation'],
+    undefined,
     contractAdmin
   )) as SmartWalletImplementation;
 
@@ -140,6 +142,7 @@ async function deployContracts(
     networkConfig.autoVerifyContract,
     'FetchTokenBalances',
     existingContract?.['fetchTokenBalances'],
+    undefined,
     contractAdmin
   )) as FetchTokenBalances;
 
@@ -148,6 +151,7 @@ async function deployContracts(
     networkConfig.autoVerifyContract,
     'FetchAaveDataWrapper',
     existingContract?.['fetchAaveDataWrapper'],
+    undefined,
     contractAdmin
   )) as FetchAaveDataWrapper;
 
@@ -159,6 +163,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'UniSwap',
           existingContract?.['swapContracts']?.['uniSwap'],
+          undefined,
           contractAdmin,
           networkConfig.uniswap.routers
         )) as UniSwap),
@@ -169,6 +174,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'UniSwapV3',
           existingContract?.['swapContracts']?.['uniSwapV3'],
+          undefined,
           contractAdmin,
           networkConfig.uniswapV3.routers
         )) as UniSwapV3),
@@ -179,6 +185,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'KyberProxy',
           existingContract?.['swapContracts']?.['kyberProxy'],
+          undefined,
           contractAdmin,
           networkConfig.kyberProxy.proxy
         )) as KyberProxy),
@@ -189,6 +196,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'KyberDmm',
           existingContract?.['swapContracts']?.['kyberDmm'],
+          undefined,
           contractAdmin,
           networkConfig.kyberDmm.router
         )) as KyberDmm),
@@ -202,6 +210,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'CompoundLending',
           existingContract?.['lendingContracts']?.['compoundLending'],
+          undefined,
           contractAdmin
         )) as CompoundLending,
 
@@ -212,6 +221,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'AaveV1Lending',
           existingContract?.['lendingContracts']?.['aaveV1'],
+          undefined,
           contractAdmin
         )) as AaveV1Lending,
 
@@ -222,6 +232,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'AaveV2Lending',
           existingContract?.['lendingContracts']?.['aaveV2'],
+          undefined,
           contractAdmin
         )) as AaveV2Lending,
 
@@ -232,6 +243,7 @@ async function deployContracts(
           networkConfig.autoVerifyContract,
           'AaveV2Lending',
           existingContract?.['lendingContracts']?.['aaveAMM'],
+          undefined,
           contractAdmin
         )) as AaveV2Lending,
   };
@@ -241,6 +253,7 @@ async function deployContracts(
     networkConfig.autoVerifyContract,
     'SmartWalletProxy',
     existingContract?.['smartWalletProxy'],
+    undefined,
     contractAdmin,
     smartWalletImplementation.address,
     networkConfig.supportedWallets,
@@ -258,20 +271,27 @@ async function deployContracts(
       ++step,
       networkConfig.autoVerifyContract,
       'KrystalCollectiblesImpl',
-      existingContract?.['nftImplementation']
+      existingContract?.['nftImplementation'],
+      undefined
     )) as KrystalCollectiblesImpl;
 
+    let initData =
+      (
+        await nftImplementation.populateTransaction['initialize(string,string,string)'](
+          networkConfig.nft.name,
+          networkConfig.nft.symbol,
+          networkConfig.nft.uri
+        )
+      ).data?.toString() ?? '0x';
     nft = (await deployContract(
       ++step,
       networkConfig.autoVerifyContract,
       'KrystalCollectibles',
       existingContract?.['nft'],
+      'contracts/nft/KrystalCollectibles.sol:KrystalCollectibles',
       nftImplementation.address,
-      contractAdmin,
-      '0x',
-      networkConfig.nft.uri,
-      networkConfig.nft.name,
-      networkConfig.nft.symbol
+      networkConfig.proxyAdminMultisig ?? contractAdmin,
+      initData
     )) as KrystalCollectibles;
   }
 
@@ -292,6 +312,7 @@ async function deployContract(
   autoVerify: boolean,
   contractName: string,
   contractAddress: string | undefined,
+  contractLocation: string | undefined,
   ...args: any[]
 ): Promise<Contract> {
   log(1, `${step}. Deploying '${contractName}'`);
@@ -314,7 +335,7 @@ async function deployContract(
 
   // Only verify new contract to save time
   if (autoVerify && !contractAddress) {
-    // // Try to verify no matter what
+    // Try to verify no matter what
     // if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
@@ -323,6 +344,7 @@ async function deployContract(
       await run('verify:verify', {
         address: contract.address,
         constructorArguments: args,
+        contract: contractLocation,
       });
       log(3, '>> done verifying');
     } catch (e) {
@@ -342,7 +364,7 @@ async function updateProxy(
   if (currentImpl.toLowerCase() === smartWalletImplementation.address.toLowerCase()) {
     log(2, `Impl contract is already up-to-date at ${smartWalletImplementation.address}`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await smartWalletProxy.populateTransaction.updateNewImplementation(smartWalletImplementation.address, {
         gasLimit,
         ...extraArgs,
@@ -400,17 +422,26 @@ async function updateNftProxy({nft, nftImplementation}: KrystalContracts, extraA
     nft.address,
     '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
   );
+  let currentAdmin = await ethers.provider.getStorageAt(
+    nft.address,
+    '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
+  );
+
+  log(2, `currentImpl = ${currentImpl}`);
+  log(2, `currentAdmin = ${currentAdmin}`);
+
   // bytes32 to address
   currentImpl = '0x' + currentImpl.slice(26, 66);
 
   if (currentImpl.toLowerCase() === nftImplementation.address.toLowerCase()) {
     log(2, `Impl contract is already up-to-date at ${nftImplementation.address}`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await nft.populateTransaction.upgradeTo(nftImplementation.address, {
         gasLimit,
         ...extraArgs,
-      })
+      }),
+      networkConfig.proxyAdminMultisig
     );
     await printInfo(tx);
     log(2, `Impl contract is updated from ${currentImpl} to  ${nftImplementation.address}`);
@@ -431,7 +462,7 @@ async function updateChildContracts(
       if ((await contract.proxyContract()).toLowerCase() == smartWalletProxy.address.toLowerCase()) {
         log(2, `> Proxy contract is already up-to-date at ${smartWalletProxy.address}`);
       } else {
-        const tx = await executeTxn(
+        const tx = await executeTxnOnBehalfOf(
           await contract.populateTransaction.updateProxyContract(smartWalletProxy.address, {
             gasLimit,
             ...extraArgs,
@@ -480,7 +511,9 @@ async function updateKyberProxy(kyberProxy: KyberProxy | undefined, extraArgs: {
   if ((await kyberProxy.kyberProxy()).toLowerCase() === networkConfig.kyberProxy.proxy.toLowerCase()) {
     log(2, `kyberProxy already up-to-date at ${networkConfig.kyberProxy.proxy}`);
   } else {
-    const tx = await executeTxn(await kyberProxy.populateTransaction.updateKyberProxy(networkConfig.kyberProxy.proxy));
+    const tx = await executeTxnOnBehalfOf(
+      await kyberProxy.populateTransaction.updateKyberProxy(networkConfig.kyberProxy.proxy)
+    );
     log(2, '> updated kyberProxy', JSON.stringify(networkConfig.kyberProxy, null, 2));
     await printInfo(tx);
   }
@@ -496,7 +529,9 @@ async function updateKyberDmm(kyberDmm: KyberDmm | undefined, extraArgs: {from?:
   if ((await kyberDmm.dmmRouter()).toLowerCase() === networkConfig.kyberDmm.router.toLowerCase()) {
     log(2, `dmmRouter already up-to-date at ${networkConfig.kyberDmm.router}`);
   } else {
-    const tx = await executeTxn(await kyberDmm.populateTransaction.updateDmmRouter(networkConfig.kyberDmm.router));
+    const tx = await executeTxnOnBehalfOf(
+      await kyberDmm.populateTransaction.updateDmmRouter(networkConfig.kyberDmm.router)
+    );
     log(2, '> updated dmmRouter', JSON.stringify(networkConfig.kyberDmm, null, 2));
     await printInfo(tx);
   }
@@ -514,7 +549,7 @@ async function updateCompoundLending(compoundLending: CompoundLending | undefine
   if (compoundData.toLowerCase() === networkConfig.compound.compTroller.toLowerCase()) {
     log(2, `comptroller already up-to-date at ${networkConfig.compound.compTroller}`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await compoundLending.populateTransaction.updateCompoundData(
         networkConfig.compound.compTroller,
         networkConfig.compound.cNative,
@@ -537,7 +572,7 @@ async function updateAaveV1Lending(aaveV1Lending: AaveV1Lending | undefined, ext
   if (networkConfig.aaveV1.poolV1.toLowerCase() === aaveData.lendingPoolV1.toLowerCase()) {
     log(2, `aave pool already up-to-date at ${networkConfig.aaveV1.poolV1}`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await aaveV1Lending.populateTransaction.updateAaveData(
         networkConfig.aaveV1.poolV1,
         networkConfig.aaveV1.poolCoreV1,
@@ -568,7 +603,7 @@ async function updateAaveV2Lending(
   ) {
     log(2, `aave pool and provider already up-to-date`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await aaveV2Lending.populateTransaction.updateAaveData(
         aaveV2Config.provider,
         aaveV2Config.poolV2,
@@ -602,7 +637,7 @@ async function updateAddressSet(
   }
   console.log('\n');
   if (toBeAdded.length) {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await populateFunc(toBeAdded, true, {
         gasLimit,
         ...extraArgs,
@@ -653,19 +688,26 @@ function log(level: number, ...args: any[]) {
   console.log(`${prefix}`, ...args);
 }
 
-async function executeTxn(txn: TransactionRequest | PopulatedTransaction): Promise<TransactionResponse> {
+async function executeTxnOnBehalfOf(
+  txn: TransactionRequest | PopulatedTransaction,
+  customMultisig?: string
+): Promise<TransactionResponse> {
   let tx;
-
-  if (multisig) {
+  let m = customMultisig || multisig;
+  if (m) {
     const signer = (await ethers.getSigners())[0];
-    const safeSdk = await EthersSafe.create({ethers, safeAddress: multisig, providerOrSigner: signer});
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signer,
+    });
+    const safeSdk: Safe = await Safe.create({ethAdapter, safeAddress: m});
     const safeTransaction = await safeSdk.createTransaction({
       to: txn.to ?? zeroAddress,
       value: txn.value?.toString() ?? '0',
       data: txn.data!.toString(),
       operation: OperationType.Call,
     });
-    tx = await safeSdk.executeTransaction(safeTransaction);
+    tx = (await safeSdk.executeTransaction(safeTransaction)).transactionResponse!;
   } else {
     const signer = (await ethers.getSigners())[0];
     tx = await signer.sendTransaction(txn);

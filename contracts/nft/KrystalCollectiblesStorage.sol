@@ -2,7 +2,6 @@
 pragma solidity 0.7.6;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/presets/ERC1155PresetMinterPauser.sol";
 import "@openzeppelin/contracts-upgradeable/presets/ERC1155PresetMinterPauserUpgradeable.sol";
 
 contract KrystalCollectiblesStorage is ERC1155PresetMinterPauserUpgradeable, ReentrancyGuard {

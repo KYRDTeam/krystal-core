@@ -2,7 +2,6 @@
 pragma solidity 0.7.6;
 
 import "./KrystalCollectiblesStorage.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract KrystalCollectiblesImpl is KrystalCollectiblesStorage {
@@ -27,5 +26,11 @@ contract KrystalCollectiblesImpl is KrystalCollectiblesStorage {
     // ERC-721 Compatible
     function tokenUri(uint256 tokenId) external view returns (string memory) {
         return string(abi.encodePacked(tokenUriPrefix, tokenId.toString()));
+    }
+
+    function setURI(string memory newuri) external {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "setURI: admin required");
+        super._setURI(newuri);
+        tokenUriPrefix = newuri;
     }
 }

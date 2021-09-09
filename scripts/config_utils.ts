@@ -61,6 +61,12 @@ export interface IConfig {
     symbol: string;
     uri: string;
   };
+
+  // For proxy admin
+  proxyAdminMultisig?: string;
+
+  // For managing the config and admin jobs
+  adminMultisign?: string;
 }
 
 export const commonPlatformWallets = [
