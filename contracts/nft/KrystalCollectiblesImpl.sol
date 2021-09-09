@@ -8,8 +8,16 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract KrystalCollectiblesImpl is KrystalCollectiblesStorage {
     using Strings for uint256;
 
-    // Set to empty as this is just the implementation contract
-    constructor() KrystalCollectiblesStorage("", "", "") {}
+    function initialize(
+        string memory _name,
+        string memory _symbol,
+        string memory _uri
+    ) public initializer {
+        super.initialize(_uri);
+        name = _name;
+        symbol = _symbol;
+        tokenUriPrefix = _uri;
+    }
 
     // Overriding original ERC-1155 format
     function uri(uint256 tokenId) external view override returns (string memory) {

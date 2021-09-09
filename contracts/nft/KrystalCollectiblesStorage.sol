@@ -3,19 +3,10 @@ pragma solidity 0.7.6;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/presets/ERC1155PresetMinterPauser.sol";
+import "@openzeppelin/contracts-upgradeable/presets/ERC1155PresetMinterPauserUpgradeable.sol";
 
-contract KrystalCollectiblesStorage is ERC1155PresetMinterPauser, ReentrancyGuard {
+contract KrystalCollectiblesStorage is ERC1155PresetMinterPauserUpgradeable, ReentrancyGuard {
     string public name;
     string public symbol;
     string public tokenUriPrefix;
-
-    constructor(
-        string memory _uri,
-        string memory _name,
-        string memory _symbol
-    ) ERC1155PresetMinterPauser(_uri) {
-        name = _name;
-        symbol = _symbol;
-        tokenUriPrefix = _uri;
-    }
 }

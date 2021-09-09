@@ -1,4 +1,4 @@
-import {commonPlatformWallets, IConfig} from './config_utils';
+import {commonNftConfig, commonPlatformWallets, IConfig} from './config_utils';
 
 export const BscConfig: Record<string, IConfig> = {
   bsc_mainnet: {
@@ -35,6 +35,12 @@ export const BscConfig: Record<string, IConfig> = {
 
     supportedWallets: commonPlatformWallets,
     fundedAmount: 10, // swap 10 bnb each for every token
+
+    nft: {
+      ...commonNftConfig,
+      uri: 'https://api.krystal.app/bsc/nft/',
+      name: 'Krystal Collectibles',
+    },
   },
 
   bsc_testnet: {
@@ -61,5 +67,11 @@ export const BscConfig: Record<string, IConfig> = {
       cTokens: [],
     },
     supportedWallets: commonPlatformWallets,
+
+    nft: {
+      ...commonNftConfig,
+      uri: 'https://staging-krystal-api.knstats.com/bsc/nft/',
+      name: 'Krystal Collectibles Test',
+    },
   },
 };

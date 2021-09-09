@@ -20,7 +20,9 @@
     },
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
-    }
+    },
+    "nft_staging": "0xedE7cc39C5160d7DD82Eb5Ec71c63AEEe442cf32",
+    "nftImplementation_staging": "0x2ce6E029f52da66c95682541F3c230c28E72dF14"
   },
   "bsc_testnet": {
     "smartWalletImplementation": "0xe66cc698a26a943A6152040662e88b254f9afcAa",
