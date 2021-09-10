@@ -59,7 +59,7 @@ export const BscConfig: Record<string, IConfig> = {
 
     nft: {
       ...commonNftConfig,
-      uri: 'https://staging-krystal-api.knstats.com/bsc/nft/',
+      uri: 'https://dev-krystal-api.knstats.com/bsc/nft/',
       name: 'Krystal Collectibles Staging',
     },
 
