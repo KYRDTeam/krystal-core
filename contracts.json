@@ -84,8 +84,8 @@
     "lendingContracts": {
       "compoundLending": "0x60fc810EA972809d729FCE0043B82a58766596ee"
     },
-    "nft": "0xd7BF4eCc82CeD2df173138afB052B710D990022a",
-    "nftImplementation": "0xCEeE507f47A7C81a64Fb64B6ADBD8FD236f20bE6"
+    "nft": "0x3209286B92060D2f5e88565E7194ccB5aA831606",
+    "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3"
   },
   "polygon_mainnet": {
     "smartWalletImplementation": "0x867eB83fEe136Be5b35d3554C89eC75D79737368",

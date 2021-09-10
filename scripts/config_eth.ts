@@ -302,7 +302,11 @@ export const EthConfig: Record<string, IConfig> = {
 
     nft: {
       ...commonNftConfig,
+      uri: 'https://dev-krystal-api.knstats.com/ropsten/nft/',
+      name: 'Krystal Collectibles Test',
     },
+
+    proxyAdminMultisig: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
   },
 
   eth_rinkeby: {
