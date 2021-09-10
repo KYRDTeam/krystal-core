@@ -64,9 +64,13 @@ export interface IConfig {
 
   // For proxy admin
   proxyAdminMultisig?: string;
-
   // For managing the config and admin jobs
-  adminMultisign?: string;
+  adminMultisig?: string;
+  // For maintaining, minting and some executing jobs
+  maintainerMultisig?: string;
+
+  // For staging contracts, which doesn't need a full settings
+  disableProxy?: boolean;
 }
 
 export const commonPlatformWallets = [

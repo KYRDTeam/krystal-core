@@ -24,6 +24,10 @@
     "nft": "0x9e81428F5672EDCea83F5bf58b6B2cD968df8EE6",
     "nftImplementation": "0x029B41cD39Ccb4131807AaB24C2ae5c948Da56f9"
   },
+  "bsc_staging": {
+    "nft": "0x0993A84E5bdad44f2Cb49C8eB8CEC81Bc8791d6B",
+    "nftImplementation": "0xfd5904626c103A9bE91635DF823B442f0b77EC88"
+  },
   "bsc_testnet": {
     "smartWalletImplementation": "0xe66cc698a26a943A6152040662e88b254f9afcAa",
     "smartWalletProxy": "0xA58573970cfFAd93309071cE9aff46b8A35eC62B",
