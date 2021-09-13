@@ -20,7 +20,13 @@
     },
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
-    }
+    },
+    "nft": "0x9e81428F5672EDCea83F5bf58b6B2cD968df8EE6",
+    "nftImplementation": "0x029B41cD39Ccb4131807AaB24C2ae5c948Da56f9"
+  },
+  "bsc_staging": {
+    "nft": "0x0993A84E5bdad44f2Cb49C8eB8CEC81Bc8791d6B",
+    "nftImplementation": "0xfd5904626c103A9bE91635DF823B442f0b77EC88"
   },
   "bsc_testnet": {
     "smartWalletImplementation": "0xe66cc698a26a943A6152040662e88b254f9afcAa",
@@ -33,7 +39,9 @@
     },
     "lendingContracts": {
       "compoundLending": "0xb455810945407Ad3146B74Aa3773df1cDaD61b11"
-    }
+    },
+    "nft": "0x3209286B92060D2f5e88565E7194ccB5aA831606",
+    "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3"
   },
   "eth_mainnet": {
     "smartWalletImplementation": "0x95ceC39Aa053C62d1A49D88B60620a489C241F53",
@@ -75,7 +83,9 @@
     },
     "lendingContracts": {
       "compoundLending": "0x60fc810EA972809d729FCE0043B82a58766596ee"
-    }
+    },
+    "nft": "0x3209286B92060D2f5e88565E7194ccB5aA831606",
+    "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3"
   },
   "polygon_mainnet": {
     "smartWalletImplementation": "0x867eB83fEe136Be5b35d3554C89eC75D79737368",

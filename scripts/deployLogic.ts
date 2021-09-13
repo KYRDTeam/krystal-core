@@ -13,6 +13,8 @@ import {
   AaveV1Lending,
   AaveV2Lending,
   FetchAaveDataWrapper,
+  KrystalCollectibles,
+  KrystalCollectiblesImpl,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -20,8 +22,9 @@ import {sleep, zeroAddress} from '../test/helper';
 import {PopulatedTransaction} from 'ethers';
 import {TransactionRequest} from '@ethersproject/abstract-provider';
 import {multisig} from '../hardhat.config';
-import EthersSafe from '@gnosis.pm/safe-core-sdk';
+import {EthersAdapter} from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
+import Safe from '@gnosis.pm/safe-core-sdk';
 
 const gasLimit = 200000;
 
@@ -31,22 +34,25 @@ if (!networkConfig) {
 }
 
 export interface KrystalContracts {
-  smartWalletImplementation: SmartWalletImplementation;
-  smartWalletProxy: SmartWalletProxy;
-  fetchTokenBalances: FetchTokenBalances;
-  fetchAaveDataWrapper: FetchAaveDataWrapper;
-  swapContracts: {
+  smartWalletImplementation?: SmartWalletImplementation;
+  smartWalletProxy?: SmartWalletProxy;
+  fetchTokenBalances?: FetchTokenBalances;
+  fetchAaveDataWrapper?: FetchAaveDataWrapper;
+  swapContracts?: {
     uniSwap?: UniSwap;
     uniSwapV3?: UniSwapV3;
     kyberProxy?: KyberProxy;
     kyberDmm?: KyberDmm;
   };
-  lendingContracts: {
+  lendingContracts?: {
     compoundLending?: CompoundLending;
     aaveV1?: AaveV1Lending;
     aaveV2?: AaveV2Lending;
     aaveAMM?: AaveV2Lending;
   };
+
+  nft?: KrystalCollectibles;
+  nftImplementation?: KrystalCollectiblesImpl;
 }
 
 export const deploy = async (
@@ -72,35 +78,39 @@ export const deploy = async (
 
   log(0, 'Updating uniswap/clones config');
   log(0, '======================\n');
-  await updateUniSwap(deployedContracts.swapContracts.uniSwap, extraArgs);
+  await updateUniSwap(deployedContracts.swapContracts?.uniSwap, extraArgs);
 
   log(0, 'Updating uniswapV3/clones config');
   log(0, '======================\n');
-  await updateUniSwapV3(deployedContracts.swapContracts.uniSwapV3, extraArgs);
+  await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
 
   log(0, 'Updating kyberProxy config');
   log(0, '======================\n');
-  await updateKyberProxy(deployedContracts.swapContracts.kyberProxy, extraArgs);
+  await updateKyberProxy(deployedContracts.swapContracts?.kyberProxy, extraArgs);
 
   log(0, 'Updating kyberDmm config');
   log(0, '======================\n');
-  await updateKyberDmm(deployedContracts.swapContracts.kyberDmm, extraArgs);
+  await updateKyberDmm(deployedContracts.swapContracts?.kyberDmm, extraArgs);
 
   log(0, 'Updating compound/clones config');
   log(0, '======================\n');
-  await updateCompoundLending(deployedContracts.lendingContracts.compoundLending, extraArgs);
+  await updateCompoundLending(deployedContracts.lendingContracts?.compoundLending, extraArgs);
 
   log(0, 'Updating aave V1 config');
   log(0, '======================\n');
-  await updateAaveV1Lending(deployedContracts.lendingContracts.aaveV1, extraArgs);
+  await updateAaveV1Lending(deployedContracts.lendingContracts?.aaveV1, extraArgs);
 
   log(0, 'Updating aave V2 config');
   log(0, '======================\n');
-  await updateAaveV2Lending(deployedContracts.lendingContracts.aaveV2, networkConfig.aaveV2, extraArgs);
+  await updateAaveV2Lending(deployedContracts.lendingContracts?.aaveV2, networkConfig.aaveV2, extraArgs);
 
   log(0, 'Updating aave AMM config');
   log(0, '======================\n');
-  await updateAaveV2Lending(deployedContracts.lendingContracts.aaveAMM, networkConfig.aaveAMM, extraArgs);
+  await updateAaveV2Lending(deployedContracts.lendingContracts?.aaveAMM, networkConfig.aaveAMM, extraArgs);
+
+  log(0, 'Updating NFT proxy data');
+  log(0, '======================\n');
+  await updateNftProxy(deployedContracts, extraArgs);
 
   // Summary
   log(0, 'Summary');
@@ -118,130 +128,181 @@ async function deployContracts(
 ): Promise<KrystalContracts> {
   let step = 0;
 
-  const smartWalletImplementation = (await deployContract(
-    ++step,
-    networkConfig.autoVerifyContract,
-    'SmartWalletImplementation',
-    existingContract?.['smartWalletImplementation'],
-    contractAdmin
-  )) as SmartWalletImplementation;
+  let smartWalletImplementation,
+    smartWalletProxy,
+    fetchTokenBalances,
+    fetchAaveDataWrapper,
+    swapContracts,
+    lendingContracts;
 
-  const fetchTokenBalances = (await deployContract(
-    ++step,
-    networkConfig.autoVerifyContract,
-    'FetchTokenBalances',
-    existingContract?.['fetchTokenBalances'],
-    contractAdmin
-  )) as FetchTokenBalances;
+  if (!networkConfig.disableProxy) {
+    smartWalletImplementation = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'SmartWalletImplementation',
+      existingContract?.['smartWalletImplementation'],
+      undefined,
+      contractAdmin
+    )) as SmartWalletImplementation;
 
-  const fetchAaveDataWrapper = (await deployContract(
-    ++step,
-    networkConfig.autoVerifyContract,
-    'FetchAaveDataWrapper',
-    existingContract?.['fetchAaveDataWrapper'],
-    contractAdmin
-  )) as FetchAaveDataWrapper;
+    fetchTokenBalances = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'FetchTokenBalances',
+      existingContract?.['fetchTokenBalances'],
+      undefined,
+      contractAdmin
+    )) as FetchTokenBalances;
 
-  const swapContracts = {
-    uniSwap: !networkConfig.uniswap
-      ? undefined
-      : ((await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'UniSwap',
-          existingContract?.['swapContracts']?.['uniSwap'],
-          contractAdmin,
-          networkConfig.uniswap.routers
-        )) as UniSwap),
-    uniSwapV3: !networkConfig.uniswapV3
-      ? undefined
-      : ((await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'UniSwapV3',
-          existingContract?.['swapContracts']?.['uniSwapV3'],
-          contractAdmin,
-          networkConfig.uniswapV3.routers
-        )) as UniSwapV3),
-    kyberProxy: !networkConfig.kyberProxy
-      ? undefined
-      : ((await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'KyberProxy',
-          existingContract?.['swapContracts']?.['kyberProxy'],
-          contractAdmin,
-          networkConfig.kyberProxy.proxy
-        )) as KyberProxy),
-    kyberDmm: !networkConfig.kyberDmm
-      ? undefined
-      : ((await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'KyberDmm',
-          existingContract?.['swapContracts']?.['kyberDmm'],
-          contractAdmin,
-          networkConfig.kyberDmm.router
-        )) as KyberDmm),
-  };
+    fetchAaveDataWrapper = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'FetchAaveDataWrapper',
+      existingContract?.['fetchAaveDataWrapper'],
+      undefined,
+      contractAdmin
+    )) as FetchAaveDataWrapper;
 
-  const lendingContracts = {
-    compoundLending: (!networkConfig.compound
-      ? undefined
-      : await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'CompoundLending',
-          existingContract?.['lendingContracts']?.['compoundLending'],
-          contractAdmin
-        )) as CompoundLending,
+    swapContracts = {
+      uniSwap: !networkConfig.uniswap
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'UniSwap',
+            existingContract?.['swapContracts']?.['uniSwap'],
+            undefined,
+            contractAdmin,
+            networkConfig.uniswap.routers
+          )) as UniSwap),
+      uniSwapV3: !networkConfig.uniswapV3
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'UniSwapV3',
+            existingContract?.['swapContracts']?.['uniSwapV3'],
+            undefined,
+            contractAdmin,
+            networkConfig.uniswapV3.routers
+          )) as UniSwapV3),
+      kyberProxy: !networkConfig.kyberProxy
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'KyberProxy',
+            existingContract?.['swapContracts']?.['kyberProxy'],
+            undefined,
+            contractAdmin,
+            networkConfig.kyberProxy.proxy
+          )) as KyberProxy),
+      kyberDmm: !networkConfig.kyberDmm
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'KyberDmm',
+            existingContract?.['swapContracts']?.['kyberDmm'],
+            undefined,
+            contractAdmin,
+            networkConfig.kyberDmm.router
+          )) as KyberDmm),
+    };
 
-    aaveV1: (!networkConfig.aaveV1
-      ? undefined
-      : await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'AaveV1Lending',
-          existingContract?.['lendingContracts']?.['aaveV1'],
-          contractAdmin
-        )) as AaveV1Lending,
+    lendingContracts = {
+      compoundLending: (!networkConfig.compound
+        ? undefined
+        : await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'CompoundLending',
+            existingContract?.['lendingContracts']?.['compoundLending'],
+            undefined,
+            contractAdmin
+          )) as CompoundLending,
 
-    aaveV2: (!networkConfig.aaveV2
-      ? undefined
-      : await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'AaveV2Lending',
-          existingContract?.['lendingContracts']?.['aaveV2'],
-          contractAdmin
-        )) as AaveV2Lending,
+      aaveV1: (!networkConfig.aaveV1
+        ? undefined
+        : await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'AaveV1Lending',
+            existingContract?.['lendingContracts']?.['aaveV1'],
+            undefined,
+            contractAdmin
+          )) as AaveV1Lending,
 
-    aaveAMM: (!networkConfig.aaveAMM
-      ? undefined
-      : await deployContract(
-          ++step,
-          networkConfig.autoVerifyContract,
-          'AaveV2Lending',
-          existingContract?.['lendingContracts']?.['aaveAMM'],
-          contractAdmin
-        )) as AaveV2Lending,
-  };
+      aaveV2: (!networkConfig.aaveV2
+        ? undefined
+        : await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'AaveV2Lending',
+            existingContract?.['lendingContracts']?.['aaveV2'],
+            undefined,
+            contractAdmin
+          )) as AaveV2Lending,
 
-  const smartWalletProxy = (await deployContract(
-    ++step,
-    networkConfig.autoVerifyContract,
-    'SmartWalletProxy',
-    existingContract?.['smartWalletProxy'],
-    contractAdmin,
-    smartWalletImplementation.address,
-    networkConfig.supportedWallets,
-    Object.values(swapContracts)
-      .filter((c) => c)
-      .map((c?: Contract) => c!.address),
-    Object.values(lendingContracts)
-      .filter((c) => c)
-      .map((c: Contract) => c.address)
-  )) as SmartWalletProxy;
+      aaveAMM: (!networkConfig.aaveAMM
+        ? undefined
+        : await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'AaveV2Lending',
+            existingContract?.['lendingContracts']?.['aaveAMM'],
+            undefined,
+            contractAdmin
+          )) as AaveV2Lending,
+    };
+
+    smartWalletProxy = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'SmartWalletProxy',
+      existingContract?.['smartWalletProxy'],
+      undefined,
+      contractAdmin,
+      smartWalletImplementation.address,
+      networkConfig.supportedWallets,
+      Object.values(swapContracts)
+        .filter((c) => c)
+        .map((c?: Contract) => c!.address),
+      Object.values(lendingContracts)
+        .filter((c) => c)
+        .map((c: Contract) => c.address)
+    )) as SmartWalletProxy;
+  }
+
+  let nft, nftImplementation;
+  if (networkConfig.nft?.enabled) {
+    nftImplementation = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalCollectiblesImpl',
+      existingContract?.['nftImplementation'],
+      undefined
+    )) as KrystalCollectiblesImpl;
+
+    let initData =
+      (
+        await nftImplementation.populateTransaction['initialize(string,string,string)'](
+          networkConfig.nft.name,
+          networkConfig.nft.symbol,
+          networkConfig.nft.uri
+        )
+      ).data?.toString() ?? '0x';
+    nft = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalCollectibles',
+      existingContract?.['nft'],
+      'contracts/nft/KrystalCollectibles.sol:KrystalCollectibles',
+      nftImplementation.address,
+      networkConfig.proxyAdminMultisig ?? contractAdmin,
+      initData
+    )) as KrystalCollectibles;
+  }
 
   return {
     smartWalletImplementation,
@@ -250,6 +311,8 @@ async function deployContracts(
     fetchAaveDataWrapper,
     swapContracts,
     lendingContracts,
+    nft,
+    nftImplementation,
   };
 }
 
@@ -258,6 +321,7 @@ async function deployContract(
   autoVerify: boolean,
   contractName: string,
   contractAddress: string | undefined,
+  contractLocation: string | undefined,
   ...args: any[]
 ): Promise<Contract> {
   log(1, `${step}. Deploying '${contractName}'`);
@@ -278,7 +342,10 @@ async function deployContract(
     log(2, `> address:\t${contract.address}`);
   }
 
-  if (autoVerify) {
+  // Only verify new contract to save time
+  if (autoVerify && !contractAddress) {
+    // Try to verify no matter what
+    // if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
       await sleep(5000);
@@ -286,6 +353,7 @@ async function deployContract(
       await run('verify:verify', {
         address: contract.address,
         constructorArguments: args,
+        contract: contractLocation,
       });
       log(3, '>> done verifying');
     } catch (e) {
@@ -301,17 +369,22 @@ async function updateProxy(
   extraArgs: {from?: string}
 ) {
   log(1, 'Update impl contract');
+  if (!smartWalletProxy || !smartWalletImplementation) {
+    log(2, 'Proxy not supported');
+    return;
+  }
   let currentImpl = await smartWalletProxy.implementation();
-  if (currentImpl === smartWalletImplementation.address) {
+  if (currentImpl.toLowerCase() === smartWalletImplementation.address.toLowerCase()) {
     log(2, `Impl contract is already up-to-date at ${smartWalletImplementation.address}`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await smartWalletProxy.populateTransaction.updateNewImplementation(smartWalletImplementation.address, {
         gasLimit,
         ...extraArgs,
       })
     );
     await printInfo(tx);
+    log(2, `Impl contract is updated from ${currentImpl} to  ${smartWalletImplementation.address}`);
   }
 
   log(1, 'update supported platform wallets');
@@ -328,7 +401,7 @@ async function updateProxy(
 
   log(1, 'update supported swaps');
   existing = (await smartWalletProxy.getAllSupportedSwaps()).map((r) => r.toLowerCase());
-  let swaps: string[] = Object.values(swapContracts)
+  let swaps: string[] = Object.values(swapContracts ?? {})
     .filter((c) => c)
     .map((c) => c!.address.toLowerCase());
   toBeRemoved = existing.filter((add) => !swaps.includes(add));
@@ -337,7 +410,7 @@ async function updateProxy(
 
   log(1, 'update supported lendings');
   existing = (await smartWalletProxy.getAllSupportedLendings()).map((r) => r.toLowerCase());
-  let lendings: string[] = Object.values(lendingContracts)
+  let lendings: string[] = Object.values(lendingContracts ?? {})
     .filter((c) => c)
     .map((c) => c!.address.toLowerCase());
   toBeRemoved = existing.filter((add) => !lendings.includes(add));
@@ -350,11 +423,53 @@ async function updateProxy(
   );
 }
 
+async function updateNftProxy({nft, nftImplementation}: KrystalContracts, extraArgs: {from?: string}) {
+  log(1, 'Update impl contract');
+  if (!nft || !nftImplementation) {
+    log(2, `NFT not supported`);
+    return;
+  }
+
+  // Read directly from the slots. Pls refer to TransparentUpgradeableProxy
+  let currentImpl = await ethers.provider.getStorageAt(
+    nft.address,
+    '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
+  );
+  let currentAdmin = await ethers.provider.getStorageAt(
+    nft.address,
+    '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
+  );
+
+  log(2, `currentImpl = ${currentImpl}`);
+  log(2, `currentAdmin = ${currentAdmin}`);
+
+  // bytes32 to address
+  currentImpl = '0x' + currentImpl.slice(26, 66);
+
+  if (currentImpl.toLowerCase() === nftImplementation.address.toLowerCase()) {
+    log(2, `Impl contract is already up-to-date at ${nftImplementation.address}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await nft.populateTransaction.upgradeTo(nftImplementation.address, {
+        gasLimit,
+        ...extraArgs,
+      }),
+      networkConfig.proxyAdminMultisig
+    );
+    await printInfo(tx);
+    log(2, `Impl contract is updated from ${currentImpl} to  ${nftImplementation.address}`);
+  }
+}
+
 async function updateChildContracts(
   {smartWalletProxy, swapContracts, lendingContracts}: KrystalContracts,
   extraArgs: {from?: string}
 ) {
   log(1, 'Linking swap contracts to proxy');
+  if (!smartWalletProxy) {
+    log(2, `Proxy not supported`);
+    return;
+  }
   let merged = {...swapContracts, ...lendingContracts};
   for (let contractName in merged) {
     // @ts-ignore maping to UniSwap to get function list
@@ -364,7 +479,7 @@ async function updateChildContracts(
       if ((await contract.proxyContract()).toLowerCase() == smartWalletProxy.address.toLowerCase()) {
         log(2, `> Proxy contract is already up-to-date at ${smartWalletProxy.address}`);
       } else {
-        const tx = await executeTxn(
+        const tx = await executeTxnOnBehalfOf(
           await contract.populateTransaction.updateProxyContract(smartWalletProxy.address, {
             gasLimit,
             ...extraArgs,
@@ -413,7 +528,9 @@ async function updateKyberProxy(kyberProxy: KyberProxy | undefined, extraArgs: {
   if ((await kyberProxy.kyberProxy()).toLowerCase() === networkConfig.kyberProxy.proxy.toLowerCase()) {
     log(2, `kyberProxy already up-to-date at ${networkConfig.kyberProxy.proxy}`);
   } else {
-    const tx = await executeTxn(await kyberProxy.populateTransaction.updateKyberProxy(networkConfig.kyberProxy.proxy));
+    const tx = await executeTxnOnBehalfOf(
+      await kyberProxy.populateTransaction.updateKyberProxy(networkConfig.kyberProxy.proxy)
+    );
     log(2, '> updated kyberProxy', JSON.stringify(networkConfig.kyberProxy, null, 2));
     await printInfo(tx);
   }
@@ -429,7 +546,9 @@ async function updateKyberDmm(kyberDmm: KyberDmm | undefined, extraArgs: {from?:
   if ((await kyberDmm.dmmRouter()).toLowerCase() === networkConfig.kyberDmm.router.toLowerCase()) {
     log(2, `dmmRouter already up-to-date at ${networkConfig.kyberDmm.router}`);
   } else {
-    const tx = await executeTxn(await kyberDmm.populateTransaction.updateDmmRouter(networkConfig.kyberDmm.router));
+    const tx = await executeTxnOnBehalfOf(
+      await kyberDmm.populateTransaction.updateDmmRouter(networkConfig.kyberDmm.router)
+    );
     log(2, '> updated dmmRouter', JSON.stringify(networkConfig.kyberDmm, null, 2));
     await printInfo(tx);
   }
@@ -447,7 +566,7 @@ async function updateCompoundLending(compoundLending: CompoundLending | undefine
   if (compoundData.toLowerCase() === networkConfig.compound.compTroller.toLowerCase()) {
     log(2, `comptroller already up-to-date at ${networkConfig.compound.compTroller}`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await compoundLending.populateTransaction.updateCompoundData(
         networkConfig.compound.compTroller,
         networkConfig.compound.cNative,
@@ -470,7 +589,7 @@ async function updateAaveV1Lending(aaveV1Lending: AaveV1Lending | undefined, ext
   if (networkConfig.aaveV1.poolV1.toLowerCase() === aaveData.lendingPoolV1.toLowerCase()) {
     log(2, `aave pool already up-to-date at ${networkConfig.aaveV1.poolV1}`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await aaveV1Lending.populateTransaction.updateAaveData(
         networkConfig.aaveV1.poolV1,
         networkConfig.aaveV1.poolCoreV1,
@@ -501,7 +620,7 @@ async function updateAaveV2Lending(
   ) {
     log(2, `aave pool and provider already up-to-date`);
   } else {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await aaveV2Lending.populateTransaction.updateAaveData(
         aaveV2Config.provider,
         aaveV2Config.poolV2,
@@ -535,7 +654,7 @@ async function updateAddressSet(
   }
   console.log('\n');
   if (toBeAdded.length) {
-    const tx = await executeTxn(
+    const tx = await executeTxnOnBehalfOf(
       await populateFunc(toBeAdded, true, {
         gasLimit,
         ...extraArgs,
@@ -586,19 +705,26 @@ function log(level: number, ...args: any[]) {
   console.log(`${prefix}`, ...args);
 }
 
-async function executeTxn(txn: TransactionRequest | PopulatedTransaction): Promise<TransactionResponse> {
+async function executeTxnOnBehalfOf(
+  txn: TransactionRequest | PopulatedTransaction,
+  customMultisig?: string
+): Promise<TransactionResponse> {
   let tx;
-
-  if (multisig) {
+  let m = customMultisig || multisig;
+  if (m) {
     const signer = (await ethers.getSigners())[0];
-    const safeSdk = await EthersSafe.create({ethers, safeAddress: multisig, providerOrSigner: signer});
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signer,
+    });
+    const safeSdk: Safe = await Safe.create({ethAdapter, safeAddress: m});
     const safeTransaction = await safeSdk.createTransaction({
       to: txn.to ?? zeroAddress,
       value: txn.value?.toString() ?? '0',
       data: txn.data!.toString(),
       operation: OperationType.Call,
     });
-    tx = await safeSdk.executeTransaction(safeTransaction);
+    tx = (await safeSdk.executeTransaction(safeTransaction)).transactionResponse!;
   } else {
     const signer = (await ethers.getSigners())[0];
     tx = await signer.sendTransaction(txn);

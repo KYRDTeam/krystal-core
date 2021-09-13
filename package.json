@@ -33,13 +33,14 @@
   "dependencies": {
     "@kyber.network/utils-sc": "^2.2.1",
     "@openzeppelin/contracts": "^3.4.1",
+    "@openzeppelin/contracts-upgradeable": "^3.4.1",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "@uniswap/v3-periphery": "^1.1.0",
     "dotenv": "^10.0.0",
     "solc": "0.7.6"
   },
   "devDependencies": {
-    "@gnosis.pm/safe-core-sdk": "^0.2.0",
+    "@gnosis.pm/safe-core-sdk": "^0.3.1",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",

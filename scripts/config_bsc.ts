@@ -1,4 +1,4 @@
-import {commonPlatformWallets, IConfig} from './config_utils';
+import {commonNftConfig, commonPlatformWallets, IConfig} from './config_utils';
 
 export const BscConfig: Record<string, IConfig> = {
   bsc_mainnet: {
@@ -35,6 +35,35 @@ export const BscConfig: Record<string, IConfig> = {
 
     supportedWallets: commonPlatformWallets,
     fundedAmount: 10, // swap 10 bnb each for every token
+
+    nft: {
+      ...commonNftConfig,
+      uri: 'https://api.krystal.app/bsc/nft/',
+      name: 'Krystal Collectibles',
+    },
+
+    proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
+    maintainerMultisig: '0x5dCB1EFD48AB4927EA9F801bdC0848bE72d23082',
+  },
+
+  bsc_staging: {
+    disableProxy: true,
+    autoVerifyContract: true,
+    tokens: [
+      {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
+      {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
+    ],
+    wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+
+    supportedWallets: commonPlatformWallets,
+
+    nft: {
+      ...commonNftConfig,
+      uri: 'https://dev-krystal-api.knstats.com/bsc/nft/',
+      name: 'Krystal Collectibles Staging',
+    },
+
+    proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
   },
 
   bsc_testnet: {
@@ -61,5 +90,14 @@ export const BscConfig: Record<string, IConfig> = {
       cTokens: [],
     },
     supportedWallets: commonPlatformWallets,
+
+    nft: {
+      ...commonNftConfig,
+      uri: 'https://staging-krystal-api.knstats.com/bsc/nft/',
+      name: 'Krystal Collectibles Test',
+    },
+
+    // This is the mainnet one as gnosis doesnt support bsc-testnet, but it doesnt matter on testnet anw
+    proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
   },
 };

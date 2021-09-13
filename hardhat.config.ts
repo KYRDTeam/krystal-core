@@ -116,6 +116,14 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 5 * 1e9,
   };
+
+  config.networks!.bsc_staging = {
+    url: 'https://bsc-dataseed.binance.org/',
+    chainId: 56,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 5 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
@@ -155,7 +163,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 3,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 80 * 1e9,
+    gasPrice: 15 * 1e9,
   };
 
   config.networks!.eth_mainnet = {
