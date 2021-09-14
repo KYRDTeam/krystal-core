@@ -17,6 +17,9 @@ contract KrystalClaimImpl is KrystalClaimStorage, IKrystalClaim {
 
         _setupRole(DEFAULT_ADMIN_ROLE, _admin);
         verifier = _verifier;
+        assembly {
+            sstore(chainId.slot, chainid())
+        }
     }
 
     modifier onlyAdmin() {
@@ -43,19 +46,16 @@ contract KrystalClaimImpl is KrystalClaimStorage, IKrystalClaim {
     }
 
     function claim(
-        uint256 chainId,
         address recipient,
         uint256 claimId,
         address token,
         uint256 claimAmount,
         bytes memory signature
     ) external override whenNotPaused {
-        require(chainId == getChainID(), "claim: unsupported chain");
-        claimInternal(chainId, recipient, claimId, token, claimAmount, signature);
+        claimInternal(recipient, claimId, token, claimAmount, signature);
     }
 
     function claimAll(
-        uint256 chainId,
         address recipient,
         uint256[] memory claimIds,
         address[] memory tokens,
@@ -66,22 +66,13 @@ contract KrystalClaimImpl is KrystalClaimStorage, IKrystalClaim {
         require(claims == tokens.length, "claimAll: wrong tokens");
         require(claims == claimAmounts.length, "claimAll: wrong amounts");
         require(claims == signatures.length, "claimAll: wrong signatures");
-        require(chainId == getChainID(), "claim: unsupported chain");
 
         for (uint256 i = 0; i < claims; i += 1) {
-            claimInternal(
-                chainId,
-                recipient,
-                claimIds[i],
-                tokens[i],
-                claimAmounts[i],
-                signatures[i]
-            );
+            claimInternal(recipient, claimIds[i], tokens[i], claimAmounts[i], signatures[i]);
         }
     }
 
     function claimInternal(
-        uint256 chainId,
         address recipient,
         uint256 claimId,
         address token,
@@ -129,11 +120,5 @@ contract KrystalClaimImpl is KrystalClaimStorage, IKrystalClaim {
         if (v < 27) v += 27;
 
         require(ecrecover(message, v, r, s) == verifier, "verify: failed");
-    }
-
-    function getChainID() private pure returns (uint256 id) {
-        assembly {
-            id := chainid()
-        }
     }
 }

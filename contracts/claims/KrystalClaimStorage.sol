@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 
 contract KrystalClaimStorage is AccessControlUpgradeable, PausableUpgradeable {
     address internal constant NATIVE_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    uint256 internal constant MAX_AMOUNT = type(uint256).max;
+    uint256 public chainId;
 
     // Backend signer for verifying the claim
     address public verifier;

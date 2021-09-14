@@ -15,7 +15,6 @@ interface IKrystalClaim {
     event SetClaimCap(address token, uint256 newCap);
 
     function claim(
-        uint256 chainId,
         address recipient,
         uint256 claimId,
         address token,
@@ -24,7 +23,6 @@ interface IKrystalClaim {
     ) external;
 
     function claimAll(
-        uint256 chainId,
         address recipient,
         uint256[] memory claimIds,
         address[] memory tokens,
