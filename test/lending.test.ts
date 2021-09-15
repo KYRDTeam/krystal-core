@@ -362,10 +362,10 @@ describe('lending test', async () => {
       executeLendingTest(
         'univ2/clones + compound',
         async () => {
-          return setup.krystalContracts.swapContracts.uniSwap!.address;
+          return setup.krystalContracts.swapContracts!.uniSwap!.address;
         },
         async () => {
-          return setup.krystalContracts.lendingContracts.compoundLending!.address;
+          return setup.krystalContracts.lendingContracts!.compoundLending!.address;
         },
         router,
         () => hexlify(arrayify(router)),
@@ -397,10 +397,10 @@ describe('lending test', async () => {
       executeLendingTest(
         'univ2/clones + aave v1',
         async () => {
-          return setup.krystalContracts.swapContracts.uniSwap!.address;
+          return setup.krystalContracts.swapContracts!.uniSwap!.address;
         },
         async () => {
-          return setup.krystalContracts.lendingContracts.aaveV1!.address;
+          return setup.krystalContracts.lendingContracts!.aaveV1!.address;
         },
         router,
         () => hexlify(arrayify(router)),
@@ -431,10 +431,10 @@ describe('lending test', async () => {
       executeLendingTest(
         'univ2/clones + aave v2',
         async () => {
-          return setup.krystalContracts.swapContracts.uniSwap!.address;
+          return setup.krystalContracts.swapContracts!.uniSwap!.address;
         },
         async () => {
-          return setup.krystalContracts.lendingContracts.aaveV2!.address;
+          return setup.krystalContracts.lendingContracts!.aaveV2!.address;
         },
         router,
         () => hexlify(arrayify(router)),
@@ -465,10 +465,10 @@ describe('lending test', async () => {
       executeLendingTest(
         'univ2/clones + aave AMM',
         async () => {
-          return setup.krystalContracts.swapContracts.uniSwap!.address;
+          return setup.krystalContracts.swapContracts!.uniSwap!.address;
         },
         async () => {
-          return setup.krystalContracts.lendingContracts.aaveAMM!.address;
+          return setup.krystalContracts.lendingContracts!.aaveAMM!.address;
         },
         router,
         () => hexlify(arrayify(router)),

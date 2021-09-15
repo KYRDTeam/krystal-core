@@ -252,7 +252,7 @@ describe('swap test', async () => {
       executeSwapTest(
         'univ2/clones',
         async () => {
-          return setup.krystalContracts.swapContracts.uniSwap!.address;
+          return setup.krystalContracts.swapContracts!.uniSwap!.address;
         },
         router,
         async () => hexlify(arrayify(router)),
@@ -278,7 +278,7 @@ describe('swap test', async () => {
       executeSwapTest(
         'uniV3',
         async () => {
-          return setup.krystalContracts.swapContracts.uniSwapV3!.address;
+          return setup.krystalContracts.swapContracts!.uniSwapV3!.address;
         },
         router,
         async (tradePath: string[]) => {
@@ -309,7 +309,7 @@ describe('swap test', async () => {
     executeSwapTest(
       'kyberProxy',
       async () => {
-        return setup.krystalContracts.swapContracts.kyberProxy!.address;
+        return setup.krystalContracts.swapContracts!.kyberProxy!.address;
       },
       networkSetting.kyberProxy.proxy,
       async () => '0x', // empty hint
@@ -346,7 +346,7 @@ describe('swap test', async () => {
     executeSwapTest(
       'kyberDmm',
       async () => {
-        return setup.krystalContracts.swapContracts.kyberDmm!.address;
+        return setup.krystalContracts.swapContracts!.kyberDmm!.address;
       },
       networkSetting.kyberDmm.router,
       async (tradePath: string[]) => {

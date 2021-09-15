@@ -62,6 +62,11 @@ export interface IConfig {
     uri: string;
   };
 
+  krystalClaim?: {
+    enabled?: boolean;
+    verifier?: string;
+  };
+
   // For proxy admin
   proxyAdminMultisig?: string;
   // For managing the config and admin jobs

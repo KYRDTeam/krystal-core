@@ -15,10 +15,12 @@ import {
   FetchAaveDataWrapper,
   KrystalCollectibles,
   KrystalCollectiblesImpl,
+  KrystalClaim,
+  KrystalClaimImpl,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
-import {sleep, zeroAddress} from '../test/helper';
+import {getOpenzeppelinDefaultAdmin, getOpenzeppelinDefaultImplementation, sleep, zeroAddress} from '../test/helper';
 import {PopulatedTransaction} from 'ethers';
 import {TransactionRequest} from '@ethersproject/abstract-provider';
 import {multisig} from '../hardhat.config';
@@ -53,6 +55,9 @@ export interface KrystalContracts {
 
   nft?: KrystalCollectibles;
   nftImplementation?: KrystalCollectiblesImpl;
+
+  krystalClaim?: KrystalClaim;
+  krystalClaimImplementation?: KrystalClaimImpl;
 }
 
 export const deploy = async (
@@ -274,6 +279,7 @@ async function deployContracts(
     )) as SmartWalletProxy;
   }
 
+  // --- Nft contracts
   let nft, nftImplementation;
   if (networkConfig.nft?.enabled) {
     nftImplementation = (await deployContract(
@@ -304,6 +310,37 @@ async function deployContracts(
     )) as KrystalCollectibles;
   }
 
+  // --- Claim contracts
+  let krystalClaim, krystalClaimImplementation;
+  if (networkConfig.krystalClaim?.enabled) {
+    krystalClaimImplementation = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalClaimImpl',
+      existingContract?.['krystalClaimImplementation'],
+      undefined
+    )) as KrystalClaimImpl;
+
+    let initData =
+      (
+        await krystalClaimImplementation.populateTransaction.initialize(
+          networkConfig.adminMultisig ?? contractAdmin,
+          networkConfig.krystalClaim?.verifier ?? contractAdmin
+        )
+      ).data?.toString() ?? '0x';
+
+    krystalClaim = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalClaim',
+      existingContract?.['krystalClaim'],
+      'contracts/claims/KrystalClaim.sol:KrystalClaim',
+      krystalClaimImplementation.address,
+      networkConfig.proxyAdminMultisig ?? contractAdmin,
+      initData
+    )) as KrystalCollectibles;
+  }
+
   return {
     smartWalletImplementation,
     smartWalletProxy,
@@ -313,6 +350,8 @@ async function deployContracts(
     lendingContracts,
     nft,
     nftImplementation,
+    krystalClaim,
+    krystalClaimImplementation,
   };
 }
 
@@ -431,14 +470,8 @@ async function updateNftProxy({nft, nftImplementation}: KrystalContracts, extraA
   }
 
   // Read directly from the slots. Pls refer to TransparentUpgradeableProxy
-  let currentImpl = await ethers.provider.getStorageAt(
-    nft.address,
-    '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
-  );
-  let currentAdmin = await ethers.provider.getStorageAt(
-    nft.address,
-    '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
-  );
+  let currentImpl = await getOpenzeppelinDefaultImplementation(ethers.provider, nft.address);
+  let currentAdmin = await getOpenzeppelinDefaultAdmin(ethers.provider, nft.address);
 
   log(2, `currentImpl = ${currentImpl}`);
   log(2, `currentAdmin = ${currentAdmin}`);

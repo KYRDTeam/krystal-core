@@ -1,4 +1,5 @@
 import {BigNumber} from '@ethersproject/bignumber';
+import {ethers} from 'ethers';
 import * as hre from 'hardhat';
 
 export const MAX_AMOUNT = BigNumber.from(10e10);
@@ -34,4 +35,15 @@ export const sleep = (timeout: number) => {
       resolve('ok');
     }, timeout);
   });
+};
+
+export const getOpenzeppelinDefaultImplementation = async (
+  provider: ethers.providers.JsonRpcProvider,
+  address: string
+) => {
+  return await provider.getStorageAt(address, '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc');
+};
+
+export const getOpenzeppelinDefaultAdmin = async (provider: ethers.providers.JsonRpcProvider, address: string) => {
+  return await provider.getStorageAt(address, '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc');
 };
