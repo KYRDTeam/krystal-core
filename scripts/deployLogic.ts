@@ -311,10 +311,29 @@ async function deployContracts(
   }
 
   // --- Claim contracts
+
+  return {
+    smartWalletImplementation,
+    smartWalletProxy,
+    fetchTokenBalances,
+    fetchAaveDataWrapper,
+    swapContracts,
+    lendingContracts,
+    nft,
+    nftImplementation,
+    ...(await deployClaimContract(++step, existingContract, contractAdmin)),
+  };
+}
+
+export const deployClaimContract = async (
+  step: number,
+  existingContract: Record<string, any> | undefined,
+  contractAdmin: string
+): Promise<KrystalContracts> => {
   let krystalClaim, krystalClaimImplementation;
   if (networkConfig.krystalClaim?.enabled) {
     krystalClaimImplementation = (await deployContract(
-      ++step,
+      `${step} >>`,
       networkConfig.autoVerifyContract,
       'KrystalClaimImpl',
       existingContract?.['krystalClaimImplementation'],
@@ -330,7 +349,7 @@ async function deployContracts(
       ).data?.toString() ?? '0x';
 
     krystalClaim = (await deployContract(
-      ++step,
+      `${step} >>`,
       networkConfig.autoVerifyContract,
       'KrystalClaim',
       existingContract?.['krystalClaim'],
@@ -340,23 +359,14 @@ async function deployContracts(
       initData
     )) as KrystalCollectibles;
   }
-
   return {
-    smartWalletImplementation,
-    smartWalletProxy,
-    fetchTokenBalances,
-    fetchAaveDataWrapper,
-    swapContracts,
-    lendingContracts,
-    nft,
-    nftImplementation,
     krystalClaim,
     krystalClaimImplementation,
   };
-}
+};
 
 async function deployContract(
-  step: number,
+  step: number | string,
   autoVerify: boolean,
   contractName: string,
   contractAddress: string | undefined,
@@ -475,9 +485,6 @@ async function updateNftProxy({nft, nftImplementation}: KrystalContracts, extraA
 
   log(2, `currentImpl = ${currentImpl}`);
   log(2, `currentAdmin = ${currentAdmin}`);
-
-  // bytes32 to address
-  currentImpl = '0x' + currentImpl.slice(26, 66);
 
   if (currentImpl.toLowerCase() === nftImplementation.address.toLowerCase()) {
     log(2, `Impl contract is already up-to-date at ${nftImplementation.address}`);

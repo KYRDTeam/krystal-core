@@ -22,6 +22,8 @@ contract KrystalClaimImpl is KrystalClaimStorage, IKrystalClaim {
         }
     }
 
+    receive() external payable {}
+
     modifier onlyAdmin() {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "unauthorized: admin required");
         _;

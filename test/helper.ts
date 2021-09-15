@@ -41,9 +41,17 @@ export const getOpenzeppelinDefaultImplementation = async (
   provider: ethers.providers.JsonRpcProvider,
   address: string
 ) => {
-  return await provider.getStorageAt(address, '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc');
+  let data = await provider.getStorageAt(
+    address,
+    '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
+  );
+  return '0x' + data.slice(26, 66);
 };
 
 export const getOpenzeppelinDefaultAdmin = async (provider: ethers.providers.JsonRpcProvider, address: string) => {
-  return await provider.getStorageAt(address, '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc');
+  let data = await provider.getStorageAt(
+    address,
+    '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
+  );
+  return '0x' + data.slice(26, 66);
 };

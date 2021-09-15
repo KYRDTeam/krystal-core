@@ -1,80 +1,128 @@
-import {
-  nativeTokenAddress,
-  nativeTokenDecimals,
-  BPS,
-  evm_revert,
-  FeeMode,
-  EPS,
-  evm_snapshot,
-  getOpenzeppelinDefaultAdmin,
-} from './helper';
-import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
+import {nativeTokenAddress, evm_revert, evm_snapshot, getOpenzeppelinDefaultAdmin} from './helper';
+import {networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
-import {IDMMFactory, IDMMRouter, IERC20Ext, IUniswapV2Router02, KrystalClaimImpl} from '../typechain';
+import {KrystalClaimImpl} from '../typechain';
 import {ethers} from 'hardhat';
-import {arrayify, hexConcat, hexlify, zeroPad} from 'ethers/lib/utils';
+import {deployClaimContract, KrystalContracts} from '../scripts/deployLogic';
 
 describe('claim test', async () => {
-  let setup: IInitialSetup;
+  let contracts: KrystalContracts;
 
   let proxyAdmin: string;
   let contractAdmin: string;
   let proxyInstance: KrystalClaimImpl;
+  let postSetupSnapshotId: any;
 
   before(async () => {
-    setup = await getInitialSetup();
+    console.log('\n\n\n=== Setting initial claim contracts ===');
+    contracts = await deployClaimContract(0, {}, (await ethers.getSigners())[0].address);
 
     proxyInstance = (await ethers.getContractAt(
-      'SmartWalletImplementation',
-      setup.krystalContracts!.krystalClaim!.address
+      'KrystalClaimImpl',
+      contracts!.krystalClaim!.address
     )) as KrystalClaimImpl;
 
     proxyAdmin = networkSetting.proxyAdminMultisig ?? (await ethers.getSigners())[0].address;
     contractAdmin = networkSetting.adminMultisig ?? (await ethers.getSigners())[0].address;
+
+    postSetupSnapshotId = await evm_snapshot();
   });
 
   beforeEach(async () => {
-    await evm_revert(setup.postSetupSnapshotId);
-    setup.postSetupSnapshotId = await evm_snapshot();
+    await evm_revert(postSetupSnapshotId);
+    postSetupSnapshotId = await evm_snapshot();
   });
 
   it('setup config correctly', async () => {
-    assert(!!setup.krystalContracts.krystalClaim, 'claim: not set');
+    assert(!!contracts.krystalClaim, 'claim not set');
+
+    let onchainAdmin = await getOpenzeppelinDefaultAdmin(ethers.provider, contracts.krystalClaim!.address);
     assert(
-      (await getOpenzeppelinDefaultAdmin(ethers.provider, setup.krystalContracts.krystalClaim!.address)) ===
-        proxyAdmin,
-      'claim: wrong proxy admin'
+      onchainAdmin.toLowerCase() === proxyAdmin.toLowerCase(),
+      `claim: wrong proxy admin ${JSON.stringify({onchainAdmin, proxyAdmin})}`
     );
-    assert((await proxyInstance.paused()) === false, 'claim: wrong paused');
+    assert((await proxyInstance.paused()) === false, 'wrong paused');
 
     let verifier = ethers.Wallet.createRandom();
     await proxyInstance.setVerifier(verifier.address);
-    expect('setVerifier').to.be.calledOnContractWith(proxyInstance, [verifier.address]);
     expect((await proxyInstance.verifier()) === verifier.address, 'verifier not set');
+  });
+
+  it('permission works correctly', async () => {
+    let stranger = (await ethers.getSigners())[19];
+
+    await expect(proxyInstance.connect(stranger).pause()).to.be.revertedWith('unauthorized: admin required');
+    await expect(proxyInstance.connect(stranger).setVerifier(stranger.address)).to.be.revertedWith(
+      'unauthorized: admin required'
+    );
+    await expect(
+      proxyInstance.connect(stranger).setClaimCap(networkSetting.tokens[0].address, BigNumber.from(10))
+    ).to.be.revertedWith('unauthorized: admin required');
   });
 
   it('claim works correctly', async () => {
     let verifier = ethers.Wallet.createRandom();
     await proxyInstance.setVerifier(verifier.address);
-    expect('setVerifier').to.be.calledOnContractWith(proxyInstance, [verifier.address]);
 
     let chainId = (await ethers.provider.getNetwork()).chainId;
     let recipient = ethers.Wallet.createRandom();
     let token = networkSetting.tokens[0];
-    let claimAmount = BigNumber.from(10000);
+    let claimAmount = BigNumber.from(10).pow(18);
     let claimId = BigNumber.from(1);
 
-    // Wrong chain
+    // Claim unsupported token
     let msg = ethers.utils.solidityPack(
       ['uint256', 'address', 'uint256', 'address', 'uint256'],
       [0, recipient.address, claimId, token.address, claimAmount]
     );
     let sig = await verifier.signMessage(msg);
     await expect(proxyInstance.claim(recipient.address, claimId, token.address, claimAmount, sig)).to.be.revertedWith(
-      'Insufficient funds'
+      'claim: amount too big'
+    );
+
+    // Wrong chain ID
+    await proxyInstance.setClaimCap(networkSetting.tokens[0].address, claimAmount);
+    msg = ethers.utils.solidityPack(
+      ['uint256', 'address', 'uint256', 'address', 'uint256'],
+      [0, recipient.address, claimId, token.address, claimAmount]
+    );
+    sig = await verifier.signMessage(ethers.utils.arrayify(msg));
+    await expect(proxyInstance.claim(recipient.address, claimId, token.address, claimAmount, sig)).to.be.revertedWith(
+      `verify: failed`
+    );
+
+    // No balance
+    await proxyInstance.setClaimCap(networkSetting.tokens[0].address, claimAmount);
+    msg = ethers.utils.solidityKeccak256(
+      ['uint256', 'address', 'uint256', 'address', 'uint256'],
+      [chainId, recipient.address, claimId, token.address, claimAmount]
+    );
+    sig = await verifier.signMessage(ethers.utils.arrayify(msg));
+    await expect(proxyInstance.claim(recipient.address, claimId, token.address, claimAmount, sig)).to.be.revertedWith(
+      `transfer amount exceeds balance`
+    );
+
+    // Claim Native
+    let signer = (await ethers.getSigners())[0];
+    await signer.sendTransaction({
+      to: proxyInstance.address,
+      value: claimAmount,
+    });
+    await proxyInstance.setClaimCap(nativeTokenAddress, claimAmount);
+    msg = ethers.utils.solidityKeccak256(
+      ['uint256', 'address', 'uint256', 'address', 'uint256'],
+      [chainId, recipient.address, claimId, nativeTokenAddress, claimAmount]
+    );
+    sig = await verifier.signMessage(ethers.utils.arrayify(msg));
+    await expect(
+      await proxyInstance.claim(recipient.address, claimId, nativeTokenAddress, claimAmount, sig)
+    ).to.changeEtherBalances([proxyInstance], [BigNumber.from(0).sub(claimAmount)]);
+
+    // Already claimed
+    assert(await proxyInstance.claimed(claimId), 'wrong claim status');
+    await expect(proxyInstance.claim(recipient.address, claimId, token.address, claimAmount, sig)).to.be.revertedWith(
+      `claim: claimed`
     );
   });
-
-  it('lending test should be initialized', async () => {});
 });

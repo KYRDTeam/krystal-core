@@ -42,6 +42,10 @@ export const BscConfig: Record<string, IConfig> = {
       name: 'Krystal Collectibles',
     },
 
+    krystalClaim: {
+      enabled: true,
+    },
+
     proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
     maintainerMultisig: '0x5dCB1EFD48AB4927EA9F801bdC0848bE72d23082',
   },
