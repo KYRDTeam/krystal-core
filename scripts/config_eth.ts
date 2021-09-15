@@ -35,6 +35,10 @@ export const EthConfig: Record<string, IConfig> = {
       router: '0x1c87257f5e8609940bc751a07bb085bb7f8cdbe6',
     },
 
+    oneInch: {
+      router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
+    },
+
     // Compound
     compound: {
       compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',

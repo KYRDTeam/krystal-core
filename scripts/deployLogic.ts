@@ -15,6 +15,7 @@ import {
   FetchAaveDataWrapper,
   KrystalCollectibles,
   KrystalCollectiblesImpl,
+  OneInch,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -43,6 +44,7 @@ export interface KrystalContracts {
     uniSwapV3?: UniSwapV3;
     kyberProxy?: KyberProxy;
     kyberDmm?: KyberDmm;
+    oneInch?: OneInch;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -91,6 +93,10 @@ export const deploy = async (
   log(0, 'Updating kyberDmm config');
   log(0, '======================\n');
   await updateKyberDmm(deployedContracts.swapContracts?.kyberDmm, extraArgs);
+
+  log(0, 'Updating oneInch config');
+  log(0, '======================\n');
+  await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
 
   log(0, 'Updating compound/clones config');
   log(0, '======================\n');
@@ -209,6 +215,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.kyberDmm.router
           )) as KyberDmm),
+      oneInch: !networkConfig.oneInch
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'OneInch',
+            existingContract?.['swapContracts']?.['oneInch'],
+            undefined,
+            contractAdmin,
+            networkConfig.oneInch.router
+          )) as OneInch),
     };
 
     lendingContracts = {
@@ -568,6 +585,24 @@ async function updateKyberDmm(kyberDmm: KyberDmm | undefined, extraArgs: {from?:
       await kyberDmm.populateTransaction.updateDmmRouter(networkConfig.kyberDmm.router)
     );
     log(2, '> updated dmmRouter', JSON.stringify(networkConfig.kyberDmm, null, 2));
+    await printInfo(tx);
+  }
+}
+
+async function updateOneInch(oneInch: OneInch | undefined, extraArgs: {from?: string}) {
+  if (!oneInch || !networkConfig.oneInch) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await oneInch.router()).toLowerCase() === networkConfig.oneInch.router.toLowerCase()) {
+    log(2, `oneInch already up-to-date at ${networkConfig.oneInch.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await oneInch.populateTransaction.updateAggregationRouter(networkConfig.oneInch.router)
+    );
+    log(2, '> updated oneInch', JSON.stringify(networkConfig.oneInch, null, 2));
     await printInfo(tx);
   }
 }
