@@ -19,13 +19,21 @@ contract UniSwap is BaseSwap {
     using BytesLib for bytes;
 
     EnumerableSet.AddressSet private uniRouters;
+    address public wEth;
+    mapping(address => bytes4) public customSwapFromEth;
+    mapping(address => bytes4) public customSwapToEth;
 
     event UpdatedUniRouters(IUniswapV2Router02[] routers, bool isSupported);
 
-    constructor(address _admin, IUniswapV2Router02[] memory routers) BaseSwap(_admin) {
+    constructor(
+        address _admin,
+        IUniswapV2Router02[] memory routers,
+        address _weth
+    ) BaseSwap(_admin) {
         for (uint256 i = 0; i < routers.length; i++) {
             uniRouters.add(address(routers[i]));
         }
+        wEth = _weth;
     }
 
     function getAllUniRouters() external view returns (address[] memory addresses) {
@@ -34,6 +42,15 @@ contract UniSwap is BaseSwap {
         for (uint256 i = 0; i < length; i++) {
             addresses[i] = uniRouters.at(i);
         }
+    }
+
+    function updateCustomSwapSelector(
+        address _router,
+        bytes4 _swapFromEth,
+        bytes4 _swapToEth
+    ) external onlyAdmin {
+        customSwapFromEth[_router] = _swapFromEth;
+        customSwapToEth[_router] = _swapToEth;
     }
 
     function updateUniRouters(IUniswapV2Router02[] calldata routers, bool isSupported)
@@ -58,8 +75,11 @@ contract UniSwap is BaseSwap {
         onlyProxyContract
         returns (uint256 destAmount)
     {
-        IUniswapV2Router02 router = parseExtraArgs(params.extraArgs);
-        uint256[] memory amounts = router.getAmountsOut(params.srcAmount, params.tradePath);
+        address router = parseExtraArgs(params.extraArgs);
+        uint256[] memory amounts = IUniswapV2Router02(router).getAmountsOut(
+            params.srcAmount,
+            params.tradePath
+        );
         destAmount = amounts[params.tradePath.length - 1];
     }
 
@@ -70,8 +90,11 @@ contract UniSwap is BaseSwap {
         onlyProxyContract
         returns (uint256 srcAmount)
     {
-        IUniswapV2Router02 router = parseExtraArgs(params.extraArgs);
-        uint256[] memory amounts = router.getAmountsIn(params.destAmount, params.tradePath);
+        address router = parseExtraArgs(params.extraArgs);
+        uint256[] memory amounts = IUniswapV2Router02(router).getAmountsIn(
+            params.destAmount,
+            params.tradePath
+        );
         srcAmount = amounts[0];
     }
 
@@ -88,9 +111,9 @@ contract UniSwap is BaseSwap {
     {
         require(params.tradePath.length >= 2, "invalid tradePath");
 
-        IUniswapV2Router02 router = parseExtraArgs(params.extraArgs);
+        address router = parseExtraArgs(params.extraArgs);
 
-        safeApproveAllowance(address(router), IERC20Ext(params.tradePath[0]));
+        safeApproveAllowance(router, IERC20Ext(params.tradePath[0]));
 
         uint256 tradeLen = params.tradePath.length;
         IERC20Ext actualSrc = IERC20Ext(params.tradePath[0]);
@@ -99,35 +122,59 @@ contract UniSwap is BaseSwap {
         // convert eth/bnb -> weth/wbnb address to trade on Uni
         address[] memory convertedTradePath = params.tradePath;
         if (convertedTradePath[0] == address(ETH_TOKEN_ADDRESS)) {
-            convertedTradePath[0] = router.WETH();
+            convertedTradePath[0] = wEth;
         }
         if (convertedTradePath[tradeLen - 1] == address(ETH_TOKEN_ADDRESS)) {
-            convertedTradePath[tradeLen - 1] = router.WETH();
+            convertedTradePath[tradeLen - 1] = wEth;
         }
 
         uint256 destBalanceBefore = getBalance(actualDest, params.recipient);
 
         if (actualSrc == ETH_TOKEN_ADDRESS) {
             // swap eth/bnb -> token
-            router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: params.srcAmount}(
-                params.minDestAmount,
-                convertedTradePath,
-                params.recipient,
-                MAX_AMOUNT
-            );
+            if (customSwapFromEth[address(router)] != "") {
+                (bool success, ) = router.call{value: params.srcAmount}(
+                    abi.encodeWithSelector(
+                        customSwapFromEth[address(router)],
+                        params.minDestAmount,
+                        convertedTradePath,
+                        params.recipient,
+                        MAX_AMOUNT
+                    )
+                );
+                require(success, "swapFromEth: failed");
+            } else {
+                IUniswapV2Router02(router).swapExactETHForTokensSupportingFeeOnTransferTokens{
+                    value: params.srcAmount
+                }(params.minDestAmount, convertedTradePath, params.recipient, MAX_AMOUNT);
+            }
         } else {
             if (actualDest == ETH_TOKEN_ADDRESS) {
                 // swap token -> eth/bnb
-                router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-                    params.srcAmount,
-                    params.minDestAmount,
-                    convertedTradePath,
-                    params.recipient,
-                    MAX_AMOUNT
-                );
+                if (customSwapToEth[address(router)] != "") {
+                    (bool success, ) = router.call(
+                        abi.encodeWithSelector(
+                            customSwapToEth[address(router)],
+                            params.srcAmount,
+                            params.minDestAmount,
+                            convertedTradePath,
+                            params.recipient,
+                            MAX_AMOUNT
+                        )
+                    );
+                    require(success, "swapToEth: failed");
+                } else {
+                    IUniswapV2Router02(router).swapExactTokensForETHSupportingFeeOnTransferTokens(
+                        params.srcAmount,
+                        params.minDestAmount,
+                        convertedTradePath,
+                        params.recipient,
+                        MAX_AMOUNT
+                    );
+                }
             } else {
                 // swap token -> token
-                router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+                IUniswapV2Router02(router).swapExactTokensForTokensSupportingFeeOnTransferTokens(
                     params.srcAmount,
                     params.minDestAmount,
                     convertedTradePath,
@@ -141,14 +188,10 @@ contract UniSwap is BaseSwap {
     }
 
     /// @param extraArgs expecting <[20B] address router>
-    function parseExtraArgs(bytes calldata extraArgs)
-        internal
-        view
-        returns (IUniswapV2Router02 router)
-    {
+    function parseExtraArgs(bytes calldata extraArgs) internal view returns (address router) {
         require(extraArgs.length == 20, "invalid args");
-        router = IUniswapV2Router02(extraArgs.toAddress(0));
-        require(router != IUniswapV2Router02(0), "invalid address");
-        require(uniRouters.contains(address(router)), "unsupported router");
+        router = extraArgs.toAddress(0);
+        require(router != address(0), "invalid address");
+        require(uniRouters.contains(router), "unsupported router");
     }
 }

@@ -21,7 +21,7 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
 
   let proxyInstance = (await ethers.getContractAt(
     'SmartWalletImplementation',
-    krystalContracts.smartWalletProxy.address
+    krystalContracts.smartWalletProxy!.address
   )) as SmartWalletImplementation;
 
   // Fund wallet
