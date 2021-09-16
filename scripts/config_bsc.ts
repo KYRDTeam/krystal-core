@@ -5,7 +5,7 @@ export const BscConfig: Record<string, IConfig> = {
     autoVerifyContract: true,
     tokens: [
       {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
-      // {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
+      {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
     ],
     wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
