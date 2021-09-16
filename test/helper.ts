@@ -35,3 +35,7 @@ export const sleep = (timeout: number) => {
     }, timeout);
   });
 };
+
+export const equalHex = (a: string, b: string) => {
+  return a.toLowerCase() === b.toLowerCase();
+};

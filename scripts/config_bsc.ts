@@ -5,18 +5,28 @@ export const BscConfig: Record<string, IConfig> = {
     autoVerifyContract: true,
     tokens: [
       {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56'},
-      {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
+      // {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3'},
     ],
     wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
     // Pancake swap
     uniswap: {
       routers: [
-        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // panceke v2
+        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // pancake v2
         '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
         '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // sushiswap
         '0xcF0feBd3f17CEf5b47b0cD257aCf6025c5BFf3b7', // apeswap
+        '0x7DAe51BD3E3376B8c7c4900E9107f12Be3AF1bA8', // mdex
+        '0x325E343f1dE602396E256B67eFd1F61C3A6B38Bd', // babyswap
+        '0xCDe540d7eAFE93aC5fE6233Bee57E1270D3E330F', // bakeryswap
       ],
+      customSelectors: {
+        // bakeryswap
+        '0xCDe540d7eAFE93aC5fE6233Bee57E1270D3E330F': {
+          swapFromEth: 'swapExactBNBForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)',
+          swapToEth: 'swapExactTokensForBNBSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)',
+        },
+      },
     },
 
     kyberDmm: {

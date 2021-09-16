@@ -20,6 +20,13 @@ export interface IConfig {
   // Uniswap or clones
   uniswap?: {
     routers: string[];
+    customSelectors?: Record<
+      string,
+      {
+        swapFromEth: string;
+        swapToEth: string;
+      }
+    >;
   };
 
   uniswapV3?: {
