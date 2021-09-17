@@ -12,6 +12,7 @@ export interface IConfig {
   tokens: Array<{
     symbol: string;
     address: string;
+    usdRate: number;
   }>;
 
   // wrapped native token (wEth/wBnb ..)
@@ -60,7 +61,7 @@ export interface IConfig {
   aaveAMM?: IAaveV2Config;
 
   supportedWallets: string[];
-  fundedAmount?: number;
+  nativeUsdRate: number;
 
   nft?: {
     enabled?: boolean;
