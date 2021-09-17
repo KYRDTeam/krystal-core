@@ -1,11 +1,10 @@
 import {ethers, network} from 'hardhat';
-import {nativeTokenDecimals, evm_snapshot, MAX_AMOUNT} from './helper';
-import {IERC20Ext, IUniswapV2Router02, SmartWalletImplementation} from '../typechain';
+import {evm_snapshot} from './helper';
+import {IUniswapV2Router02, SmartWalletImplementation} from '../typechain';
 import {deploy, KrystalContracts} from '../scripts/deployLogic';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import {NetworkConfig} from '../scripts/config';
 import {IConfig} from '../scripts/config_utils';
-import {BigNumber} from '@ethersproject/bignumber';
 
 const setupContracts = async (accounts: SignerWithAddress[]) => {
   let user = accounts[0];
@@ -23,35 +22,6 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
     'SmartWalletImplementation',
     krystalContracts.smartWalletProxy!.address
   )) as SmartWalletImplementation;
-
-  // Fund wallet
-  console.log('\nStart funding...');
-  for (let {symbol, address} of networkConfig.tokens) {
-    const tokenContract = (await ethers.getContractAt('IERC20Ext', address)) as IERC20Ext;
-    const nativeTokenAmount = BigNumber.from(networkConfig.fundedAmount ?? 5).mul(
-      BigNumber.from(10).pow(nativeTokenDecimals)
-    );
-    const beforeAmount = await tokenContract.balanceOf(user.address);
-    await uniRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
-      0,
-      [networkConfig.wNative, address],
-      user.address,
-      MAX_AMOUNT,
-      {
-        from: user.address,
-        value: nativeTokenAmount,
-      }
-    );
-
-    const afterAmount = await tokenContract.balanceOf(user.address);
-    console.log('Funded', {
-      token: symbol,
-      token_address: address,
-      address: user.address,
-      new_balance: afterAmount.toString(),
-      funded: afterAmount.sub(beforeAmount).toString(),
-    });
-  }
 
   return {
     user,

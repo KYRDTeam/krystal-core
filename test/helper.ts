@@ -38,7 +38,7 @@ export const sleep = (timeout: number) => {
 
 export const equalHex = (a: string, b: string) => {
   return a.toLowerCase() === b.toLowerCase();
-}
+};
 
 export const getChain = async () => {
   const chainId = (await hre.network.provider.request({
@@ -46,4 +46,13 @@ export const getChain = async () => {
     params: [],
   })) as string;
   return chainId.substring(2);
+};
+
+export const fromWei = (balance: BigNumber, decimal: number): string => {
+  const divisor = BigNumber.from(10).pow(decimal);
+
+  const beforeDecimal = balance.div(divisor);
+  const afterDecimal = balance.mod(divisor);
+
+  return beforeDecimal.toString() + '.' + afterDecimal.toString();
 };

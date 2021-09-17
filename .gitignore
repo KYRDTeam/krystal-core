@@ -50,9 +50,6 @@ typechain
 report
 
 .env
-.env.polygon.*
-.env.eth.*
-.env.bsc.*
 
 !.env.sample
 !.env.eth.mainnet.sample

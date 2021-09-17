@@ -5,9 +5,9 @@ export const EthConfig: Record<string, IConfig> = {
     autoVerifyContract: true,
 
     tokens: [
-      {symbol: 'dai', address: '0x6b175474e89094c44da98b954eedeac495271d0f'},
-      {symbol: 'usdc', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'},
-      {symbol: 'usdt', address: '0xdac17f958d2ee523a2206206994597c13d831ec7'},
+      {symbol: 'dai', address: '0x6b175474e89094c44da98b954eedeac495271d0f', usdRate: 1},
+      {symbol: 'usdc', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', usdRate: 1},
+      {symbol: 'usdt', address: '0xdac17f958d2ee523a2206206994597c13d831ec7', usdRate: 1},
       // {symbol: 'knc', address: '0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202'},
     ],
 
@@ -155,13 +155,13 @@ export const EthConfig: Record<string, IConfig> = {
     // },
 
     supportedWallets: commonPlatformWallets,
-    fundedAmount: 5, // swap 5 eth each for every token
+    nativeUsdRate: 3000,
   },
 
   eth_ropsten: {
     autoVerifyContract: true,
 
-    tokens: [{symbol: 'dai', address: '0xad6d458402f60fd3bd25163575031acdce07538d'}],
+    tokens: [{symbol: 'dai', address: '0xad6d458402f60fd3bd25163575031acdce07538d', usdRate: 1}],
 
     wNative: '0xc778417e063141139fce010982780140aa0cd5ab',
 
@@ -302,7 +302,7 @@ export const EthConfig: Record<string, IConfig> = {
     // },
 
     supportedWallets: commonPlatformWallets,
-    fundedAmount: 5, // swap 5 eth each for every token
+    nativeUsdRate: 5, // swap 5 eth each for every token
 
     nft: {
       ...commonNftConfig,
@@ -316,7 +316,7 @@ export const EthConfig: Record<string, IConfig> = {
   eth_rinkeby: {
     autoVerifyContract: true,
 
-    tokens: [{symbol: 'dai', address: '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658'}],
+    tokens: [{symbol: 'dai', address: '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658', usdRate: 1}],
 
     wNative: '0xc778417e063141139fce010982780140aa0cd5ab',
 
@@ -328,7 +328,7 @@ export const EthConfig: Record<string, IConfig> = {
     },
 
     supportedWallets: commonPlatformWallets,
-    fundedAmount: 5, // swap 5 eth each for every token
+    nativeUsdRate: 3000,
 
     nft: {
       ...commonNftConfig,
