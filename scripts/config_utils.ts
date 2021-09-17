@@ -42,6 +42,10 @@ export interface IConfig {
     router: string;
   };
 
+  oneInch?: {
+    router: string;
+  };
+
   // Compound or clones
   compound?: {
     compTroller: string;
