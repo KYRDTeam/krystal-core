@@ -94,6 +94,12 @@ contract OneInch is BaseSwap {
             params.minDestAmount,
             data
         );
+
+        if (params.tradePath[1] == address(ETH_TOKEN_ADDRESS)) {
+            (bool success, ) = params.recipient.call{value: destAmount}("");
+        } else {
+            IERC20Ext(params.tradePath[1]).safeTransfer(params.recipient, destAmount);
+        }
     }
 
     /// @dev called when 1inch API returns method AggregationRouter.swap
@@ -101,19 +107,12 @@ contract OneInch is BaseSwap {
     /// Since we don't know what included in that calldata, backend must take into account fee
     /// when calling 1inch API
     function doSwap(SwapParams calldata params) private returns (uint256 destAmount) {
-        address srcToken;
         uint256 callValue;
         if (params.tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
-            srcToken = address(0);
             callValue = params.srcAmount;
         } else {
-            srcToken = params.tradePath[0];
             callValue = 0;
         }
-
-        address destToken = (params.tradePath[1] == address(ETH_TOKEN_ADDRESS))
-            ? address(0)
-            : params.tradePath[1];
 
         address aggregationExecutor;
         IAggregationRouter.SwapDescription memory desc;
@@ -127,8 +126,8 @@ contract OneInch is BaseSwap {
         (destAmount, ) = router.swap{value: callValue}(
             aggregationExecutor,
             IAggregationRouter.SwapDescription({
-                srcToken: srcToken,
-                dstToken: destToken,
+                srcToken: params.tradePath[0],
+                dstToken: params.tradePath[1],
                 srcReceiver: desc.srcReceiver,
                 dstReceiver: params.recipient,
                 amount: params.srcAmount,
