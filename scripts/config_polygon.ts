@@ -10,7 +10,7 @@ export const PolygonConfig: Record<string, IConfig> = {
       // {symbol: 'aave', address: '0xd6df932a45c0f255f85145f286ea0b292b21c90b'},
       // {symbol: 'weth', address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'},
       // {symbol: 'dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'},
-      {symbol: 'usdc', address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'},
+      {symbol: 'usdc', address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', usdRate: 1},
     ],
 
     wNative: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
@@ -54,7 +54,7 @@ export const PolygonConfig: Record<string, IConfig> = {
     },
 
     supportedWallets: commonPlatformWallets,
-    fundedAmount: 10000, // swap some matic each for every token
+    nativeUsdRate: 1.5,
   },
 
   polygon_mumbai: {
@@ -65,8 +65,8 @@ export const PolygonConfig: Record<string, IConfig> = {
       // {symbol: 'uni', address: '0xb33eaad8d922b1083446dc23f610c2567fb5180f'},'
       // {symbol: 'aave', address: '0xd6df932a45c0f255f85145f286ea0b292b21c90b'},
       // {symbol: 'weth', address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'},
-      {symbol: 'dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'},
-      {symbol: 'usdc', address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'},
+      {symbol: 'dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', usdRate: 1},
+      {symbol: 'usdc', address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', usdRate: 1},
     ],
 
     wNative: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
@@ -104,6 +104,6 @@ export const PolygonConfig: Record<string, IConfig> = {
     // },
 
     supportedWallets: commonPlatformWallets,
-    fundedAmount: 10000, // swap some matic each for every token
+    nativeUsdRate: 1.5,
   },
 };
