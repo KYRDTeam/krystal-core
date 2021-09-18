@@ -179,7 +179,7 @@ async function deployContracts(
             existingContract?.['swapContracts']?.['uniSwap'],
             undefined,
             contractAdmin,
-            networkConfig.uniswap.routers,
+            Object.values(networkConfig.uniswap.routers).map((c) => c.address),
             networkConfig.wNative
           )) as UniSwap),
       uniSwapV3: !networkConfig.uniswapV3
@@ -517,7 +517,7 @@ async function updateUniSwap(uniSwap: UniSwap | undefined, extraArgs: {from?: st
   }
   log(1, 'update supported routers');
   let existing = (await uniSwap.getAllUniRouters()).map((r) => r.toLowerCase());
-  let configRouters = networkConfig.uniswap!.routers.map((r) => r.toLowerCase());
+  let configRouters = Object.values(networkConfig.uniswap!.routers).map((r) => r.address.toLowerCase());
   let toBeRemoved = existing.filter((add) => !configRouters.includes(add));
   let toBeAdded = configRouters.filter((add) => !existing.includes(add));
   await updateAddressSet(uniSwap.populateTransaction.updateUniRouters, toBeRemoved, toBeAdded, extraArgs);

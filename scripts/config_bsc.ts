@@ -3,25 +3,39 @@ import {commonNftConfig, commonPlatformWallets, IConfig} from './config_utils';
 export const BscConfig: Record<string, IConfig> = {
   bsc_mainnet: {
     autoVerifyContract: true,
-    tokens: [
-      {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56', usdRate: 1},
+    tokens: {
+      busc: {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56', usdRate: 1},
       // {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3', usdRate: 1},
       // {symbol: 'usdc', address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', usdRate: 1},
-      {symbol: 'eth', address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8', usdRate: 3500},
-    ],
+      eth: {symbol: 'eth', address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8', usdRate: 3500},
+    },
     wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
     // Pancake swap
     uniswap: {
-      routers: [
-        '0x10ed43c718714eb63d5aa57b78b54704e256024e', // pancake v2
-        '0x05ff2b0db69458a0750badebc4f9e13add608c7f', // pancake v1
-        '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // sushiswap
-        '0xcF0feBd3f17CEf5b47b0cD257aCf6025c5BFf3b7', // apeswap
-        '0x7DAe51BD3E3376B8c7c4900E9107f12Be3AF1bA8', // mdex
-        '0x325E343f1dE602396E256B67eFd1F61C3A6B38Bd', // babyswap
-        '0xCDe540d7eAFE93aC5fE6233Bee57E1270D3E330F', // bakeryswap
-      ],
+      routers: {
+        pancakeV2: {
+          address: '0x10ed43c718714eb63d5aa57b78b54704e256024e',
+        },
+        pancakeV1: {
+          address: '0x05ff2b0db69458a0750badebc4f9e13add608c7f',
+        },
+        sushiswap: {
+          address: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
+        },
+        apeswap: {
+          address: '0xcF0feBd3f17CEf5b47b0cD257aCf6025c5BFf3b7',
+        },
+        mdex: {
+          address: '0x7DAe51BD3E3376B8c7c4900E9107f12Be3AF1bA8',
+        },
+        babyswap: {
+          address: '0x325E343f1dE602396E256B67eFd1F61C3A6B38Bd',
+        },
+        bakeryswap: {
+          address: '0xCDe540d7eAFE93aC5fE6233Bee57E1270D3E330F',
+        },
+      },
       customSelectors: {
         // bakeryswap
         '0xCDe540d7eAFE93aC5fE6233Bee57E1270D3E330F': {
@@ -61,10 +75,10 @@ export const BscConfig: Record<string, IConfig> = {
   bsc_staging: {
     disableProxy: true,
     autoVerifyContract: true,
-    tokens: [
-      {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56', usdRate: 1},
-      {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3', usdRate: 1},
-    ],
+    tokens: {
+      busd: {symbol: 'busd', address: '0xe9e7cea3dedca5984780bafc599bd69add087d56', usdRate: 1},
+      dai: {symbol: 'dai', address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3', usdRate: 1},
+    },
     wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
     supportedWallets: commonPlatformWallets,
@@ -82,13 +96,15 @@ export const BscConfig: Record<string, IConfig> = {
   bsc_testnet: {
     autoVerifyContract: true,
 
-    tokens: [{symbol: 'busd', address: '0x8301f2213c0eed49a7e28ae4c3e91722919b8b47', usdRate: 1}],
+    tokens: {
+      busd: {symbol: 'busd', address: '0x8301f2213c0eed49a7e28ae4c3e91722919b8b47', usdRate: 1},
+    },
 
     wNative: '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f',
 
     // Pancake swap
     uniswap: {
-      routers: ['0xD99D1c33F9fC3444f8101754aBC46c52416550D1'],
+      routers: {},
     },
 
     kyberDmm: {

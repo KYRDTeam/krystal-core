@@ -14,7 +14,7 @@ describe('config test', async () => {
   });
 
   it('tokens should exist', async () => {
-    for (let {address} of setup.network.tokens) {
+    for (let {address} of Object.values(setup.network.tokens)) {
       await ethers.getContractAt('IERC20Ext', address);
     }
   });
