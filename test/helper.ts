@@ -40,12 +40,11 @@ export const equalHex = (a: string, b: string) => {
   return a.toLowerCase() === b.toLowerCase();
 };
 
-export const getChain = async () => {
-  const chainId = (await hre.network.provider.request({
+export const getChain = async (): Promise<string> => {
+  return (await hre.network.provider.request({
     method: 'eth_chainId',
     params: [],
   })) as string;
-  return chainId.substring(2);
 };
 
 export const fromWei = (balance: BigNumber, decimal: number): string => {

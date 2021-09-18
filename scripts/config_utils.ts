@@ -27,7 +27,7 @@ export interface IConfig {
       string,
       {
         address: string;
-        testingTokens?: Record<string, string[]>;
+        testingTokens?: string[];
       }
     >;
     customSelectors?: Record<

@@ -11,6 +11,7 @@ export const PolygonConfig: Record<string, IConfig> = {
       weth: {symbol: 'weth', address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', usdRate: 3000},
       dai: {symbol: 'dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', usdRate: 1},
       usdc: {symbol: 'usdc', address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', usdRate: 1},
+      knc: {symbol: 'knc', address: '0x1c954e8fe737f99f68fa1ccda3e51ebdb291948c', usdRate: 1},
     },
 
     wNative: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
@@ -20,19 +21,27 @@ export const PolygonConfig: Record<string, IConfig> = {
       routers: {
         quickswap: {
           address: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff',
+          testingTokens: ['quick', 'uni', 'aave', 'weth', 'dai', 'usdc'],
         },
         sushiswap: {
           address: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
+          testingTokens: ['dai', 'weth'],
         },
         apeswap: {
           address: '0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607',
+          testingTokens: ['dai', 'weth', 'usdc'],
         },
       },
     },
 
     kyberDmm: {
       router: '0x546C79662E028B661dFB4767664d0273184E4dD1',
-      testingTokens: ['dai', 'usdc'],
+      testingTokens: ['knc'],
+    },
+
+    oneInch: {
+      router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
+      testingTokens: ['weth'],
     },
 
     // Compound

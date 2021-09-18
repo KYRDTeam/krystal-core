@@ -12,7 +12,7 @@ import {getInitialSetup, IInitialSetup, networkSetting} from './setup';
 import {BigNumber} from 'ethers';
 import {assert, expect} from 'chai';
 import {IDMMFactory, IDMMRouter, IERC20Ext, IUniswapV2Router02} from '../typechain';
-import {ethers, network} from 'hardhat';
+import {ethers} from 'hardhat';
 import {arrayify, hexConcat, hexlify} from 'ethers/lib/utils';
 import axios from 'axios';
 
@@ -204,7 +204,7 @@ describe('swap test', async () => {
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
           let extraArgs = await generateArgsFunc(tradePath, nativeAmount10.mul(10), FeeMode.FROM_SOURCE);
-          setup.proxyInstance.swap(
+          await setup.proxyInstance.swap(
             {
               swapContract,
               srcAmount: nativeAmount10.mul(10),
@@ -310,18 +310,17 @@ describe('swap test', async () => {
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
-  /*
   if (networkSetting.uniswap) {
-    for (let router of networkSetting.uniswap.routers) {
-      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+    for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.uniswap.routers)) {
+      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', address)) as IUniswapV2Router02;
 
       executeSwapTest({
         name: 'univ2/clones',
         getSwapContract: async () => {
           return setup.krystalContracts.swapContracts!.uniSwap!.address;
         },
-        router,
-        generateArgsFunc: async () => hexlify(arrayify(router)),
+        router: routerName,
+        generateArgsFunc: async () => hexlify(arrayify(address)),
         platformFee,
         getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
@@ -329,7 +328,7 @@ describe('swap test', async () => {
         },
         maxDiffAllowed: 0,
         getExpectedInSupported: true,
-        testingTokens: networkSetting.uniswap.testingTokens ?? Object.keys(networkSetting.tokens),
+        testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
       });
     }
   }
@@ -339,7 +338,7 @@ describe('swap test', async () => {
       // Using v2 router as a price estimate for testing
       const routerContract = (await ethers.getContractAt(
         'IUniswapV2Router02',
-        networkSetting.uniswap!.routers[0]
+        Object.values(networkSetting.uniswap!.routers)[0].address
       )) as IUniswapV2Router02;
 
       executeSwapTest({
@@ -371,7 +370,7 @@ describe('swap test', async () => {
     // Using v2 router as a price estimate for testing
     const routerContract = (await ethers.getContractAt(
       'IUniswapV2Router02',
-      networkSetting.uniswap!.routers[0]
+      Object.values(networkSetting.uniswap!.routers)[0].address
     )) as IUniswapV2Router02;
 
     executeSwapTest({
@@ -436,7 +435,6 @@ describe('swap test', async () => {
       testingTokens: networkSetting.kyberDmm.testingTokens ?? Object.keys(networkSetting.tokens),
     });
   }
-  */
 
   if (networkSetting.oneInch) {
     executeSwapTest({
@@ -446,7 +444,8 @@ describe('swap test', async () => {
       },
       router: networkSetting.oneInch!.router,
       generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
-        const chainId = await getChain();
+        const chainIdHex = await getChain();
+        const chainId = BigNumber.from(chainIdHex).toString();
         let amount = srcAmount;
         if (feeMode === FeeMode.FROM_SOURCE) {
           amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
@@ -456,6 +455,8 @@ describe('swap test', async () => {
         }&amount=${amount?.toString()}&fromAddress=${
           setup.user.address
         }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
+
+        console.log('1inch call', url);
         const resp = (await axios.get(url)) as any;
         return resp.data.tx.data as string;
       },
