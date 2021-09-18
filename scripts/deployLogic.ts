@@ -160,14 +160,16 @@ async function deployContracts(
       contractAdmin
     )) as FetchTokenBalances;
 
-    fetchAaveDataWrapper = (await deployContract(
-      ++step,
-      networkConfig.autoVerifyContract,
-      'FetchAaveDataWrapper',
-      existingContract?.['fetchAaveDataWrapper'],
-      undefined,
-      contractAdmin
-    )) as FetchAaveDataWrapper;
+    if (!networkConfig.diabledFetchAaveDataWrapper) {
+      fetchAaveDataWrapper = (await deployContract(
+        ++step,
+        networkConfig.autoVerifyContract,
+        'FetchAaveDataWrapper',
+        existingContract?.['fetchAaveDataWrapper'],
+        undefined,
+        contractAdmin
+      )) as FetchAaveDataWrapper;
+    }
 
     swapContracts = {
       uniSwap: !networkConfig.uniswap

@@ -98,6 +98,8 @@ export interface IConfig {
 
   // For staging contracts, which doesn't need a full settings
   disableProxy?: boolean;
+
+  diabledFetchAaveDataWrapper?: boolean;
 }
 
 export const commonPlatformWallets = [

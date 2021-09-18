@@ -201,13 +201,14 @@ describe('swap test', async () => {
           let tokenUnit = BigNumber.from(10).pow(tokenDec);
 
           // Get some fund first .i.e 100$ worth of tokens
+          let fundAmount = nativeAmount10.mul(10);
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
-          let extraArgs = await generateArgsFunc(tradePath, nativeAmount10.mul(10), FeeMode.FROM_SOURCE);
+          let extraArgs = await generateArgsFunc(tradePath, fundAmount, FeeMode.FROM_SOURCE);
           await setup.proxyInstance.swap(
             {
               swapContract,
-              srcAmount: nativeAmount10.mul(10),
+              srcAmount: fundAmount,
               minDestAmount: BigNumber.from(1),
               tradePath,
               feeMode: FeeMode.FROM_SOURCE,
@@ -216,7 +217,7 @@ describe('swap test', async () => {
               extraArgs: extraArgs,
             },
             {
-              value: nativeAmount10.mul(10),
+              value: fundAmount,
             }
           );
           let afterFunded = await token.balanceOf(setup.user.address);

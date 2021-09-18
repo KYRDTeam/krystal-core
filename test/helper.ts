@@ -53,5 +53,10 @@ export const fromWei = (balance: BigNumber, decimal: number): string => {
   const beforeDecimal = balance.div(divisor);
   const afterDecimal = balance.mod(divisor);
 
-  return beforeDecimal.toString() + '.' + afterDecimal.toString();
+  let res = beforeDecimal.toString() + '.';
+  for (let i = 0; i < decimal - afterDecimal.toString().length; i++) {
+    res += '0';
+  }
+  res += afterDecimal.toString();
+  return res;
 };
