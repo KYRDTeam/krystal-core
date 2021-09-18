@@ -203,16 +203,17 @@ describe('swap test', async () => {
           // Get some fund first .i.e 100$ worth of tokens
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
+          let extraArgs = await generateArgsFunc(tradePath, nativeAmount10.mul(10), FeeMode.FROM_SOURCE);
           setup.proxyInstance.swap(
             {
               swapContract,
               srcAmount: nativeAmount10.mul(10),
-              minDestAmount: BigNumber.from(0),
+              minDestAmount: BigNumber.from(1),
               tradePath,
               feeMode: FeeMode.FROM_SOURCE,
               feeBps: platformFee,
               platformWallet: setup.network.supportedWallets[0],
-              extraArgs: await generateArgsFunc(tradePath, nativeAmount10.mul(10), FeeMode.FROM_SOURCE),
+              extraArgs: extraArgs,
             },
             {
               value: nativeAmount10.mul(10),
@@ -275,6 +276,7 @@ describe('swap test', async () => {
                 }
               );
             }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(tokenAmount));
+            console.log(`swapped from ${token.address} -> ${targetToken}`);
 
             // Extra value not needed
             await expect(
@@ -308,6 +310,7 @@ describe('swap test', async () => {
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
+  /*
   if (networkSetting.uniswap) {
     for (let router of networkSetting.uniswap.routers) {
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
@@ -433,6 +436,7 @@ describe('swap test', async () => {
       testingTokens: networkSetting.kyberDmm.testingTokens ?? Object.keys(networkSetting.tokens),
     });
   }
+  */
 
   if (networkSetting.oneInch) {
     executeSwapTest({
@@ -445,12 +449,13 @@ describe('swap test', async () => {
         const chainId = await getChain();
         let amount = srcAmount;
         if (feeMode === FeeMode.FROM_SOURCE) {
-          amount = srcAmount?.mul(BPS.sub(8)).div(BPS);
-          console.log('amount', amount?.toString());
+          amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
         }
         const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
           tradePath[1]
-        }&amount=${amount?.toString()}&fromAddress=${setup.user.address}&slippage=1&disableEstimate=true&fee=0`;
+        }&amount=${amount?.toString()}&fromAddress=${
+          setup.user.address
+        }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
         const resp = (await axios.get(url)) as any;
         return resp.data.tx.data as string;
       },
