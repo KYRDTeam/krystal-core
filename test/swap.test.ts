@@ -294,7 +294,6 @@ describe('swap test', async () => {
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
-  /*
   if (networkSetting.uniswap) {
     for (let router of networkSetting.uniswap.routers) {
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
@@ -416,7 +415,6 @@ describe('swap test', async () => {
       true
     );
   }
-  */
 
   if (networkSetting.oneInch) {
     executeSwapTest(
