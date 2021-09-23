@@ -17,6 +17,7 @@ import {
   KrystalCollectiblesImpl,
   OneInch,
   KrystalClaimImpl,
+  KrystalClaim,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';

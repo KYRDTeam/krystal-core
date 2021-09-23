@@ -57,7 +57,7 @@ describe('claim test', async () => {
       'unauthorized: admin required'
     );
     await expect(
-      proxyInstance.connect(stranger).setClaimCap(networkSetting.tokens[0].address, BigNumber.from(10))
+      proxyInstance.connect(stranger).setClaimCap(Object.values(networkSetting.tokens)[0].address, BigNumber.from(10))
     ).to.be.revertedWith('unauthorized: admin required');
   });
 
@@ -67,7 +67,7 @@ describe('claim test', async () => {
 
     let chainId = (await ethers.provider.getNetwork()).chainId;
     let recipient = ethers.Wallet.createRandom();
-    let token = networkSetting.tokens[0];
+    let token = Object.values(networkSetting.tokens)[0];
     let claimAmount = BigNumber.from(10).pow(18);
     let claimId = BigNumber.from(1);
 
@@ -82,7 +82,7 @@ describe('claim test', async () => {
     );
 
     // Wrong chain ID
-    await proxyInstance.setClaimCap(networkSetting.tokens[0].address, claimAmount);
+    await proxyInstance.setClaimCap(token.address, claimAmount);
     msg = ethers.utils.solidityPack(
       ['uint256', 'address', 'uint256', 'address', 'uint256'],
       [0, recipient.address, claimId, token.address, claimAmount]
@@ -93,7 +93,7 @@ describe('claim test', async () => {
     );
 
     // No balance
-    await proxyInstance.setClaimCap(networkSetting.tokens[0].address, claimAmount);
+    await proxyInstance.setClaimCap(token.address, claimAmount);
     msg = ethers.utils.solidityKeccak256(
       ['uint256', 'address', 'uint256', 'address', 'uint256'],
       [chainId, recipient.address, claimId, token.address, claimAmount]
