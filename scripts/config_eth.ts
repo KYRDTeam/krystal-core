@@ -4,21 +4,25 @@ export const EthConfig: Record<string, IConfig> = {
   eth_mainnet: {
     autoVerifyContract: true,
 
-    tokens: [
-      {symbol: 'dai', address: '0x6b175474e89094c44da98b954eedeac495271d0f', usdRate: 1},
-      {symbol: 'usdc', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', usdRate: 1},
-      {symbol: 'usdt', address: '0xdac17f958d2ee523a2206206994597c13d831ec7', usdRate: 1},
-      // {symbol: 'knc', address: '0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202'},
-    ],
+    tokens: {
+      dai: {symbol: 'dai', address: '0x6b175474e89094c44da98b954eedeac495271d0f', usdRate: 1},
+      usdc: {symbol: 'usdc', address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', usdRate: 1},
+      usdt: {symbol: 'usdt', address: '0xdac17f958d2ee523a2206206994597c13d831ec7', usdRate: 1},
+      knc: {symbol: 'knc', address: '0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202', usdRate: 2},
+    },
 
     wNative: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 
     // Uniswap & clones
     uniswap: {
-      routers: [
-        '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // univ2 router2
-        '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f', // sushiswap
-      ],
+      routers: {
+        univ2: {
+          address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+        },
+        sushiswap: {
+          address: '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f',
+        },
+      },
     },
 
     uniswapV3: {
@@ -161,16 +165,22 @@ export const EthConfig: Record<string, IConfig> = {
   eth_ropsten: {
     autoVerifyContract: true,
 
-    tokens: [{symbol: 'dai', address: '0xad6d458402f60fd3bd25163575031acdce07538d', usdRate: 1}],
+    tokens: {
+      dai: {symbol: 'dai', address: '0xad6d458402f60fd3bd25163575031acdce07538d', usdRate: 1},
+    },
 
     wNative: '0xc778417e063141139fce010982780140aa0cd5ab',
 
     // Uniswap & clones
     uniswap: {
-      routers: [
-        '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // univ2 router2
-        '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // sushiswap
-      ],
+      routers: {
+        univ2: {
+          address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+        },
+        sushiswap: {
+          address: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
+        },
+      },
     },
 
     uniswapV3: {
@@ -316,15 +326,19 @@ export const EthConfig: Record<string, IConfig> = {
   eth_rinkeby: {
     autoVerifyContract: true,
 
-    tokens: [{symbol: 'dai', address: '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658', usdRate: 1}],
+    tokens: {
+      dai: {symbol: 'dai', address: '0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658', usdRate: 1},
+    },
 
     wNative: '0xc778417e063141139fce010982780140aa0cd5ab',
 
     // Uniswap & clones
     uniswap: {
-      routers: [
-        '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // univ2 router2
-      ],
+      routers: {
+        univ2: {
+          address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+        },
+      },
     },
 
     supportedWallets: commonPlatformWallets,

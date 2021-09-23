@@ -11,12 +11,6 @@ const setupContracts = async (accounts: SignerWithAddress[]) => {
   let admin = accounts[0];
 
   const krystalContracts = await deploy(undefined, {from: admin.address});
-  const networkConfig = NetworkConfig[network.name];
-
-  let uniRouter = (await ethers.getContractAt(
-    'IUniswapV2Router02',
-    networkConfig.uniswap!.routers[0]
-  )) as IUniswapV2Router02;
 
   let proxyInstance = (await ethers.getContractAt(
     'SmartWalletImplementation',

@@ -26,16 +26,27 @@ describe('swap test', async () => {
     .div(networkSetting.nativeUsdRate)
     .mul(10);
 
-  function executeSwapTest(
-    name: string,
-    getSwapContract: () => Promise<string>,
-    router: string,
-    generateArgsFunc: (tradePath: string[], srcAmount: BigNumber, feeMode: FeeMode) => Promise<string>,
-    platformFee: number,
-    getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>,
-    maxDiffAllowed: number = 0,
-    getExpectedInSupported: boolean = false
-  ) {
+  function executeSwapTest({
+    name,
+    getSwapContract,
+    router,
+    generateArgsFunc,
+    platformFee,
+    getActualRate,
+    maxDiffAllowed = 0,
+    getExpectedInSupported = false,
+    testingTokens = [],
+  }: {
+    name: string;
+    getSwapContract: () => Promise<string>;
+    router: string;
+    generateArgsFunc: (tradePath: string[], srcAmount: BigNumber, feeMode: FeeMode) => Promise<string>;
+    platformFee: number;
+    getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>;
+    maxDiffAllowed: number;
+    getExpectedInSupported: boolean;
+    testingTokens: string[];
+  }) {
     const testGetExpectedRate = async (
       swapContract: string,
       srcAmount: BigNumber,
@@ -113,7 +124,9 @@ describe('swap test', async () => {
       return data.destAmount;
     };
 
-    for (let {address, symbol, usdRate} of networkSetting.tokens) {
+    for (let t of testingTokens) {
+      let {address, symbol, usdRate} = networkSetting.tokens[t];
+
       describe(`testing swap funtionalities on ${name} with ${symbol} token and router ${router}`, async () => {
         beforeEach(async () => {
           await evm_revert(setup.postSetupSnapshotId);
@@ -188,13 +201,14 @@ describe('swap test', async () => {
           let tokenUnit = BigNumber.from(10).pow(tokenDec);
 
           // Get some fund first .i.e 100$ worth of tokens
+          let fundAmount = nativeAmount10.mul(10);
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
-          let extraArgs = await generateArgsFunc(tradePath, nativeAmount10.mul(10), FeeMode.FROM_SOURCE);
-          setup.proxyInstance.swap(
+          let extraArgs = await generateArgsFunc(tradePath, fundAmount, FeeMode.FROM_SOURCE);
+          await setup.proxyInstance.swap(
             {
               swapContract,
-              srcAmount: nativeAmount10.mul(10),
+              srcAmount: fundAmount,
               minDestAmount: BigNumber.from(1),
               tradePath,
               feeMode: FeeMode.FROM_SOURCE,
@@ -203,7 +217,7 @@ describe('swap test', async () => {
               extraArgs: extraArgs,
             },
             {
-              value: nativeAmount10.mul(10),
+              value: fundAmount,
             }
           );
           let afterFunded = await token.balanceOf(setup.user.address);
@@ -213,7 +227,10 @@ describe('swap test', async () => {
           let tokenAmount = tokenUnit.div(usdRate).mul(5);
 
           // Only swap to usdt & native token, as they most-likely have the pools
-          for (let targetToken of [...setup.network.tokens.map((t) => t.address), nativeTokenAddress]) {
+          for (let targetToken of [
+            ...testingTokens.map((t) => networkSetting.tokens[t].address),
+            nativeTokenAddress,
+          ]) {
             if (address === targetToken) {
               continue;
             }
@@ -294,26 +311,26 @@ describe('swap test', async () => {
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
-  /*
   if (networkSetting.uniswap) {
-    for (let router of networkSetting.uniswap.routers) {
-      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', router)) as IUniswapV2Router02;
+    for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.uniswap.routers)) {
+      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', address)) as IUniswapV2Router02;
 
-      executeSwapTest(
-        'univ2/clones',
-        async () => {
+      executeSwapTest({
+        name: 'univ2/clones',
+        getSwapContract: async () => {
           return setup.krystalContracts.swapContracts!.uniSwap!.address;
         },
-        router,
-        async () => hexlify(arrayify(router)),
+        router: routerName,
+        generateArgsFunc: async () => hexlify(arrayify(address)),
         platformFee,
-        async (sourceAmount: BigNumber, tradePath: string[]) => {
+        getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
         },
-        0,
-        true
-      );
+        maxDiffAllowed: 0,
+        getExpectedInSupported: true,
+        testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
+      });
     }
   }
 
@@ -322,16 +339,16 @@ describe('swap test', async () => {
       // Using v2 router as a price estimate for testing
       const routerContract = (await ethers.getContractAt(
         'IUniswapV2Router02',
-        networkSetting.uniswap!.routers[0]
+        Object.values(networkSetting.uniswap!.routers)[0].address
       )) as IUniswapV2Router02;
 
-      executeSwapTest(
-        'uniV3',
-        async () => {
+      executeSwapTest({
+        name: 'uniV3',
+        getSwapContract: async () => {
           return setup.krystalContracts.swapContracts!.uniSwapV3!.address;
         },
         router,
-        async (tradePath: string[]) => {
+        generateArgsFunc: async (tradePath: string[]) => {
           let extraArgs = hexlify(arrayify(router));
           for (let i = 0; i < tradePath.length - 1; i++) {
             extraArgs = extraArgs + '0001F4'; // fee = 3000 bps
@@ -339,13 +356,14 @@ describe('swap test', async () => {
           return extraArgs;
         },
         platformFee,
-        async (sourceAmount: BigNumber, tradePath: string[]) => {
+        getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
         },
-        1,
-        true
-      );
+        maxDiffAllowed: 1,
+        getExpectedInSupported: true,
+        testingTokens: networkSetting.uniswapV3.testingTokens ?? Object.keys(networkSetting.tokens),
+      });
     }
   }
 
@@ -353,24 +371,25 @@ describe('swap test', async () => {
     // Using v2 router as a price estimate for testing
     const routerContract = (await ethers.getContractAt(
       'IUniswapV2Router02',
-      networkSetting.uniswap!.routers[0]
+      Object.values(networkSetting.uniswap!.routers)[0].address
     )) as IUniswapV2Router02;
 
-    executeSwapTest(
-      'kyberProxy',
-      async () => {
+    executeSwapTest({
+      name: 'kyberProxy',
+      getSwapContract: async () => {
         return setup.krystalContracts.swapContracts!.kyberProxy!.address;
       },
-      networkSetting.kyberProxy.proxy,
-      async () => '0x', // empty hint
+      router: networkSetting.kyberProxy.proxy,
+      generateArgsFunc: async () => '0x', // empty hint
       platformFee,
-      async (sourceAmount: BigNumber, tradePath: string[]) => {
+      getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
         return amounts[amounts.length - 1];
       },
-      1,
-      true
-    );
+      maxDiffAllowed: 1,
+      getExpectedInSupported: true,
+      testingTokens: networkSetting.kyberProxy.testingTokens ?? Object.keys(networkSetting.tokens),
+    });
   }
 
   if (networkSetting.kyberDmm) {
@@ -393,40 +412,41 @@ describe('swap test', async () => {
       return pools;
     };
 
-    executeSwapTest(
-      'kyberDmm',
-      async () => {
+    executeSwapTest({
+      name: 'kyberDmm',
+      getSwapContract: async () => {
         return setup.krystalContracts.swapContracts!.kyberDmm!.address;
       },
-      networkSetting.kyberDmm.router,
-      async (tradePath: string[]) => {
+      router: networkSetting.kyberDmm.router,
+      generateArgsFunc: async (tradePath: string[]) => {
         // Generate pools extraArgs for kyberDmm
         const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
         let pools = await generatePools(dmmRouter, tradePath);
         return hexConcat(pools);
       },
       platformFee,
-      async (sourceAmount: BigNumber, tradePath: string[]) => {
+      getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
         const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
         let pools = await generatePools(dmmRouter, tradePath);
         const amounts = await dmmRouter.getAmountsOut(sourceAmount, pools, tradePath);
         return amounts[amounts.length - 1];
       },
-      0,
-      true
-    );
+      maxDiffAllowed: 0,
+      getExpectedInSupported: true,
+      testingTokens: networkSetting.kyberDmm.testingTokens ?? Object.keys(networkSetting.tokens),
+    });
   }
-  */
 
   if (networkSetting.oneInch) {
-    executeSwapTest(
-      '1inch',
-      async () => {
+    executeSwapTest({
+      name: '1inch',
+      getSwapContract: async () => {
         return setup.krystalContracts.swapContracts!.oneInch!.address;
       },
-      networkSetting.oneInch!.router,
-      async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
-        const chainId = await getChain();
+      router: networkSetting.oneInch!.router,
+      generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
+        const chainIdHex = await getChain();
+        const chainId = BigNumber.from(chainIdHex).toString();
         let amount = srcAmount;
         if (feeMode === FeeMode.FROM_SOURCE) {
           amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
@@ -436,15 +456,18 @@ describe('swap test', async () => {
         }&amount=${amount?.toString()}&fromAddress=${
           setup.user.address
         }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
+
+        console.log('1inch call', url);
         const resp = (await axios.get(url)) as any;
         return resp.data.tx.data as string;
       },
       platformFee,
-      async (sourceAmount: BigNumber, tradePath: string[]) => {
+      getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
         return BigNumber.from(0);
       },
-      0,
-      false
-    );
+      maxDiffAllowed: 0,
+      getExpectedInSupported: false,
+      testingTokens: networkSetting.oneInch.testingTokens ?? Object.keys(networkSetting.tokens),
+    });
   }
 });
