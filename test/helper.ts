@@ -55,3 +55,28 @@ export const getOpenzeppelinDefaultAdmin = async (provider: ethers.providers.Jso
   );
   return '0x' + data.slice(26, 66);
 };
+
+export const equalHex = (a: string, b: string) => {
+  return a.toLowerCase() === b.toLowerCase();
+};
+
+export const getChain = async (): Promise<string> => {
+  return (await hre.network.provider.request({
+    method: 'eth_chainId',
+    params: [],
+  })) as string;
+};
+
+export const fromWei = (balance: BigNumber, decimal: number): string => {
+  const divisor = BigNumber.from(10).pow(decimal);
+
+  const beforeDecimal = balance.div(divisor);
+  const afterDecimal = balance.mod(divisor);
+
+  let res = beforeDecimal.toString() + '.';
+  for (let i = 0; i < decimal - afterDecimal.toString().length; i++) {
+    res += '0';
+  }
+  res += afterDecimal.toString();
+  return res;
+};

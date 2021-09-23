@@ -9,29 +9,54 @@ export interface IConfig {
   autoVerifyContract: boolean;
 
   // mostly used for testing purpose
-  tokens: Array<{
-    symbol: string;
-    address: string;
-  }>;
+  tokens: Record<
+    string,
+    {
+      symbol: string;
+      address: string;
+      usdRate: number; // Should always be interger
+    }
+  >;
 
   // wrapped native token (wEth/wBnb ..)
   wNative: string;
 
   // Uniswap or clones
   uniswap?: {
-    routers: string[];
+    routers: Record<
+      string,
+      {
+        address: string;
+        testingTokens?: string[];
+      }
+    >;
+    customSelectors?: Record<
+      string,
+      {
+        swapFromEth: string;
+        swapToEth: string;
+      }
+    >;
   };
 
   uniswapV3?: {
     routers: string[];
+    testingTokens?: string[];
   };
 
   kyberProxy?: {
     proxy: string;
+    testingTokens?: string[];
   };
 
   kyberDmm?: {
     router: string;
+    testingTokens?: string[];
+  };
+
+  oneInch?: {
+    router: string;
+    testingTokens?: string[];
   };
 
   // Compound or clones
@@ -53,7 +78,9 @@ export interface IConfig {
   aaveAMM?: IAaveV2Config;
 
   supportedWallets: string[];
-  fundedAmount?: number;
+
+  // Should always be interger
+  nativeUsdRate: number;
 
   nft?: {
     enabled?: boolean;
@@ -76,6 +103,8 @@ export interface IConfig {
 
   // For staging contracts, which doesn't need a full settings
   disableProxy?: boolean;
+
+  diabledFetchAaveDataWrapper?: boolean;
 }
 
 export const commonPlatformWallets = [

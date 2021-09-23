@@ -124,6 +124,21 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 5 * 1e9,
   };
+
+  config.networks!.avalanche_fuji = {
+    url: 'https://api.avax-test.network/ext/bc/C/rpc',
+    chainId: 43113,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+  };
+
+  config.networks!.avalanche_mainnet = {
+    url: 'https://api.avax.network/ext/bc/C/rpc',
+    chainId: 43114,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 75 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {

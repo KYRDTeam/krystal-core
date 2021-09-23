@@ -15,12 +15,18 @@ import {
   FetchAaveDataWrapper,
   KrystalCollectibles,
   KrystalCollectiblesImpl,
-  KrystalClaim,
+  OneInch,
   KrystalClaimImpl,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
-import {getOpenzeppelinDefaultAdmin, getOpenzeppelinDefaultImplementation, sleep, zeroAddress} from '../test/helper';
+import {
+  equalHex,
+  getOpenzeppelinDefaultAdmin,
+  getOpenzeppelinDefaultImplementation,
+  sleep,
+  zeroAddress,
+} from '../test/helper';
 import {PopulatedTransaction} from 'ethers';
 import {TransactionRequest} from '@ethersproject/abstract-provider';
 import {multisig} from '../hardhat.config';
@@ -45,6 +51,7 @@ export interface KrystalContracts {
     uniSwapV3?: UniSwapV3;
     kyberProxy?: KyberProxy;
     kyberDmm?: KyberDmm;
+    oneInch?: OneInch;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -96,6 +103,10 @@ export const deploy = async (
   log(0, 'Updating kyberDmm config');
   log(0, '======================\n');
   await updateKyberDmm(deployedContracts.swapContracts?.kyberDmm, extraArgs);
+
+  log(0, 'Updating oneInch config');
+  log(0, '======================\n');
+  await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
 
   log(0, 'Updating compound/clones config');
   log(0, '======================\n');
@@ -159,14 +170,16 @@ async function deployContracts(
       contractAdmin
     )) as FetchTokenBalances;
 
-    fetchAaveDataWrapper = (await deployContract(
-      ++step,
-      networkConfig.autoVerifyContract,
-      'FetchAaveDataWrapper',
-      existingContract?.['fetchAaveDataWrapper'],
-      undefined,
-      contractAdmin
-    )) as FetchAaveDataWrapper;
+    if (!networkConfig.diabledFetchAaveDataWrapper) {
+      fetchAaveDataWrapper = (await deployContract(
+        ++step,
+        networkConfig.autoVerifyContract,
+        'FetchAaveDataWrapper',
+        existingContract?.['fetchAaveDataWrapper'],
+        undefined,
+        contractAdmin
+      )) as FetchAaveDataWrapper;
+    }
 
     swapContracts = {
       uniSwap: !networkConfig.uniswap
@@ -178,7 +191,8 @@ async function deployContracts(
             existingContract?.['swapContracts']?.['uniSwap'],
             undefined,
             contractAdmin,
-            networkConfig.uniswap.routers
+            Object.values(networkConfig.uniswap.routers).map((c) => c.address),
+            networkConfig.wNative
           )) as UniSwap),
       uniSwapV3: !networkConfig.uniswapV3
         ? undefined
@@ -213,6 +227,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.kyberDmm.router
           )) as KyberDmm),
+      oneInch: !networkConfig.oneInch
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'OneInch',
+            existingContract?.['swapContracts']?.['oneInch'],
+            undefined,
+            contractAdmin,
+            networkConfig.oneInch.router
+          )) as OneInch),
     };
 
     lendingContracts = {
@@ -539,10 +564,27 @@ async function updateUniSwap(uniSwap: UniSwap | undefined, extraArgs: {from?: st
   }
   log(1, 'update supported routers');
   let existing = (await uniSwap.getAllUniRouters()).map((r) => r.toLowerCase());
-  let configRouters = networkConfig.uniswap!.routers.map((r) => r.toLowerCase());
+  let configRouters = Object.values(networkConfig.uniswap!.routers).map((r) => r.address.toLowerCase());
   let toBeRemoved = existing.filter((add) => !configRouters.includes(add));
   let toBeAdded = configRouters.filter((add) => !existing.includes(add));
   await updateAddressSet(uniSwap.populateTransaction.updateUniRouters, toBeRemoved, toBeAdded, extraArgs);
+
+  log(1, 'update custom selectors');
+  for (const [router, {swapFromEth, swapToEth}] of Object.entries(networkConfig.uniswap.customSelectors ?? {})) {
+    let swapFromEthSelector = ethers.utils.solidityKeccak256(['string'], [swapFromEth]).slice(0, 10);
+    let swapToEthSelector = ethers.utils.solidityKeccak256(['string'], [swapToEth]).slice(0, 10);
+
+    let selector1 = await uniSwap.customSwapFromEth(router);
+    let selector2 = await uniSwap.customSwapToEth(router);
+
+    if (!equalHex(selector1, swapFromEth) || !equalHex(selector2, swapToEth)) {
+      const tx = await executeTxnOnBehalfOf(
+        await uniSwap.populateTransaction.updateCustomSwapSelector(router, swapFromEthSelector, swapToEthSelector)
+      );
+      log(2, '> Updating selectors:', router, swapFromEthSelector, swapToEthSelector);
+      await printInfo(tx);
+    }
+  }
 }
 
 async function updateUniSwapV3(uniSwapV3: UniSwapV3 | undefined, extraArgs: {from?: string}) {
@@ -590,6 +632,24 @@ async function updateKyberDmm(kyberDmm: KyberDmm | undefined, extraArgs: {from?:
       await kyberDmm.populateTransaction.updateDmmRouter(networkConfig.kyberDmm.router)
     );
     log(2, '> updated dmmRouter', JSON.stringify(networkConfig.kyberDmm, null, 2));
+    await printInfo(tx);
+  }
+}
+
+async function updateOneInch(oneInch: OneInch | undefined, extraArgs: {from?: string}) {
+  if (!oneInch || !networkConfig.oneInch) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await oneInch.router()).toLowerCase() === networkConfig.oneInch.router.toLowerCase()) {
+    log(2, `oneInch already up-to-date at ${networkConfig.oneInch.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await oneInch.populateTransaction.updateAggregationRouter(networkConfig.oneInch.router)
+    );
+    log(2, '> updated oneInch', JSON.stringify(networkConfig.oneInch, null, 2));
     await printInfo(tx);
   }
 }
