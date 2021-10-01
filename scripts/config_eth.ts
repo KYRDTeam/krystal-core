@@ -347,5 +347,13 @@ export const EthConfig: Record<string, IConfig> = {
     nft: {
       ...commonNftConfig,
     },
+
+    krystalClaim: {
+      enabled: true,
+    },
+
+    proxyAdminMultisig: '0xd57475dE0b4fB5884bD963Ac8f1b62D0086DdFF9',
+    adminMultisig: '0x2DA60E1D457f6b93ECBDa9A28441eC4a631FeDE5',
+    maintainerMultisig: '0x2DA60E1D457f6b93ECBDa9A28441eC4a631FeDE5',
   },
 };

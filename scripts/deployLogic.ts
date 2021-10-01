@@ -30,7 +30,6 @@ import {
 } from '../test/helper';
 import {PopulatedTransaction} from 'ethers';
 import {TransactionRequest} from '@ethersproject/abstract-provider';
-import {multisig} from '../hardhat.config';
 import {EthersAdapter} from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
 import Safe from '@gnosis.pm/safe-core-sdk';
@@ -78,7 +77,7 @@ export const deploy = async (
 
   log(0, 'Start deploying Krystal contracts');
   log(0, '======================\n');
-  let deployedContracts = await deployContracts(existingContract, multisig || deployerAddress);
+  let deployedContracts = await deployContracts(existingContract, deployerAddress);
 
   // Initialization
   log(0, 'Updating proxy data');
@@ -141,7 +140,7 @@ export const deploy = async (
 
 async function deployContracts(
   existingContract: Record<string, any> | undefined = undefined,
-  contractAdmin: string
+  deployer: string
 ): Promise<KrystalContracts> {
   let step = 0;
 
@@ -159,7 +158,7 @@ async function deployContracts(
       'SmartWalletImplementation',
       existingContract?.['smartWalletImplementation'],
       undefined,
-      contractAdmin
+      networkConfig.adminMultisig ?? deployer
     )) as SmartWalletImplementation;
 
     fetchTokenBalances = (await deployContract(
@@ -168,7 +167,7 @@ async function deployContracts(
       'FetchTokenBalances',
       existingContract?.['fetchTokenBalances'],
       undefined,
-      contractAdmin
+      networkConfig.adminMultisig ?? deployer
     )) as FetchTokenBalances;
 
     if (!networkConfig.diabledFetchAaveDataWrapper) {
@@ -178,7 +177,7 @@ async function deployContracts(
         'FetchAaveDataWrapper',
         existingContract?.['fetchAaveDataWrapper'],
         undefined,
-        contractAdmin
+        networkConfig.adminMultisig ?? deployer
       )) as FetchAaveDataWrapper;
     }
 
@@ -191,7 +190,7 @@ async function deployContracts(
             'UniSwap',
             existingContract?.['swapContracts']?.['uniSwap'],
             undefined,
-            contractAdmin,
+            networkConfig.adminMultisig ?? deployer,
             Object.values(networkConfig.uniswap.routers).map((c) => c.address),
             networkConfig.wNative
           )) as UniSwap),
@@ -203,7 +202,7 @@ async function deployContracts(
             'UniSwapV3',
             existingContract?.['swapContracts']?.['uniSwapV3'],
             undefined,
-            contractAdmin,
+            networkConfig.adminMultisig ?? deployer,
             networkConfig.uniswapV3.routers
           )) as UniSwapV3),
       kyberProxy: !networkConfig.kyberProxy
@@ -214,7 +213,7 @@ async function deployContracts(
             'KyberProxy',
             existingContract?.['swapContracts']?.['kyberProxy'],
             undefined,
-            contractAdmin,
+            networkConfig.adminMultisig ?? deployer,
             networkConfig.kyberProxy.proxy
           )) as KyberProxy),
       kyberDmm: !networkConfig.kyberDmm
@@ -225,7 +224,7 @@ async function deployContracts(
             'KyberDmm',
             existingContract?.['swapContracts']?.['kyberDmm'],
             undefined,
-            contractAdmin,
+            networkConfig.adminMultisig ?? deployer,
             networkConfig.kyberDmm.router
           )) as KyberDmm),
       oneInch: !networkConfig.oneInch
@@ -236,7 +235,7 @@ async function deployContracts(
             'OneInch',
             existingContract?.['swapContracts']?.['oneInch'],
             undefined,
-            contractAdmin,
+            networkConfig.adminMultisig ?? deployer,
             networkConfig.oneInch.router
           )) as OneInch),
     };
@@ -250,7 +249,7 @@ async function deployContracts(
             'CompoundLending',
             existingContract?.['lendingContracts']?.['compoundLending'],
             undefined,
-            contractAdmin
+            networkConfig.adminMultisig ?? deployer
           )) as CompoundLending,
 
       aaveV1: (!networkConfig.aaveV1
@@ -261,7 +260,7 @@ async function deployContracts(
             'AaveV1Lending',
             existingContract?.['lendingContracts']?.['aaveV1'],
             undefined,
-            contractAdmin
+            networkConfig.adminMultisig ?? deployer
           )) as AaveV1Lending,
 
       aaveV2: (!networkConfig.aaveV2
@@ -272,7 +271,7 @@ async function deployContracts(
             'AaveV2Lending',
             existingContract?.['lendingContracts']?.['aaveV2'],
             undefined,
-            contractAdmin
+            networkConfig.adminMultisig ?? deployer
           )) as AaveV2Lending,
 
       aaveAMM: (!networkConfig.aaveAMM
@@ -283,7 +282,7 @@ async function deployContracts(
             'AaveV2Lending',
             existingContract?.['lendingContracts']?.['aaveAMM'],
             undefined,
-            contractAdmin
+            networkConfig.adminMultisig ?? deployer
           )) as AaveV2Lending,
     };
 
@@ -293,7 +292,7 @@ async function deployContracts(
       'SmartWalletProxy',
       existingContract?.['smartWalletProxy'],
       undefined,
-      contractAdmin,
+      networkConfig.proxyAdminMultisig ?? deployer,
       smartWalletImplementation.address,
       networkConfig.supportedWallets,
       Object.values(swapContracts)
@@ -331,7 +330,7 @@ async function deployContracts(
       existingContract?.['nft'],
       'contracts/nft/KrystalCollectibles.sol:KrystalCollectibles',
       nftImplementation.address,
-      networkConfig.proxyAdminMultisig ?? contractAdmin,
+      networkConfig.proxyAdminMultisig ?? deployer,
       initData
     )) as KrystalCollectibles;
   }
@@ -347,14 +346,14 @@ async function deployContracts(
     lendingContracts,
     nft,
     nftImplementation,
-    ...(await deployClaimContract(++step, existingContract, contractAdmin)),
+    ...(await deployClaimContract(++step, existingContract, deployer)),
   };
 }
 
 export const deployClaimContract = async (
   step: number,
   existingContract: Record<string, any> | undefined,
-  contractAdmin: string
+  deployer: string
 ): Promise<KrystalContracts> => {
   let krystalClaim, krystalClaimImplementation;
   if (networkConfig.krystalClaim?.enabled) {
@@ -369,8 +368,8 @@ export const deployClaimContract = async (
     let initData =
       (
         await krystalClaimImplementation.populateTransaction.initialize(
-          networkConfig.adminMultisig ?? contractAdmin,
-          networkConfig.krystalClaim?.verifier ?? contractAdmin
+          networkConfig.adminMultisig ?? deployer,
+          networkConfig.krystalClaim?.verifier ?? deployer
         )
       ).data?.toString() ?? '0x';
 
@@ -381,7 +380,7 @@ export const deployClaimContract = async (
       existingContract?.['krystalClaim'],
       'contracts/claims/KrystalClaim.sol:KrystalClaim',
       krystalClaimImplementation.address,
-      networkConfig.proxyAdminMultisig ?? contractAdmin,
+      networkConfig.proxyAdminMultisig ?? deployer,
       initData
     )) as KrystalCollectibles;
   }
@@ -417,7 +416,7 @@ async function deployContract(
     log(2, `> address:\t${contract.address}`);
   }
 
-  // Only verify new contract to save time
+  // // Only verify new contract to save time
   if (autoVerify && !contractAddress) {
     // Try to verify no matter what
     // if (autoVerify) {
@@ -811,7 +810,7 @@ async function executeTxnOnBehalfOf(
   customMultisig?: string
 ): Promise<TransactionResponse> {
   let tx;
-  let m = customMultisig || multisig;
+  let m = customMultisig;
   if (m) {
     const signer = (await ethers.getSigners())[0];
     const ethAdapter = new EthersAdapter({

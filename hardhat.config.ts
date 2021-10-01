@@ -14,15 +14,13 @@ import {accounts} from './scripts/testWallet';
 dotenv.config();
 
 // Network specific config
-dotenv.config({path: `${__dirname}/./.env.${process.env.CHAIN}.${process.env.NETWORK}`});
+dotenv.config({path: `${__dirname}/env/.env.${process.env.CHAIN}.${process.env.NETWORK}`});
 
 const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY, MAINNET_ID, MAINNET_FORK, MAINNET_FORK_BLOCK} = process.env;
 
 // custom network config for testing. See scripts/config.ts
 export const customNetworkConfig =
   process.env.CHAIN && process.env.CHAIN ? `${process.env.CHAIN}_${process.env.NETWORK}` : undefined;
-
-export const multisig = process.env.MULTISIG ?? undefined;
 
 console.log(
   `--ENVS:\n--CHAIN=${process.env.CHAIN}, NETWORK=${process.env.NETWORK}, customConfig=${customNetworkConfig}`

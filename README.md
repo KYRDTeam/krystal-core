@@ -36,7 +36,6 @@ ETHERSCAN_KEY=xxx
 MAINNET_FORK=https://eth-mainnet.alchemyapi.io      // archive chain url, for testing
 MAINNET_ID=1                                        // chain ID
 MAINNET_FORK_BLOCK=12644714                         // start forking from this block for testing
-MULTISIG=0x                                         // multisig address if have, only gnosis-safe[https://gnosis-safe.io/] is supported
 ```
 
 ## Testing

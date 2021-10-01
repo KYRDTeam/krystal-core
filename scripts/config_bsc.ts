@@ -73,6 +73,7 @@ export const BscConfig: Record<string, IConfig> = {
     },
 
     proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
+    adminMultisig: '0xcD488Bf7df87337e80617F5d8574F1Ea9506a260',
     maintainerMultisig: '0x5dCB1EFD48AB4927EA9F801bdC0848bE72d23082',
   },
 

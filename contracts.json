@@ -85,7 +85,11 @@
     "swapContracts": {
       "uniSwap": "0x66f54006B47d1b381b5B933F2De9bf05a6B4Eb40"
     },
-    "lendingContracts": {}
+    "lendingContracts": {},
+    "nft": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e",
+    "nftImplementation": "0xE7314051BCFD832398e232f2c274278c44121a3f",
+    "krystalClaim": "0x051DC16b2ECB366984d1074dCC07c342a9463999",
+    "krystalClaimImplementation": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
   },
   "eth_ropsten": {
     "smartWalletImplementation": "0x2ce6E029f52da66c95682541F3c230c28E72dF14",
