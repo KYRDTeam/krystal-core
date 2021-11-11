@@ -4,7 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import "./BaseSwap.sol";
 import "../interfaces/IDMMRouter.sol";
+import "../interfaces/IDMMPool.sol";
 import "../libraries/BytesLib.sol";
+import "../libraries/UniswapV2Library.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -45,6 +47,23 @@ contract KyberDmm is BaseSwap {
         destAmount = amounts[params.tradePath.length - 1];
     }
 
+    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 destAmount, uint256 priceImpact)
+    {
+        address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
+        IERC20[] memory tradePathErc = new IERC20[](params.tradePath.length);
+        for (uint256 i = 0; i < params.tradePath.length; i++) {
+            tradePathErc[i] = IERC20(params.tradePath[i]);
+        }
+        uint256[] memory amounts = dmmRouter.getAmountsOut(params.srcAmount, pools, tradePathErc);
+        destAmount = amounts[params.tradePath.length - 1];
+        priceImpact = getPriceImpact(params.srcAmount, destAmount, tradePathErc, pools);
+    }
+
     function getExpectedIn(GetExpectedInParams calldata params)
         external
         view
@@ -59,6 +78,45 @@ contract KyberDmm is BaseSwap {
         }
         uint256[] memory amounts = dmmRouter.getAmountsIn(params.destAmount, pools, tradePathErc);
         srcAmount = amounts[0];
+    }
+
+    function getExpectedInWithImpact(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount, uint256 priceImpact)
+    {
+        address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
+        IERC20[] memory tradePathErc = new IERC20[](params.tradePath.length);
+        for (uint256 i = 0; i < params.tradePath.length; i++) {
+            tradePathErc[i] = IERC20(params.tradePath[i]);
+        }
+        uint256[] memory amounts = dmmRouter.getAmountsIn(params.destAmount, pools, tradePathErc);
+        srcAmount = amounts[0];
+        priceImpact = getPriceImpact(srcAmount, params.destAmount, tradePathErc, pools);
+    }
+
+    function getPriceImpact(
+        uint256 srcAmount,
+        uint256 destAmount,
+        IERC20[] memory tradePathErc,
+        address[] memory pools
+    ) private view returns (uint256 priceImpact) {
+        uint256 quote = srcAmount;
+        for (uint256 i; i < pools.length; i++) {
+            IDMMPool pool = IDMMPool(pools[i]);
+            (uint256 reserveIn, uint256 reserveOut) = pool.getReserves();
+            if (tradePathErc[i] == pool.token1()) {
+                (reserveIn, reserveOut) = (reserveOut, reserveIn);
+            }
+            quote = UniswapV2Library.quote(quote, reserveIn, reserveOut);
+        }
+        if (quote <= destAmount) {
+            priceImpact = 0;
+        } else {
+            priceImpact = quote.sub(destAmount).mul(BPS).div(quote);
+        }
     }
 
     /// @dev swap token via a supported UniSwap router
