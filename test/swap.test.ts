@@ -206,7 +206,7 @@ describe('swap test', async () => {
         });
 
         it('get price impact correctly', async () => {
-          if (name === '1inch') {
+          if (name === '1inch' || name === 'kyberDmmV2') {
             return;
           }
           let swapContract = await getSwapContract();
@@ -414,7 +414,7 @@ describe('swap test', async () => {
         maxDiffAllowed: 0,
         getExpectedInSupported: true,
         testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
-        expectedPriceImpactFn:         async (srcAmount: BigNumber, tradePath: string[]) => {
+        expectedPriceImpactFn: async (srcAmount: BigNumber, tradePath: string[]) => {
           let amountsOut = await routerContract.getAmountsOut(srcAmount, tradePath);
           let amountOut = amountsOut[amountsOut.length - 1];
           let quote = srcAmount;
@@ -432,7 +432,7 @@ describe('swap test', async () => {
             quote = quote.mul(997).mul(r1).div(r0).div(1000);
           }
           return quote.sub(amountOut).mul(BPS).div(quote);
-        }
+        },
       });
     }
   }
