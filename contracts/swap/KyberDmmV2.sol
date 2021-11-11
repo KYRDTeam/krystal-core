@@ -48,6 +48,27 @@ contract KyberDmmV2 is BaseSwap {
         require(false, "getExpectedIn_notSupported");
     }
 
+    /// @dev get expected return and conversion rate if using a Uni router
+    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 destAmount, uint256 priceImpact)
+    {
+        require(false, "getExpectedReturnWithImpact_notSupported");
+    }
+
+    function getExpectedInWithImpact(GetExpectedInParams calldata params)
+        external
+        view
+        override
+        onlyProxyContract
+        returns (uint256 srcAmount, uint256 priceImpact)
+    {
+        require(false, "getExpectedInWithImpact_notSupported");
+    }
+
     /// @dev swap token
     /// @notice
     /// 1inch API will returns data neccessary to build tx

@@ -25,6 +25,7 @@ import {
 import {ethers} from 'hardhat';
 import {arrayify, hexConcat, hexlify} from 'ethers/lib/utils';
 import axios from 'axios';
+import {apiMock} from './api_helper';
 
 describe('swap test', async () => {
   let platformFee = 8;
@@ -53,7 +54,7 @@ describe('swap test', async () => {
     router: string;
     generateArgsFunc: (tradePath: string[], srcAmount: BigNumber, feeMode: FeeMode) => Promise<string>;
     platformFee: number;
-    getActualRate: (sourceAmount: BigNumber, tradePath: string[]) => Promise<BigNumber>;
+    getActualRate: (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => Promise<BigNumber>;
     maxDiffAllowed: number;
     getExpectedInSupported: boolean;
     testingTokens: string[];
@@ -112,7 +113,7 @@ describe('swap test', async () => {
       tradePath: string[],
       feeMode: FeeMode
     ): Promise<BigNumber> => {
-      if (name == '1inch') {
+      if (name == '1inch' || name == 'kyberDmmV2') {
         return BigNumber.from(100);
       }
       const extraArgs = await generateArgsFunc(tradePath, srcAmount, feeMode);
@@ -129,21 +130,21 @@ describe('swap test', async () => {
       assert(!data.expectedRate.isZero(), 'zero expectedRate');
 
       if (feeMode === FeeMode.BY_PROTOCOL) {
-        const actualDest = await getActualRate(srcAmount, tradePath);
+        const actualDest = await getActualRate(srcAmount, tradePath, feeMode);
         const diff = data.destAmount.sub(actualDest).abs();
         assert(
           diff.mul(100).lte(actualDest.mul(maxDiffAllowed)),
           `expected: ${actualDest}, received: ${data.destAmount}, srcAmt: ${srcAmount}, maxDiff: ${maxDiffAllowed}`
         );
       } else if (feeMode == FeeMode.FROM_SOURCE) {
-        const actualDest = await getActualRate(srcAmount.mul(BPS.sub(platformFee)).div(BPS), tradePath);
+        const actualDest = await getActualRate(srcAmount.mul(BPS.sub(platformFee)).div(BPS), tradePath, feeMode);
         const diff = data.destAmount.sub(actualDest).abs();
         assert(
           diff.mul(100).lte(actualDest.mul(maxDiffAllowed)),
           `expected: ${actualDest}, received: ${data.destAmount}, srcAmt: ${srcAmount}, maxDiff: ${maxDiffAllowed}`
         );
       } else if (feeMode == FeeMode.FROM_DEST) {
-        const actualDest = (await getActualRate(srcAmount, tradePath)).mul(BPS.sub(platformFee)).div(BPS);
+        const actualDest = (await getActualRate(srcAmount, tradePath, feeMode)).mul(BPS.sub(platformFee)).div(BPS);
         const diff = data.destAmount.sub(actualDest).abs();
         assert(
           diff.mul(100).lte(actualDest.mul(maxDiffAllowed)),
@@ -194,7 +195,7 @@ describe('swap test', async () => {
         });
 
         it('get expected rate correctly', async () => {
-          if (name === '1inch') {
+          if (name === '1inch' || name === 'kyberDmmV2') {
             return;
           }
           let swapContract = await getSwapContract();
@@ -222,6 +223,10 @@ describe('swap test', async () => {
           const minDestAmount = destAmount.mul(97).div(100);
 
           tradePath[0] = nativeTokenAddress; // trade needs to use bnb address
+          const extraArgs = await generateArgsFunc(tradePath, nativeAmount10, FeeMode.FROM_SOURCE);
+          if (extraArgs == '') {
+            return;
+          }
 
           // Send txn
           await expect(
@@ -234,7 +239,7 @@ describe('swap test', async () => {
                 feeMode: FeeMode.FROM_SOURCE,
                 feeBps: platformFee,
                 platformWallet: setup.network.supportedWallets[0],
-                extraArgs: await generateArgsFunc(tradePath, nativeAmount10, FeeMode.FROM_SOURCE),
+                extraArgs: extraArgs,
               },
               {
                 from: setup.user.address,
@@ -275,6 +280,9 @@ describe('swap test', async () => {
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
           let extraArgs = await generateArgsFunc(tradePath, fundAmount, FeeMode.FROM_SOURCE);
+          if (extraArgs === '') {
+            return;
+          }
           await setup.proxyInstance.swap(
             {
               swapContract,
@@ -313,7 +321,7 @@ describe('swap test', async () => {
             // Trade to native token to ensure the liquidity pool
             const tradePath =
               // kyberProxy only take direct trade
-              !['kyberProxy', '1inch'].includes(name) &&
+              !['kyberProxy', '1inch', 'kyberDmmV2'].includes(name) &&
               token.address != nativeTokenAddress &&
               targetToken != nativeTokenAddress
                 ? [token.address, setup.network.wNative, targetToken]
@@ -328,6 +336,10 @@ describe('swap test', async () => {
             );
 
             let minDestAmount = destAmount.mul(97).div(100);
+            const extraArgs = await generateArgsFunc(tradePath, tokenAmount, FeeMode.FROM_SOURCE);
+            if (extraArgs === '') {
+              return;
+            }
 
             // Send txn
             await expect(async () => {
@@ -340,7 +352,7 @@ describe('swap test', async () => {
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: await generateArgsFunc(tradePath, tokenAmount, FeeMode.FROM_SOURCE),
+                  extraArgs: extraArgs,
                 },
                 {
                   from: setup.user.address,
@@ -360,7 +372,7 @@ describe('swap test', async () => {
                   feeMode: FeeMode.FROM_SOURCE,
                   feeBps: platformFee,
                   platformWallet: setup.network.supportedWallets[0],
-                  extraArgs: await generateArgsFunc(tradePath, tokenAmount, FeeMode.FROM_SOURCE),
+                  extraArgs: extraArgs,
                 },
                 {
                   from: setup.user.address,
@@ -395,7 +407,7 @@ describe('swap test', async () => {
         router: routerName,
         generateArgsFunc: async () => hexlify(arrayify(address)),
         platformFee,
-        getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
+        getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
           const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
         },
@@ -449,7 +461,7 @@ describe('swap test', async () => {
           return extraArgs;
         },
         platformFee,
-        getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
+        getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
           const amounts = await routerContractV2.getAmountsOut(sourceAmount, tradePath);
           return amounts[amounts.length - 1];
         },
@@ -461,6 +473,7 @@ describe('swap test', async () => {
     }
   }
 
+  /*
   if (networkSetting.kyberProxy) {
     // Using v2 router as a price estimate for testing
     const routerContract = (await ethers.getContractAt(
@@ -476,7 +489,7 @@ describe('swap test', async () => {
       router: networkSetting.kyberProxy.proxy,
       generateArgsFunc: async () => '0x', // empty hint
       platformFee,
-      getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
+      getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
         return amounts[amounts.length - 1];
       },
@@ -486,6 +499,7 @@ describe('swap test', async () => {
       expectedPriceImpactFn: null,
     });
   }
+ */
 
   if (networkSetting.kyberDmm) {
     const generatePools = async (dmmRouter: IDMMRouter, tradePath: string[]): Promise<string[]> => {
@@ -520,7 +534,7 @@ describe('swap test', async () => {
         return hexConcat(pools);
       },
       platformFee,
-      getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
+      getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
         const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
         let pools = await generatePools(dmmRouter, tradePath);
         const amounts = await dmmRouter.getAmountsOut(sourceAmount, pools, tradePath);
@@ -553,17 +567,123 @@ describe('swap test', async () => {
           setup.user.address
         }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
 
-        console.log('1inch call', url);
-        const resp = (await axios.get(url)) as any;
-        return resp.data.tx.data as string;
+        // const resp = (await axios.get(url)) as any;
+        // const data = resp.data;
+        console.log(url);
+        const data = apiMock[url];
+
+        return data.tx.data as string;
       },
       platformFee,
-      getActualRate: async (sourceAmount: BigNumber, tradePath: string[]) => {
-        return BigNumber.from(0);
+      getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+        const chainIdHex = await getChain();
+        const chainId = BigNumber.from(chainIdHex).toString();
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
+        }
+        const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
+          tradePath[1]
+        }&amount=${amount?.toString()}&fromAddress=${
+          setup.user.address
+        }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
+
+        // const resp = (await axios.get(url)) as any;
+        // const data = resp.data;
+        const data = apiMock[url];
+
+        return BigNumber.from(data.toTokenAmount);
       },
       maxDiffAllowed: 0,
       getExpectedInSupported: false,
       testingTokens: networkSetting.oneInch.testingTokens ?? Object.keys(networkSetting.tokens),
+      expectedPriceImpactFn: null,
+    });
+  }
+
+  if (networkSetting.kyberDmmV2) {
+    executeSwapTest({
+      name: 'kyberDmmV2',
+      getSwapContract: async () => {
+        return setup.krystalContracts.swapContracts!.kyberDmmV2!.address;
+      },
+      router: networkSetting.kyberDmmV2!.router,
+      generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
+        let tokenIn = tradePath[0];
+        let tokenOut = tradePath[1];
+        if (tradePath[0] == nativeTokenAddress) {
+          tokenIn = setup.network.wNative;
+        }
+        if (tradePath[1] == nativeTokenAddress) {
+          tokenOut = setup.network.wNative;
+        }
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
+          amount = srcAmount?.sub(fee);
+        }
+
+        const url = `https://aggregator-api.kyber.org/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
+        const data = apiMock[url];
+        // const data = ((await axios.get(url)) as any).data;
+
+        if (data.swaps.length == 0) {
+          return '';
+        }
+        // console.log(resp);
+        const abiCoder = new ethers.utils.AbiCoder();
+        const swapSequences: Array<Array<any>> = [];
+        for (const swaps of data.swaps) {
+          const sq = [];
+          for (const swap of swaps) {
+            const tokenIn = swap.tokenIn;
+            const tokenOut = swap.tokenOut;
+            const pool = swap.pool;
+            const swapAmount = swap.swapAmount;
+            const dexOptions = 1;
+            const swapSequenceData = abiCoder.encode(
+              ['address', 'address', 'address', 'uint256', 'uint256'],
+              [pool, tokenIn, tokenOut, swapAmount, '0']
+            );
+            sq.push({
+              data: swapSequenceData,
+              dexOption: dexOptions,
+            });
+          }
+          swapSequences.push(sq);
+        }
+
+        const executorData = abiCoder.encode(
+          ['tuple(tuple(bytes data,uint16 dexOption)[][], address, address, uint256, address, uint256)'],
+          [[swapSequences, tradePath[0], tradePath[1], '1', setup.user.address, '2000000000']]
+        );
+        const result = networkSetting.kyberDmmV2?.aggregationExecutor + executorData.substring(2);
+        return result;
+      },
+      platformFee,
+      getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+        let tokenIn = tradePath[0];
+        let tokenOut = tradePath[1];
+        if (tradePath[0] == nativeTokenAddress) {
+          tokenIn = setup.network.wNative;
+        }
+        if (tradePath[1] == nativeTokenAddress) {
+          tokenOut = setup.network.wNative;
+        }
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
+          amount = srcAmount?.sub(fee);
+        }
+
+        const url = `https://aggregator-api.kyber.org/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
+        const data = apiMock[url];
+
+        return BigNumber.from(data.outputAmount);
+      },
+      maxDiffAllowed: 10,
+      getExpectedInSupported: false,
+      testingTokens: networkSetting.kyberDmmV2.testingTokens ?? Object.keys(networkSetting.tokens),
       expectedPriceImpactFn: null,
     });
   }
