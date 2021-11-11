@@ -569,7 +569,6 @@ describe('swap test', async () => {
 
         // const resp = (await axios.get(url)) as any;
         // const data = resp.data;
-        console.log(url);
         const data = apiMock[url];
 
         return data.tx.data as string;
@@ -591,6 +590,9 @@ describe('swap test', async () => {
         // const resp = (await axios.get(url)) as any;
         // const data = resp.data;
         const data = apiMock[url];
+        if (data == null) {
+          console.log(url);
+        }
 
         return BigNumber.from(data.toTokenAmount);
       },
