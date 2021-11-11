@@ -16,6 +16,7 @@ import {
   KrystalCollectibles,
   KrystalCollectiblesImpl,
   OneInch,
+  KyberDmmV2,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -45,6 +46,7 @@ export interface KrystalContracts {
     kyberProxy?: KyberProxy;
     kyberDmm?: KyberDmm;
     oneInch?: OneInch;
+    kyberDmmV2?: KyberDmmV2;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -97,6 +99,10 @@ export const deploy = async (
   log(0, 'Updating oneInch config');
   log(0, '======================\n');
   await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
+
+  log(0, 'Updating kyberDmm config');
+  log(0, '======================\n');
+  await updateKyberDmmV2(deployedContracts.swapContracts?.kyberDmmV2, extraArgs);
 
   log(0, 'Updating compound/clones config');
   log(0, '======================\n');
@@ -228,6 +234,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.oneInch.router
           )) as OneInch),
+      kyberDmmV2: !networkConfig.kyberDmmV2
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'KyberDmmV2',
+            existingContract?.['swapContracts']?.['kyberDmmV2'],
+            undefined,
+            contractAdmin,
+            networkConfig.kyberDmmV2.router
+          )) as KyberDmmV2),
     };
 
     lendingContracts = {
@@ -605,6 +622,24 @@ async function updateOneInch(oneInch: OneInch | undefined, extraArgs: {from?: st
       await oneInch.populateTransaction.updateAggregationRouter(networkConfig.oneInch.router)
     );
     log(2, '> updated oneInch', JSON.stringify(networkConfig.oneInch, null, 2));
+    await printInfo(tx);
+  }
+}
+
+async function updateKyberDmmV2(kyberDmmV2: KyberDmmV2 | undefined, extraArgs: {from?: string}) {
+  if (!kyberDmmV2 || !networkConfig.kyberDmmV2) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await kyberDmmV2.router()).toLowerCase() === networkConfig.kyberDmmV2.router.toLowerCase()) {
+    log(2, `kyberDmmV2 already up-to-date at ${networkConfig.kyberDmmV2.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await kyberDmmV2.populateTransaction.updateAggregationRouter(networkConfig.kyberDmmV2.router)
+    );
+    log(2, '> updated kyberDmmV2', JSON.stringify(networkConfig.kyberDmmV2, null, 2));
     await printInfo(tx);
   }
 }

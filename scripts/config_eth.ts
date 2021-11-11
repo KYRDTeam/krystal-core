@@ -43,6 +43,11 @@ export const EthConfig: Record<string, IConfig> = {
       router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
     },
 
+    kyberDmmV2: {
+      router: '0x1Fc3607fa67B58DedDB0fAf7a116F417a20C551c',
+      aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
+    },
+
     // Compound
     compound: {
       compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',
