@@ -18,6 +18,7 @@ export const EthConfig: Record<string, IConfig> = {
       routers: {
         univ2: {
           address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+          testingTokens: ['dai', 'usdt', 'usdc'],
         },
         sushiswap: {
           address: '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f',
@@ -29,6 +30,7 @@ export const EthConfig: Record<string, IConfig> = {
       routers: [
         '0xe592427a0aece92de3edee1f18e0157c05861564', // univ3
       ],
+      testingTokens: ['dai', 'usdt', 'usdc'],
     },
 
     kyberProxy: {
@@ -37,10 +39,16 @@ export const EthConfig: Record<string, IConfig> = {
 
     kyberDmm: {
       router: '0x1c87257f5e8609940bc751a07bb085bb7f8cdbe6',
+      testingTokens: ['dai', 'usdt', 'usdc'],
     },
 
     oneInch: {
       router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
+    },
+
+    kyberDmmV2: {
+      router: '0x1Fc3607fa67B58DedDB0fAf7a116F417a20C551c',
+      aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
     },
 
     // Compound
