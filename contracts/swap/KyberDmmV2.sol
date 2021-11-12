@@ -71,7 +71,7 @@ contract KyberDmmV2 is BaseSwap {
 
     /// @dev swap token
     /// @notice
-    /// 1inch API will returns data neccessary to build tx
+    /// DMM API will returns data neccessary to build tx
     /// tx's data will be passed by params.extraData
     function swap(SwapParams calldata params)
         external
