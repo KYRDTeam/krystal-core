@@ -64,6 +64,7 @@ export interface IConfig {
     aggregationExecutor: string;
     testingTokens?: string[];
   };
+
   // Compound or clones
   compound?: {
     compTroller: string;

@@ -150,6 +150,14 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     gasPrice: 5 * 1e9,
   };
 
+  config.networks!.polygon_staging = {
+    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 137,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 35 * 1e9,
+  };
+
   config.networks!.polygon_mumbai = {
     url: `https://polygon-mumbai.infura.io/v3/${INFURA_API_KEY}`,
     chainId: 80001,

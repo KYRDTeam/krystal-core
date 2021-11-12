@@ -127,5 +127,18 @@
       "uniSwap": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
     },
     "lendingContracts": {}
+  },
+  "polygon_staging": {
+    "smartWalletImplementation": "0x1D252304ED8889eAE29f5155c9584dCF1F0369b4",
+    "smartWalletProxy": "0x487aa1a16938d9ae861E066d58b443A00b28D8F9",
+    "fetchTokenBalances": "0x17c674A51049bFc587F74313975d5146C09e0536",
+    "fetchAaveDataWrapper": "0xAA0BBf6E236321f849B2A93b50949b5EE6451b38",
+    "swapContracts": {
+      "uniSwap": "0x8FEd94F66FA1c32dA7e70F9aF702915742884187",
+      "kyberDmm": "0xce1d656a4d96bD5acF4A7D749fd897e678d98370",
+      "oneInch": "0x9A3913b3ac8C7Bc63c37A52916498fb99dea1746",
+      "kyberDmmV2": "0xc550441c6F8800aC74dd26372AB907908b4f51D9"
+    },
+    "lendingContracts": {}
   }
 }

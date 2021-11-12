@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KyberSwap/krystal-bsc-core"
+    "url": "https://github.com/KyberSwap/krystal-core"
   },
   "author": "Krystal team",
   "license": "ISC",
