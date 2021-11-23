@@ -10,7 +10,7 @@ import "./SmartWalletStorage.sol";
 import "./swap/ISwap.sol";
 import "./lending/ILending.sol";
 
-contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementation {
+contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplementation {
     using SafeERC20 for IERC20Ext;
     using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -22,23 +22,50 @@ contract SmartWalletImplementation is SmartWalletStorage, ISmartWalletImplementa
 
     receive() external payable {}
 
-    /// Claim fee to platform wallets
-    function claimPlatformFees(address[] calldata platformWallets, IERC20Ext[] calldata tokens)
+    /// Claim fee, must be done by platform address itself to avoid confusion
+    function claimPlatformFee(IERC20Ext[] calldata tokens)
         external
         override
         nonReentrant
     {
+        address platformWallet = msg.sender;
+        for (uint256 j = 0; j < tokens.length; j++) {
+            uint256 fee = platformWalletFees[platformWallet][tokens[j]];
+            if (fee > 1) {
+                // fee set to 1 to avoid the SSTORE initial gas cost
+                platformWalletFees[platformWallet][tokens[j]] = 1;
+                transferToken(payable(platformWallet), tokens[j], fee - 1);
+            }
+        }
+        address[] memory arr = new address[](1);
+        arr[0] = platformWallet;
+        emit ClaimedPlatformFees(arr, tokens, msg.sender);
+    }
+
+    /// Claim fee using admin right
+    function adminClaimPlatformFees(address[] calldata platformWallets, IERC20Ext[] calldata tokens)
+        external
+        override
+        nonReentrant
+        onlyAdmin
+    {
+        require(adminFeeCollector != address(0), "require admin fee collector");
+
         for (uint256 i = 0; i < platformWallets.length; i++) {
             for (uint256 j = 0; j < tokens.length; j++) {
                 uint256 fee = platformWalletFees[platformWallets[i]][tokens[j]];
                 if (fee > 1) {
                     // fee set to 1 to avoid the SSTORE initial gas cost
                     platformWalletFees[platformWallets[i]][tokens[j]] = 1;
-                    transferToken(payable(platformWallets[i]), tokens[j], fee - 1);
+                    transferToken(payable(adminFeeCollector), tokens[j], fee - 1);
                 }
             }
         }
         emit ClaimedPlatformFees(platformWallets, tokens, msg.sender);
+    }
+
+    function setAdminFeeCollector(address feeCollector) external override onlyAdmin {
+        adminFeeCollector = feeCollector;
     }
 
     /// @dev approve/unapprove LPs usage on the particular tokens

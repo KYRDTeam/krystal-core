@@ -197,6 +197,12 @@ interface ISmartWalletImplementation {
         payable
         returns (uint256 destAmount);
 
-    function claimPlatformFees(address[] calldata platformWallets, IERC20Ext[] calldata tokens)
-        external;
+    function claimPlatformFee(IERC20Ext[] calldata tokens) external;
+
+    function adminClaimPlatformFees(
+        address[] calldata platformWallets,
+        IERC20Ext[] calldata tokens
+    ) external;
+
+    function setAdminFeeCollector(address feeCollector) external;
 }

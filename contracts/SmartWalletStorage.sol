@@ -24,3 +24,7 @@ contract SmartWalletStorage is Utils, Withdrawable, ReentrancyGuard {
 
     constructor(address _admin) Withdrawable(_admin) {}
 }
+
+abstract contract SmartWalletStorageV2 is SmartWalletStorage {
+    address public adminFeeCollector;
+}
