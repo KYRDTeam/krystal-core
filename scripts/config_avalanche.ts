@@ -31,6 +31,12 @@ export const AvalancheConfig: Record<string, IConfig> = {
       testingTokens: ['weth'],
     },
 
+    kyberDmmV2: {
+      router: '0x1Fc3607fa67B58DedDB0fAf7a116F417a20C551c',
+      aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
+      testingTokens: ['knc'],
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 70,
 

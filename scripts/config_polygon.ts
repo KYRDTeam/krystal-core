@@ -39,6 +39,12 @@ export const PolygonConfig: Record<string, IConfig> = {
       testingTokens: ['knc'],
     },
 
+    kyberDmmV2: {
+      router: '0x1Fc3607fa67B58DedDB0fAf7a116F417a20C551c',
+      aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
+      testingTokens: ['knc'],
+    },
+
     oneInch: {
       router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
       testingTokens: ['weth'],

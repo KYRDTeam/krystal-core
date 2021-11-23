@@ -49,6 +49,12 @@ export const BscConfig: Record<string, IConfig> = {
       router: '0x78df70615ffc8066cc0887917f2Cd72092C86409',
     },
 
+    kyberDmmV2: {
+      router: '0x1Fc3607fa67B58DedDB0fAf7a116F417a20C551c',
+      aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
+      testingTokens: ['knc'],
+    },
+
     // Venus protocol
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',

@@ -147,7 +147,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 5 * 1e9,
+    gasPrice: 35 * 1e9,
   };
 
   config.networks!.polygon_staging = {
