@@ -14,7 +14,7 @@ import {accounts} from './scripts/testWallet';
 dotenv.config();
 
 // Network specific config
-dotenv.config({path: `${__dirname}/./.env.${process.env.CHAIN}.${process.env.NETWORK}`});
+dotenv.config({path: `${__dirname}/./env/.env.${process.env.CHAIN}.${process.env.NETWORK}`});
 
 const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY, MAINNET_ID, MAINNET_FORK, MAINNET_FORK_BLOCK} = process.env;
 

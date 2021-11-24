@@ -76,33 +76,33 @@ export const deploy = async (
   // log(0, '======================\n');
   // await updateProxy(deployedContracts, extraArgs);
 
-  // log(0, 'Updating swaps/lendings linking');
-  // log(0, '======================\n');
-  // await updateChildContracts(deployedContracts, extraArgs);
+  log(0, 'Updating swaps/lendings linking');
+  log(0, '======================\n');
+  await updateChildContracts(deployedContracts, extraArgs);
 
-  // log(0, 'Updating uniswap/clones config');
-  // log(0, '======================\n');
-  // await updateUniSwap(deployedContracts.swapContracts?.uniSwap, extraArgs);
+  log(0, 'Updating uniswap/clones config');
+  log(0, '======================\n');
+  await updateUniSwap(deployedContracts.swapContracts?.uniSwap, extraArgs);
 
-  // log(0, 'Updating uniswapV3/clones config');
-  // log(0, '======================\n');
-  // await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
+  log(0, 'Updating uniswapV3/clones config');
+  log(0, '======================\n');
+  await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
 
-  // log(0, 'Updating kyberProxy config');
-  // log(0, '======================\n');
-  // await updateKyberProxy(deployedContracts.swapContracts?.kyberProxy, extraArgs);
+  log(0, 'Updating kyberProxy config');
+  log(0, '======================\n');
+  await updateKyberProxy(deployedContracts.swapContracts?.kyberProxy, extraArgs);
 
-  // log(0, 'Updating kyberDmm config');
-  // log(0, '======================\n');
-  // await updateKyberDmm(deployedContracts.swapContracts?.kyberDmm, extraArgs);
+  log(0, 'Updating kyberDmm config');
+  log(0, '======================\n');
+  await updateKyberDmm(deployedContracts.swapContracts?.kyberDmm, extraArgs);
 
-  // log(0, 'Updating oneInch config');
-  // log(0, '======================\n');
-  // await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
+  log(0, 'Updating oneInch config');
+  log(0, '======================\n');
+  await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
 
-  // log(0, 'Updating kyberDmm config');
-  // log(0, '======================\n');
-  // await updateKyberDmmV2(deployedContracts.swapContracts?.kyberDmmV2, extraArgs);
+  log(0, 'Updating kyberDmm config');
+  log(0, '======================\n');
+  await updateKyberDmmV2(deployedContracts.swapContracts?.kyberDmmV2, extraArgs);
 
   // log(0, 'Updating compound/clones config');
   // log(0, '======================\n');
@@ -385,7 +385,7 @@ async function deployContract(
     // if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
-      await sleep(10000);
+      await sleep(2000);
       log(3, '>> start verifying');
       await run('verify:verify', {
         address: contract.address,
@@ -549,7 +549,7 @@ async function updateUniSwap(uniSwap: UniSwap | undefined, extraArgs: {from?: st
     let selector1 = await uniSwap.customSwapFromEth(router);
     let selector2 = await uniSwap.customSwapToEth(router);
 
-    if (!equalHex(selector1, swapFromEth) || !equalHex(selector2, swapToEth)) {
+    if (!equalHex(selector1, swapFromEthSelector) || !equalHex(selector2, swapToEthSelector)) {
       const tx = await executeTxnOnBehalfOf(
         await uniSwap.populateTransaction.updateCustomSwapSelector(router, swapFromEthSelector, swapToEthSelector)
       );
