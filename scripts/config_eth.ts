@@ -33,10 +33,6 @@ export const EthConfig: Record<string, IConfig> = {
       testingTokens: ['dai', 'usdt', 'usdc'],
     },
 
-    kyberProxy: {
-      proxy: '0x9aab3f75489902f3a48495025729a0af77d4b11e',
-    },
-
     kyberDmm: {
       router: '0x1c87257f5e8609940bc751a07bb085bb7f8cdbe6',
       testingTokens: ['dai', 'usdt', 'usdc'],
