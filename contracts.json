@@ -28,7 +28,7 @@
     "lendingContracts": {}
   },
   "bsc_mainnet": {
-    "smartWalletImplementation": "0x688AfF8efb0E9c80957c5c5A6d704b957B119040",
+    "smartWalletImplementation": "0x69B325aF8c8aCfF1dA62d1A6962691A41dbB7b32",
     "smartWalletProxy": "0x051DC16b2ECB366984d1074dCC07c342a9463999",
     "fetchTokenBalances": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
     "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
