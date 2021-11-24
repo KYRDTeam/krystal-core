@@ -317,9 +317,6 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         } else {
             diff = params.destAmount - destAmount;
         }
-
-        // Tolerate a 5% difference
-        require(diff < params.destAmount / 20, "getExpectedIn_noResult");
     }
 
     /// @dev swap using particular swap contract
