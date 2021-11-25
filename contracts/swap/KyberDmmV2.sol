@@ -109,6 +109,7 @@ contract KyberDmmV2 is BaseSwap {
 
     function parseExtraArgs(bytes calldata extraArgs)
         internal
+        pure
         returns (address aggregationExecutor, bytes memory executorData)
     {
         require(extraArgs.length > 20, "invalid extraArgs");

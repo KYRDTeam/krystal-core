@@ -94,7 +94,7 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         override
         returns (uint256 destAmount, uint256 expectedRate)
     {
-        (destAmount, expectedRate,) = getExpectedReturnInternal(params);
+        (destAmount, expectedRate,) = getExpectedReturnInternal(params, false);
     }
 
     function getExpectedReturnWithImpact(
@@ -109,11 +109,11 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
             uint256 priceImpact
         )
     {
-        return getExpectedReturnInternal(params);
+        return getExpectedReturnInternal(params, true);
     }
 
     function getExpectedReturnInternal(
-        ISmartWalletImplementation.GetExpectedReturnParams memory params
+        ISmartWalletImplementation.GetExpectedReturnParams memory params, bool withImpact
     ) private view returns (uint256 destAmount, uint256 expectedRate, uint256 priceImpact) {
         if (params.feeBps >= BPS) return (0, 0, 0); // platform fee is too high
 
@@ -121,14 +121,25 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
             ? (params.srcAmount * (BPS - params.feeBps)) / BPS
             : params.srcAmount;
 
-        (destAmount, priceImpact) = ISwap(params.swapContract).getExpectedReturnWithImpact(
-            ISwap.GetExpectedReturnParams({
-                srcAmount: actualSrc,
-                tradePath: params.tradePath,
-                feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
-                extraArgs: params.extraArgs
-            })
-        );
+        if (withImpact) {
+            (destAmount, priceImpact) = ISwap(params.swapContract).getExpectedReturnWithImpact(
+                ISwap.GetExpectedReturnParams({
+                    srcAmount: actualSrc,
+                    tradePath: params.tradePath,
+                    feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                    extraArgs: params.extraArgs
+                })
+            );
+        } else {
+            destAmount = ISwap(params.swapContract).getExpectedReturn(
+                ISwap.GetExpectedReturnParams({
+                    srcAmount: actualSrc,
+                    tradePath: params.tradePath,
+                    feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                    extraArgs: params.extraArgs
+                })
+            );
+        }
 
         if (params.feeMode == FeeMode.FROM_DEST) {
             destAmount = (destAmount * (BPS - params.feeBps)) / BPS;
@@ -151,7 +162,7 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         override
         returns (uint256 srcAmount, uint256 expectedRate)
     {
-        (srcAmount, expectedRate, ) = getExpectedInInternal(params);
+        (srcAmount, expectedRate, ) = getExpectedInInternal(params, false);
     }
 
     function getExpectedInWithImpact(ISmartWalletImplementation.GetExpectedInParams calldata params)
@@ -160,13 +171,13 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         override
         returns (uint256 srcAmount, uint256 expectedRate, uint256 priceImpact)
     {
-        return getExpectedInInternal(params);
+        return getExpectedInInternal(params, true);
     }
 
     /// @dev get expected in amount including the fee
     /// @return srcAmount expected aource amount
     /// @return expectedRate expected swap rate
-    function getExpectedInInternal(ISmartWalletImplementation.GetExpectedInParams memory params)
+    function getExpectedInInternal(ISmartWalletImplementation.GetExpectedInParams memory params, bool withImpact)
         private
         view
         returns (uint256 srcAmount, uint256 expectedRate, uint256 priceImpact)
@@ -177,30 +188,57 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
             ? (params.destAmount * (BPS + params.feeBps)) / BPS
             : params.destAmount;
 
-        try
-            ISwap(params.swapContract).getExpectedIn(
-                ISwap.GetExpectedInParams({
-                    destAmount: actualDest,
-                    tradePath: params.tradePath,
-                    feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
-                    extraArgs: params.extraArgs
-                })
-            )
-        //returns (uint256 newSrcAmount, uint256 newPriceImpact) {
-            //(srcAmount, priceImpact) = (newSrcAmount, newPriceImpact);
-        returns (uint256 newSrcAmount) {
-            srcAmount = newSrcAmount;
-        } catch Error(string memory reason) {
-            require(compareStrings(reason, "getExpectedIn_notSupported"), reason);
-            (srcAmount, priceImpact) = defaultGetExpectedIn(
-                params.swapContract,
-                ISwap.GetExpectedInParams({
-                    destAmount: actualDest,
-                    tradePath: params.tradePath,
-                    feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
-                    extraArgs: params.extraArgs
-                })
-            );
+        if (withImpact) {
+            try
+                ISwap(params.swapContract).getExpectedInWithImpact(
+                    ISwap.GetExpectedInParams({
+                        destAmount: actualDest,
+                        tradePath: params.tradePath,
+                        feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                        extraArgs: params.extraArgs
+                    })
+                )
+            returns (uint256 newSrcAmount, uint256 newPriceImpact) {
+                srcAmount = newSrcAmount;
+                priceImpact = newPriceImpact;
+            } catch Error(string memory reason) {
+                require(compareStrings(reason, "getExpectedIn_notSupported"), reason);
+                (srcAmount, priceImpact) = defaultGetExpectedIn(
+                    params.swapContract,
+                    ISwap.GetExpectedInParams({
+                        destAmount: actualDest,
+                        tradePath: params.tradePath,
+                        feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                        extraArgs: params.extraArgs
+                    }),
+                    withImpact
+                );
+            }
+        } else {
+            try
+                ISwap(params.swapContract).getExpectedIn(
+                    ISwap.GetExpectedInParams({
+                        destAmount: actualDest,
+                        tradePath: params.tradePath,
+                        feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                        extraArgs: params.extraArgs
+                    })
+                )
+            returns (uint256 newSrcAmount) {
+                srcAmount = newSrcAmount;
+            } catch Error(string memory reason) {
+                require(compareStrings(reason, "getExpectedReturnWithImpact_notSupported"), reason);
+                (srcAmount, priceImpact) = defaultGetExpectedIn(
+                    params.swapContract,
+                    ISwap.GetExpectedInParams({
+                        destAmount: actualDest,
+                        tradePath: params.tradePath,
+                        feeBps: params.feeMode == FeeMode.BY_PROTOCOL ? params.feeBps : 0,
+                        extraArgs: params.extraArgs
+                    }),
+                    withImpact
+                );
+            }
         }
 
         if (params.feeMode == FeeMode.FROM_SOURCE) {
@@ -215,7 +253,7 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         );
     }
 
-    function defaultGetExpectedIn(address swapContract, ISwap.GetExpectedInParams memory params)
+    function defaultGetExpectedIn(address swapContract, ISwap.GetExpectedInParams memory params, bool withImpact)
         private
         view
         returns (uint256 srcAmount, uint256 priceImpact)
@@ -254,23 +292,31 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
 
         // Precision check
         uint256 destAmount;
-        (destAmount, priceImpact) = ISwap(swapContract).getExpectedReturnWithImpact(
-            ISwap.GetExpectedReturnParams({
-                srcAmount: srcAmount,
-                tradePath: params.tradePath,
-                feeBps: params.feeBps,
-                extraArgs: params.extraArgs
-            })
-        );
+        if (withImpact) {
+            (destAmount, priceImpact) = ISwap(swapContract).getExpectedReturnWithImpact(
+                ISwap.GetExpectedReturnParams({
+                    srcAmount: srcAmount,
+                    tradePath: params.tradePath,
+                    feeBps: params.feeBps,
+                    extraArgs: params.extraArgs
+                })
+            );
+        } else {
+            destAmount = ISwap(swapContract).getExpectedReturn(
+                ISwap.GetExpectedReturnParams({
+                    srcAmount: srcAmount,
+                    tradePath: params.tradePath,
+                    feeBps: params.feeBps,
+                    extraArgs: params.extraArgs
+                })
+            );
+        }
         uint256 diff;
         if (destAmount > params.destAmount) {
             diff = destAmount - params.destAmount;
         } else {
             diff = params.destAmount - destAmount;
         }
-
-        // Tolerate a 5% difference
-        require(diff < params.destAmount / 20, "getExpectedIn_noResult");
     }
 
     /// @dev swap using particular swap contract

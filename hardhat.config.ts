@@ -14,7 +14,7 @@ import {accounts} from './scripts/testWallet';
 dotenv.config();
 
 // Network specific config
-dotenv.config({path: `${__dirname}/./.env.${process.env.CHAIN}.${process.env.NETWORK}`});
+dotenv.config({path: `${__dirname}/./env/.env.${process.env.CHAIN}.${process.env.NETWORK}`});
 
 const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY, MAINNET_ID, MAINNET_FORK, MAINNET_FORK_BLOCK} = process.env;
 
@@ -147,7 +147,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 5 * 1e9,
+    gasPrice: 35 * 1e9,
   };
 
   config.networks!.polygon_staging = {
@@ -194,7 +194,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 1,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 42 * 1e9,
+    gasPrice: 80 * 1e9,
   };
 }
 

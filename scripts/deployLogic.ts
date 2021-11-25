@@ -71,10 +71,10 @@ export const deploy = async (
   log(0, '======================\n');
   let deployedContracts = await deployContracts(existingContract, multisig || deployerAddress);
 
-  // Initialization
-  log(0, 'Updating proxy data');
-  log(0, '======================\n');
-  await updateProxy(deployedContracts, extraArgs);
+  // // // Initialization
+  // log(0, 'Updating proxy data');
+  // log(0, '======================\n');
+  // await updateProxy(deployedContracts, extraArgs);
 
   log(0, 'Updating swaps/lendings linking');
   log(0, '======================\n');
@@ -104,25 +104,25 @@ export const deploy = async (
   log(0, '======================\n');
   await updateKyberDmmV2(deployedContracts.swapContracts?.kyberDmmV2, extraArgs);
 
-  log(0, 'Updating compound/clones config');
-  log(0, '======================\n');
-  await updateCompoundLending(deployedContracts.lendingContracts?.compoundLending, extraArgs);
+  // log(0, 'Updating compound/clones config');
+  // log(0, '======================\n');
+  // await updateCompoundLending(deployedContracts.lendingContracts?.compoundLending, extraArgs);
 
-  log(0, 'Updating aave V1 config');
-  log(0, '======================\n');
-  await updateAaveV1Lending(deployedContracts.lendingContracts?.aaveV1, extraArgs);
+  // log(0, 'Updating aave V1 config');
+  // log(0, '======================\n');
+  // await updateAaveV1Lending(deployedContracts.lendingContracts?.aaveV1, extraArgs);
 
-  log(0, 'Updating aave V2 config');
-  log(0, '======================\n');
-  await updateAaveV2Lending(deployedContracts.lendingContracts?.aaveV2, networkConfig.aaveV2, extraArgs);
+  // log(0, 'Updating aave V2 config');
+  // log(0, '======================\n');
+  // await updateAaveV2Lending(deployedContracts.lendingContracts?.aaveV2, networkConfig.aaveV2, extraArgs);
 
-  log(0, 'Updating aave AMM config');
-  log(0, '======================\n');
-  await updateAaveV2Lending(deployedContracts.lendingContracts?.aaveAMM, networkConfig.aaveAMM, extraArgs);
+  // log(0, 'Updating aave AMM config');
+  // log(0, '======================\n');
+  // await updateAaveV2Lending(deployedContracts.lendingContracts?.aaveAMM, networkConfig.aaveAMM, extraArgs);
 
-  log(0, 'Updating NFT proxy data');
-  log(0, '======================\n');
-  await updateNftProxy(deployedContracts, extraArgs);
+  // log(0, 'Updating NFT proxy data');
+  // log(0, '======================\n');
+  // await updateNftProxy(deployedContracts, extraArgs);
 
   // Summary
   log(0, 'Summary');
@@ -385,7 +385,7 @@ async function deployContract(
     // if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
-      await sleep(2000);
+      await sleep(10000);
       log(3, '>> start verifying');
       await run('verify:verify', {
         address: contract.address,
@@ -549,7 +549,7 @@ async function updateUniSwap(uniSwap: UniSwap | undefined, extraArgs: {from?: st
     let selector1 = await uniSwap.customSwapFromEth(router);
     let selector2 = await uniSwap.customSwapToEth(router);
 
-    if (!equalHex(selector1, swapFromEth) || !equalHex(selector2, swapToEth)) {
+    if (!equalHex(selector1, swapFromEthSelector) || !equalHex(selector2, swapToEthSelector)) {
       const tx = await executeTxnOnBehalfOf(
         await uniSwap.populateTransaction.updateCustomSwapSelector(router, swapFromEthSelector, swapToEthSelector)
       );
