@@ -106,7 +106,7 @@ contract KyberDmm is BaseSwap {
         uint256 quote = srcAmount;
         for (uint256 i; i < pools.length; i++) {
             IDMMPool pool = IDMMPool(pools[i]);
-            (uint256 reserveIn, uint256 reserveOut) = pool.getReserves();
+            (, , uint256 reserveIn, uint256 reserveOut, ) = pool.getTradeInfo();
             if (tradePathErc[i] == pool.token1()) {
                 (reserveIn, reserveOut) = (reserveOut, reserveIn);
             }
