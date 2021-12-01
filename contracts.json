@@ -22,7 +22,7 @@
     "fetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B",
     "swapContracts": {
       "uniSwap": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
-      "kyberDmm": "0xE7314051BCFD832398e232f2c274278c44121a3f",
+      "kyberDmm": "0x867eB83fEe136Be5b35d3554C89eC75D79737368",
       "kyberDmmV2": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
     },
     "lendingContracts": {}
@@ -34,7 +34,7 @@
     "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
     "swapContracts": {
       "uniSwap": "0x759baFEdce842E56C3aB743e7004af8E80aDa541",
-      "kyberDmm": "0x0F0c6D2d7634288c67DF5C31250A0AFD2a6D3Ac6",
+      "kyberDmm": "0x2f0f7e11B2662CDf6e648D28A57a9A1544F0FD2F",
       "kyberDmmV2": "0x3210a8b8206bc205840c983499aB92DB0f4F3C6e"
     },
     "lendingContracts": {
@@ -114,7 +114,7 @@
     "fetchAaveDataWrapper": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",
     "swapContracts": {
       "uniSwap": "0x0Bec1f115A7D61ec618a6862A3Be0dB52a451392",
-      "kyberDmm": "0xBe382813C8F2b30B978ac665b8918ab190815130",
+      "kyberDmm": "0xEAAED9A49785A47679919A0Ebfb9720A027E5DAF",
       "oneInch": "0x256dc3c60d039ac57A36287289Fa7486Fd7dd0B3",
       "kyberDmmV2": "0xa21dBda6dEBd04E8D9ecE070c54047D6662E3930"
     },

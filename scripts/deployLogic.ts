@@ -71,7 +71,7 @@ export const deploy = async (
   log(0, '======================\n');
   let deployedContracts = await deployContracts(existingContract, multisig || deployerAddress);
 
-  // // // Initialization
+  // Initialization
   // log(0, 'Updating proxy data');
   // log(0, '======================\n');
   // await updateProxy(deployedContracts, extraArgs);
@@ -385,7 +385,7 @@ async function deployContract(
     // if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
-      await sleep(10000);
+      await sleep(20000);
       log(3, '>> start verifying');
       await run('verify:verify', {
         address: contract.address,
