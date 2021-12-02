@@ -22,7 +22,7 @@
     "fetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B",
     "swapContracts": {
       "uniSwap": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
-      "kyberDmm": "0xE7314051BCFD832398e232f2c274278c44121a3f",
+      "kyberDmm": "0x867eB83fEe136Be5b35d3554C89eC75D79737368",
       "kyberDmmV2": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
     },
     "lendingContracts": {}
@@ -34,7 +34,7 @@
     "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
     "swapContracts": {
       "uniSwap": "0x759baFEdce842E56C3aB743e7004af8E80aDa541",
-      "kyberDmm": "0x0F0c6D2d7634288c67DF5C31250A0AFD2a6D3Ac6",
+      "kyberDmm": "0x2f0f7e11B2662CDf6e648D28A57a9A1544F0FD2F",
       "kyberDmmV2": "0x3210a8b8206bc205840c983499aB92DB0f4F3C6e"
     },
     "lendingContracts": {
@@ -91,15 +91,15 @@
     "lendingContracts": {}
   },
   "eth_ropsten": {
-    "smartWalletImplementation": "0x899c3a16186087d393DfAA60BbeEf757b37268F7",
+    "smartWalletImplementation": "0xDb91C44c3e67b33cf37C1ab5A0CD17763CA51513",
     "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchTokenBalances": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
     "fetchAaveDataWrapper": "0xD7eA9048908F5E19DCcdD9623dc820feDbb54D45",
     "swapContracts": {
-      "uniSwap": "0xfd5904626c103A9bE91635DF823B442f0b77EC88",
-      "uniSwapV3": "0x0993A84E5bdad44f2Cb49C8eB8CEC81Bc8791d6B",
-      "kyberProxy": "0xF484d5D60e80cF75E5369EbFCc102CD04965F63e",
-      "kyberDmm": "0x670667eab359030aF7c6f785FC32c25BbE9a7a31"
+      "uniSwap": "0xCfaED28a00e94c4564EB1F39F97f0A5B6EED9273",
+      "uniSwapV3": "0x20aD2219485D61bD7DD58c0B4043Ee0f32E8E090",
+      "kyberProxy": "0x5Cd48B9e7a33C64f5bf8Eb9cC32DfB6051b4Ef97",
+      "kyberDmm": "0x12193242F0FB7Aa006D61efD5CC6C7dE92C88aF1"
     },
     "lendingContracts": {
       "compoundLending": "0x60fc810EA972809d729FCE0043B82a58766596ee"
@@ -114,7 +114,7 @@
     "fetchAaveDataWrapper": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",
     "swapContracts": {
       "uniSwap": "0x0Bec1f115A7D61ec618a6862A3Be0dB52a451392",
-      "kyberDmm": "0xBe382813C8F2b30B978ac665b8918ab190815130",
+      "kyberDmm": "0xEAAED9A49785A47679919A0Ebfb9720A027E5DAF",
       "oneInch": "0x256dc3c60d039ac57A36287289Fa7486Fd7dd0B3",
       "kyberDmmV2": "0xa21dBda6dEBd04E8D9ecE070c54047D6662E3930"
     },
