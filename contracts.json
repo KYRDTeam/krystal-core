@@ -68,9 +68,9 @@
     "fetchTokenBalances": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
     "fetchAaveDataWrapper": "0x0C816D6C4C37294186CBCA0E514Fc56F0c34d059",
     "swapContracts": {
-      "uniSwap": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
+      "uniSwap": "0x670667eab359030aF7c6f785FC32c25BbE9a7a31",
       "uniSwapV3": "0x6D3aCe38280BcD5aBF063bB3f941BD3af06dF546",
-      "kyberDmm": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
+      "kyberDmm": "0x64865f3D46bfcA495A00F9c5E38027c60A2a0240",
       "oneInch": "0x9e81428f5672edcea83f5bf58b6b2cd968df8ee6",
       "kyberDmmV2": "0xA3f1bD7beE8c6DAE2De8FcF37067a87706517640"
     },
