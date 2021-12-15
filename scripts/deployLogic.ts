@@ -72,9 +72,9 @@ export const deploy = async (
   let deployedContracts = await deployContracts(existingContract, multisig || deployerAddress);
 
   // Initialization
-  log(0, 'Updating proxy data');
-  log(0, '======================\n');
-  await updateProxy(deployedContracts, extraArgs);
+  // log(0, 'Updating proxy data');
+  // log(0, '======================\n');
+  // await updateProxy(deployedContracts, extraArgs);
 
   log(0, 'Updating swaps/lendings linking');
   log(0, '======================\n');
