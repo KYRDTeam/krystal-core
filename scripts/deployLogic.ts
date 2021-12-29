@@ -380,12 +380,12 @@ async function deployContract(
   }
 
   // Only verify new contract to save time
-  if (autoVerify && !contractAddress) {
-    // Try to verify no matter what
-    // if (autoVerify) {
+  // if (autoVerify && !contractAddress) {
+  // Try to verify no matter what
+  if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
-      await sleep(20000);
+      await sleep(1000);
       log(3, '>> start verifying');
       await run('verify:verify', {
         address: contract.address,
