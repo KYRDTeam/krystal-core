@@ -16,7 +16,18 @@ dotenv.config();
 // Network specific config
 dotenv.config({path: `${__dirname}/./env/.env.${process.env.CHAIN}.${process.env.NETWORK}`});
 
-const {PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_KEY, MAINNET_ID, MAINNET_FORK, MAINNET_FORK_BLOCK} = process.env;
+const {
+  PRIVATE_KEY,
+  INFURA_API_KEY,
+  ETHERSCAN_KEY,
+  BSCSCAN_KEY,
+  AVAXSCAN_KEY,
+  POLYGONSCAN_KEY,
+  FANTOMSCAN_KEY,
+  MAINNET_ID,
+  MAINNET_FORK,
+  MAINNET_FORK_BLOCK,
+} = process.env;
 
 // custom network config for testing. See scripts/config.ts
 export const customNetworkConfig =
@@ -81,7 +92,27 @@ const config: HardhatUserConfig = {
   etherscan: {
     // Your API key for bscscan / ethscan
     // Obtain one at https://bscscan.io/
-    apiKey: ETHERSCAN_KEY,
+    apiKey: {
+      mainnet: ETHERSCAN_KEY,
+      ropsten: ETHERSCAN_KEY,
+      rinkeby: ETHERSCAN_KEY,
+
+      // binance smart chain
+      bsc: BSCSCAN_KEY,
+      bscTestnet: BSCSCAN_KEY,
+
+      // fantom mainnet
+      opera: FANTOMSCAN_KEY,
+      ftmTestnet: FANTOMSCAN_KEY,
+
+      // polygon
+      polygon: POLYGONSCAN_KEY,
+      polygonMumbai: POLYGONSCAN_KEY,
+
+      // avalanche
+      avalanche: AVAXSCAN_KEY,
+      avalancheFujiTestnet: AVAXSCAN_KEY,
+    },
   },
 
   typechain: {
@@ -138,6 +169,14 @@ if (PRIVATE_KEY) {
     accounts: [PRIVATE_KEY],
     timeout: 20000,
     gasPrice: 75 * 1e9,
+  };
+
+  config.networks!.fantom_mainnet = {
+    url: 'https://rpc.ftm.tools/',
+    chainId: 250,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 301 * 1e9,
   };
 }
 

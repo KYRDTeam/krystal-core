@@ -107,6 +107,15 @@
     "nft": "0x3209286B92060D2f5e88565E7194ccB5aA831606",
     "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3"
   },
+  "fantom_mainnet": {
+    "smartWalletImplementation": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
+    "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
+    "fetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B",
+    "swapContracts": {
+      "kyberDmmV2": "0x60fc810EA972809d729FCE0043B82a58766596ee"
+    },
+    "lendingContracts": {}
+  },
   "polygon_mainnet": {
     "smartWalletImplementation": "0x9715975C4C5e3447dC14E07A0d00Ff74A6FaF8CD",
     "smartWalletProxy": "0x70270c228c5b4279d1578799926873aa72446ccd",
