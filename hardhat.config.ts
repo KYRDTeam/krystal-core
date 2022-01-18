@@ -178,6 +178,14 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 301 * 1e9,
   };
+
+  config.networks!.cronos_mainnet = {
+    url: 'https://evm-cronos.crypto.org',
+    chainId: 25,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 5000 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
