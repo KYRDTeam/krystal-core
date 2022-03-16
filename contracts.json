@@ -15,6 +15,23 @@
     "fetchTokenBalances": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
     "swapContracts": {
       "uniSwap": "0xfA5d8aAF312c96b42Ac4355B13D9D28fB10b305c"
+    }
+  },
+  "arbitrum_mainnet": {
+    "smartWalletImplementation": "0xe6eD54B6C7723f27300e247B2C7aA18B35586232",
+    "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
+    "fetchTokenBalances": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
+    "swapContracts": {
+      "uniSwap": "0x477Feff760340F73F98B340BB4D9f049CdE0db33"
+    },
+    "lendingContracts": {}
+  },
+  "arbitrum_rinkeby": {
+    "smartWalletImplementation": "0xe6eD54B6C7723f27300e247B2C7aA18B35586232",
+    "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
+    "fetchTokenBalances": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
+    "swapContracts": {
+      "uniSwap": "0x477Feff760340F73F98B340BB4D9f049CdE0db33"
     },
     "lendingContracts": {}
   },

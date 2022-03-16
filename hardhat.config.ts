@@ -25,6 +25,7 @@ const {
   POLYGONSCAN_KEY,
   FANTOMSCAN_KEY,
   AURORASCAN_KEY,
+  ARBISCAN_KEY,
   MAINNET_ID,
   MAINNET_FORK,
   MAINNET_FORK_BLOCK,
@@ -114,8 +115,13 @@ const config: HardhatUserConfig = {
       avalanche: AVAXSCAN_KEY,
       avalancheFujiTestnet: AVAXSCAN_KEY,
 
+      // aurora
       aurora: AURORASCAN_KEY,
       auroraTestnet: AURORASCAN_KEY,
+
+      // arbitrum
+      arbitrumOne: ARBISCAN_KEY,
+      arbitrumTestnet: ARBISCAN_KEY,
     },
   },
 
@@ -181,6 +187,22 @@ if (PRIVATE_KEY) {
     accounts: [PRIVATE_KEY],
     timeout: 20000,
     gasPrice: 301 * 1e9,
+  };
+
+  config.networks!.arbitrum_mainnet = {
+    url: 'https://arb1.arbitrum.io/rpc',
+    chainId: 42161,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 1 * 1e9,
+  };
+
+  config.networks!.arbitrum_rinkeby = {
+    url: 'https://rinkeby.arbitrum.io/rpc',
+    chainId: 421611,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 1 * 1e9,
   };
 
   config.networks!.cronos_mainnet = {
