@@ -28,7 +28,7 @@ import {EthersAdapter} from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
 import Safe from '@gnosis.pm/safe-core-sdk';
 
-const gasLimit = 300000;
+const gasLimit = 3000000;
 
 const networkConfig = NetworkConfig[network.name];
 if (!networkConfig) {
