@@ -186,6 +186,22 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 5000 * 1e9,
   };
+
+  config.networks!.aurora_mainnet = {
+    url: 'https://mainnet.aurora.dev/',
+    chainId: 1313161554,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 1 * 1e9,
+  };
+
+  config.networks!.aurora_testnet = {
+    url: 'https://testnet.aurora.dev/',
+    chainId: 1313161555,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 1 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
