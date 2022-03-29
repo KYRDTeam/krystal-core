@@ -24,6 +24,7 @@ const {
   AVAXSCAN_KEY,
   POLYGONSCAN_KEY,
   FANTOMSCAN_KEY,
+  AURORASCAN_KEY,
   MAINNET_ID,
   MAINNET_FORK,
   MAINNET_FORK_BLOCK,
@@ -112,6 +113,9 @@ const config: HardhatUserConfig = {
       // avalanche
       avalanche: AVAXSCAN_KEY,
       avalancheFujiTestnet: AVAXSCAN_KEY,
+
+      aurora: AURORASCAN_KEY,
+      auroraTestnet: AURORASCAN_KEY,
     },
   },
 

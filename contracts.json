@@ -9,6 +9,13 @@
     "SmartWalletSwapProxy": "0xE7314051BCFD832398e232f2c274278c44121a3f",
     "FetchTokenBalances": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
   },
+  "aurora_mainnet": {
+    "smartWalletImplementation": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
+    "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
+    "fetchTokenBalances": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
+    "swapContracts": {},
+    "lendingContracts": {}
+  },
   "avalanche_fuji": {
     "smartWalletImplementation": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",
     "smartWalletProxy": "0xAE0505c0C30Dc0EA077cDB4Ed1B2BB894D9c6B65",
