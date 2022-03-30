@@ -22,7 +22,8 @@
     "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
     "fetchTokenBalances": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
     "swapContracts": {
-      "uniSwap": "0x477Feff760340F73F98B340BB4D9f049CdE0db33"
+      "uniSwap": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
+      "kyberSwapV2": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93"
     },
     "lendingContracts": {}
   },

@@ -16,6 +16,11 @@ export const ArbitrumConfig: Record<string, IConfig> = {
       },
     },
 
+    kyberSwapV2: {
+      router: '0xdf1a1b60f2d438842916c0adc43748768353ec25',
+      aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 2500,
   },
