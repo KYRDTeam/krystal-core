@@ -90,12 +90,20 @@ contract KyberSwapV2 is BaseSwap {
         uint256 callValue = etherIn ? params.srcAmount : 0;
         uint256 flags = etherIn ? 0 : 4;
 
-        address[] memory srcReceivers = new address[](1);
-        srcReceivers[0] = aggregationExecutorAddress;
-        uint256[] memory srcAmounts = new uint256[](1);
-        srcAmounts[0] = params.srcAmount;
+        address[] memory srcReceivers;
+        uint256[] memory srcAmounts;
 
-        (uint256 returnAmount, ) = router.swap{value: callValue}(
+        if (etherIn) {
+            srcReceivers = new address[](0);
+            srcAmounts = new uint256[](0);
+        } else {
+            srcReceivers = new address[](1);
+            srcReceivers[0] = aggregationExecutorAddress;
+            srcAmounts = new uint256[](1);
+            srcAmounts[0] = params.srcAmount;
+        }
+
+        uint256 returnAmount = router.swap{value: callValue}(
             aggregationExecutorAddress,
             IAggregationRouterV2.SwapDescriptionV2({
                 srcToken: params.tradePath[0],

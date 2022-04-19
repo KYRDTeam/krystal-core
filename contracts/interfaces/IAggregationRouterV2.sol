@@ -19,5 +19,5 @@ interface IAggregationRouterV2 {
         address aggregationExecutor,
         SwapDescriptionV2 calldata desc,
         bytes calldata data
-    ) external payable returns (uint256 returnAmount, uint256 gasLeft); // 0x7c025200
+    ) external payable returns (uint256 returnAmount); // 0x7c025200
 }

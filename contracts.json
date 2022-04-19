@@ -161,7 +161,8 @@
       "uniSwap": "0x0Bec1f115A7D61ec618a6862A3Be0dB52a451392",
       "kyberDmm": "0xEAAED9A49785A47679919A0Ebfb9720A027E5DAF",
       "oneInch": "0x256dc3c60d039ac57A36287289Fa7486Fd7dd0B3",
-      "kyberDmmV2": "0xa21dBda6dEBd04E8D9ecE070c54047D6662E3930"
+      "kyberDmmV2": "0xa21dBda6dEBd04E8D9ecE070c54047D6662E3930",
+      "kyberSwapV2": "0x97a22317cbFCE23d9AAF9ba973e4E32FE55d68fc"
     },
     "lendingContracts": {
       "aaveV2": "0x95ceC39Aa053C62d1A49D88B60620a489C241F53"
