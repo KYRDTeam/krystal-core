@@ -24,6 +24,7 @@ const {
   AVAXSCAN_KEY,
   POLYGONSCAN_KEY,
   FANTOMSCAN_KEY,
+  AURORASCAN_KEY,
   MAINNET_ID,
   MAINNET_FORK,
   MAINNET_FORK_BLOCK,
@@ -112,6 +113,9 @@ const config: HardhatUserConfig = {
       // avalanche
       avalanche: AVAXSCAN_KEY,
       avalancheFujiTestnet: AVAXSCAN_KEY,
+
+      aurora: AURORASCAN_KEY,
+      auroraTestnet: AURORASCAN_KEY,
     },
   },
 
@@ -185,6 +189,22 @@ if (PRIVATE_KEY) {
     accounts: [PRIVATE_KEY],
     timeout: 20000,
     gasPrice: 5000 * 1e9,
+  };
+
+  config.networks!.aurora_mainnet = {
+    url: 'https://mainnet.aurora.dev/',
+    chainId: 1313161554,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 1 * 1e9,
+  };
+
+  config.networks!.aurora_testnet = {
+    url: 'https://testnet.aurora.dev/',
+    chainId: 1313161555,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 1 * 1e9,
   };
 }
 
