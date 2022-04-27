@@ -13,7 +13,9 @@
     "smartWalletImplementation": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
     "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
     "fetchTokenBalances": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
-    "swapContracts": {},
+    "swapContracts": {
+      "uniSwap": "0xfA5d8aAF312c96b42Ac4355B13D9D28fB10b305c"
+    },
     "lendingContracts": {}
   },
   "avalanche_fuji": {
