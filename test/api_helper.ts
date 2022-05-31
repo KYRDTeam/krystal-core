@@ -1,5 +1,5 @@
 export const apiMock: {[url: string]: any} = {
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '3330666666666664',
       outputAmount: '15388008267926874564',
@@ -42,7 +42,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '33306666666666634',
       outputAmount: '153879606400649702128',
@@ -85,7 +85,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0x6b175474e89094c44da98b954eedeac495271d0f&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=4996000000000000000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0x6b175474e89094c44da98b954eedeac495271d0f&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=4996000000000000000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '4996000000000000000',
       outputAmount: '4985848',
@@ -166,7 +166,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0x6b175474e89094c44da98b954eedeac495271d0f&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=4996000000000000000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0x6b175474e89094c44da98b954eedeac495271d0f&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=4996000000000000000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '4996000000000000000',
       outputAmount: '4979299',
@@ -209,7 +209,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0x6b175474e89094c44da98b954eedeac495271d0f&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=4996000000000000000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0x6b175474e89094c44da98b954eedeac495271d0f&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=4996000000000000000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '0',
       outputAmount: '0',
@@ -222,7 +222,7 @@ export const apiMock: {[url: string]: any} = {
       swaps: [],
       tokens: {},
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '3330666666666664',
       outputAmount: '15387407',
@@ -265,7 +265,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '33306666666666634',
       outputAmount: '153873935',
@@ -308,7 +308,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '4996000',
       outputAmount: '4984478080985186611',
@@ -351,7 +351,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '4996000',
       outputAmount: '4971372',
@@ -432,7 +432,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '0',
       outputAmount: '0',
@@ -445,7 +445,7 @@ export const apiMock: {[url: string]: any} = {
       swaps: [],
       tokens: {},
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '3330666666666664',
       outputAmount: '15354657',
@@ -488,7 +488,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '33306666666666634',
       outputAmount: '153546325',
@@ -531,7 +531,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xdac17f958d2ee523a2206206994597c13d831ec7&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xdac17f958d2ee523a2206206994597c13d831ec7&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '4996000',
       outputAmount: '4982710906843669954',
@@ -574,7 +574,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xdac17f958d2ee523a2206206994597c13d831ec7&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xdac17f958d2ee523a2206206994597c13d831ec7&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '4996000',
       outputAmount: '4991095',
@@ -617,7 +617,7 @@ export const apiMock: {[url: string]: any} = {
         },
       },
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xdac17f958d2ee523a2206206994597c13d831ec7&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xdac17f958d2ee523a2206206994597c13d831ec7&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '0',
       outputAmount: '0',
@@ -630,7 +630,7 @@ export const apiMock: {[url: string]: any} = {
       swaps: [],
       tokens: {},
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=3330666666666664&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '0',
       outputAmount: '0',
@@ -643,7 +643,7 @@ export const apiMock: {[url: string]: any} = {
       swaps: [],
       tokens: {},
     },
-  'https://aggregator-api.kyber.org/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=33306666666666634&saveGas=0&gasInclude=0&dexes=uniswap':
     {
       inputAmount: '0',
       outputAmount: '0',
@@ -1656,6 +1656,541 @@ export const apiMock: {[url: string]: any} = {
         value: '0',
         gas: 0,
         gasPrice: '190758030499',
+      },
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=333066666666666333600&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '0',
+      outputAmount: '0',
+      totalGas: 125000,
+      gasPriceGwei: '30.8670576',
+      gasUsd: 11.761300011677752,
+      amountInUsd: 1015269.2988623207,
+      amountOutUsd: 0,
+      receivedUsd: -11.761300011677752,
+      swaps: [],
+      tokens: {},
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amountIn=3333333333333330&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '0',
+      outputAmount: '0',
+      totalGas: 125000,
+      gasPriceGwei: '34.25414393',
+      gasUsd: 13.05188426651577,
+      amountInUsd: 10.16082164593996,
+      amountOutUsd: 0,
+      receivedUsd: -13.05188426651577,
+      swaps: [],
+      tokens: {},
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=333066666666666333600&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '333066666666666333600',
+      outputAmount: '1001487615850',
+      totalGas: 425000,
+      gasPriceGwei: '35.68113018',
+      gasUsd: 46.23686372810608,
+      amountInUsd: 1015528.2440967058,
+      amountOutUsd: 1001487.61585,
+      receivedUsd: 1001441.3789862718,
+      swaps: [
+        [
+          {
+            pool: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            swapAmount: '266453333333333066880',
+            amountOut: '801946069235',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+        [
+          {
+            pool: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            swapAmount: '49959999999999950040',
+            amountOut: '151649695787',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0x3041cbd36888becc7bbcbc0045e3b1f144466f5f',
+            tokenIn: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            tokenOut: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            swapAmount: '151649695787',
+            amountOut: '149901538027',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+        [
+          {
+            pool: '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            swapAmount: '16653333333333316680',
+            amountOut: '50432790962952162894982',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0xb20bd5d04be54f870d5c0d3ca85d82b34b836405',
+            tokenIn: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            tokenOut: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            swapAmount: '50432790962952162894982',
+            amountOut: '49640008588',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+      ],
+      tokens: {
+        '0x6b175474e89094c44da98b954eedeac495271d0f': {
+          address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          symbol: 'DAI',
+          name: 'Dai Stablecoin',
+          price: 1,
+          decimals: 18,
+        },
+        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': {
+          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          price: 1,
+          decimals: 6,
+        },
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+          address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+          price: 3049.0239514512814,
+          decimals: 18,
+        },
+        '0xdac17f958d2ee523a2206206994597c13d831ec7': {
+          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          symbol: 'USDT',
+          name: 'Tether USD',
+          price: 1,
+          decimals: 6,
+        },
+      },
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=3333333333333330&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '3333333333333330',
+      outputAmount: '10151354',
+      totalGas: 185000,
+      gasPriceGwei: '36.4815836',
+      gasUsd: 20.5821172790167,
+      amountInUsd: 10.165374508910219,
+      amountOutUsd: 10.151354,
+      receivedUsd: -10.4307632790167,
+      swaps: [
+        [
+          {
+            pool: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            swapAmount: '3333333333333330',
+            amountOut: '10151354',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+      ],
+      tokens: {
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+          address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+          price: 3049.612352673069,
+          decimals: 18,
+        },
+        '0xdac17f958d2ee523a2206206994597c13d831ec7': {
+          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          symbol: 'USDT',
+          name: 'Tether USD',
+          price: 1,
+          decimals: 6,
+        },
+      },
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=3330666666666663336&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '3330666666666663336',
+      outputAmount: '9686691223',
+      totalGas: 185000,
+      gasPriceGwei: '21.08637049',
+      gasUsd: 11.380272523261727,
+      amountInUsd: 9716.509320427347,
+      amountOutUsd: 9686.691223,
+      receivedUsd: 9675.310950476738,
+      swaps: [
+        [
+          {
+            pool: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            swapAmount: '3330666666666663336',
+            amountOut: '9686691223',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+      ],
+      tokens: {
+        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': {
+          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          price: 1,
+          decimals: 6,
+        },
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+          address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+          price: 2917.28662542855,
+          decimals: 18,
+        },
+      },
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amountIn=3333333333333330&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '3333333333333330',
+      outputAmount: '10137033',
+      totalGas: 185000,
+      gasPriceGwei: '33.24405341',
+      gasUsd: 18.759562284726737,
+      amountInUsd: 10.16753664567667,
+      amountOutUsd: 10.137033,
+      receivedUsd: -8.622529284726737,
+      swaps: [
+        [
+          {
+            pool: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            swapAmount: '3333333333333330',
+            amountOut: '10137033',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+      ],
+      tokens: {
+        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': {
+          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          price: 1,
+          decimals: 6,
+        },
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+          address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+          price: 3050.260993703004,
+          decimals: 18,
+        },
+      },
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=333066666666666333600&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '333066666666666333600',
+      outputAmount: '990005002839544782595732',
+      totalGas: 605000,
+      gasPriceGwei: '38.29301792',
+      gasUsd: 70.66852885869578,
+      amountInUsd: 1015973.1989728267,
+      amountOutUsd: 990005.0028395448,
+      receivedUsd: 989934.3343106861,
+      swaps: [
+        [
+          {
+            pool: '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            swapAmount: '83266666666666583400',
+            amountOut: '248177101848563220307053',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+        [
+          {
+            pool: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            swapAmount: '216493333333333116840',
+            amountOut: '654239966214',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5',
+            tokenIn: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            tokenOut: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            swapAmount: '654239966214',
+            amountOut: '643269001159123467276159',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+        [
+          {
+            pool: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            swapAmount: '16653333333333316680',
+            amountOut: '50758914778',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0x3041cbd36888becc7bbcbc0045e3b1f144466f5f',
+            tokenIn: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            tokenOut: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            swapAmount: '50758914778',
+            amountOut: '50433969179',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5',
+            tokenIn: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            tokenOut: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            swapAmount: '50433969179',
+            amountOut: '48861655837467711808869',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+        [
+          {
+            pool: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            swapAmount: '16653333333333316680',
+            amountOut: '50685519056',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0xb20bd5d04be54f870d5c0d3ca85d82b34b836405',
+            tokenIn: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            tokenOut: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            swapAmount: '50685519056',
+            amountOut: '49697243994390383203651',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+      ],
+      tokens: {
+        '0x6b175474e89094c44da98b954eedeac495271d0f': {
+          address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          symbol: 'DAI',
+          name: 'Dai Stablecoin',
+          price: 1,
+          decimals: 18,
+        },
+        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': {
+          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          price: 1,
+          decimals: 6,
+        },
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+          address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+          price: 3050.359884826344,
+          decimals: 18,
+        },
+        '0xdac17f958d2ee523a2206206994597c13d831ec7': {
+          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          symbol: 'USDT',
+          name: 'Tether USD',
+          price: 1,
+          decimals: 6,
+        },
+      },
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&tokenOut=0x6b175474e89094c44da98b954eedeac495271d0f&amountIn=3333333333333330&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '3333333333333330',
+      outputAmount: '10135330628572302512',
+      totalGas: 185000,
+      gasPriceGwei: '48.18980933',
+      gasUsd: 27.194218413530987,
+      amountInUsd: 10.167832664288769,
+      amountOutUsd: 10.135330628572303,
+      receivedUsd: -17.058887784958685,
+      swaps: [
+        [
+          {
+            pool: '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
+            tokenIn: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            tokenOut: '0x6b175474e89094c44da98b954eedeac495271d0f',
+            swapAmount: '3333333333333330',
+            amountOut: '10135330628572302512',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+      ],
+      tokens: {
+        '0x6b175474e89094c44da98b954eedeac495271d0f': {
+          address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          symbol: 'DAI',
+          name: 'Dai Stablecoin',
+          price: 1,
+          decimals: 18,
+        },
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+          address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+          price: 3050.3497992866337,
+          decimals: 18,
+        },
+      },
+    },
+  'https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&tokenOut=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&amountIn=4996000&saveGas=0&gasInclude=0&dexes=uniswap':
+    {
+      inputAmount: '4996000',
+      outputAmount: '1646689103680911',
+      totalGas: 305000,
+      gasPriceGwei: '43.14295943',
+      gasUsd: 39.97011611292912,
+      amountInUsd: 4.996,
+      amountOutUsd: 5.001925854062346,
+      receivedUsd: -34.96819025886677,
+      swaps: [
+        [
+          {
+            pool: '0x3041cbd36888becc7bbcbc0045e3b1f144466f5f',
+            tokenIn: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            tokenOut: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            swapAmount: '4996000',
+            amountOut: '5004829',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0x0de0fa91b6dbab8c8503aaa2d1dfa91a192cb149',
+            tokenIn: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+            tokenOut: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+            swapAmount: '5004829',
+            amountOut: '12352',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+          {
+            pool: '0xbb2b8038a1640196fbe3e38816f3e67cba72d940',
+            tokenIn: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+            tokenOut: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            swapAmount: '12352',
+            amountOut: '1646689103680911',
+            limitReturnAmount: '0',
+            maxPrice: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+            exchange: 'uniswap',
+            poolLength: 2,
+            poolType: 'uni',
+          },
+        ],
+      ],
+      tokens: {
+        '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': {
+          address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+          symbol: 'WBTC',
+          name: 'Wrapped BTC',
+          price: 40757.06295609904,
+          decimals: 8,
+        },
+        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': {
+          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          symbol: 'USDC',
+          name: 'USD Coin',
+          price: 1,
+          decimals: 6,
+        },
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+          address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+          price: 3037.5654049579475,
+          decimals: 18,
+        },
+        '0xdac17f958d2ee523a2206206994597c13d831ec7': {
+          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          symbol: 'USDT',
+          name: 'Tether USD',
+          price: 1,
+          decimals: 6,
+        },
       },
     },
 };

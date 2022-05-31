@@ -17,6 +17,7 @@ import {
   KrystalCollectiblesImpl,
   OneInch,
   KyberDmmV2,
+  KyberSwapV2,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -28,7 +29,7 @@ import {EthersAdapter} from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
 import Safe from '@gnosis.pm/safe-core-sdk';
 
-const gasLimit = 300000;
+const gasLimit = 3000000;
 
 const networkConfig = NetworkConfig[network.name];
 if (!networkConfig) {
@@ -47,6 +48,7 @@ export interface KrystalContracts {
     kyberDmm?: KyberDmm;
     oneInch?: OneInch;
     kyberDmmV2?: KyberDmmV2;
+    kyberSwapV2?: KyberSwapV2;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -103,6 +105,10 @@ export const deploy = async (
   log(0, 'Updating kyberDmm config');
   log(0, '======================\n');
   await updateKyberDmmV2(deployedContracts.swapContracts?.kyberDmmV2, extraArgs);
+
+  log(0, 'Updating kyberSwap config');
+  log(0, '======================\n');
+  await updateKyberSwapV2(deployedContracts.swapContracts?.kyberSwapV2, extraArgs);
 
   // log(0, 'Updating compound/clones config');
   // log(0, '======================\n');
@@ -245,6 +251,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.kyberDmmV2.router
           )) as KyberDmmV2),
+      kyberSwapV2: !networkConfig.kyberSwapV2
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'KyberSwapV2',
+            existingContract?.['swapContracts']?.['kyberSwapV2'],
+            undefined,
+            contractAdmin,
+            networkConfig.kyberSwapV2.router
+          )) as KyberSwapV2),
     };
 
     lendingContracts = {
@@ -639,6 +656,24 @@ async function updateKyberDmmV2(kyberDmmV2: KyberDmmV2 | undefined, extraArgs: {
       await kyberDmmV2.populateTransaction.updateAggregationRouter(networkConfig.kyberDmmV2.router)
     );
     log(2, '> updated kyberDmmV2', JSON.stringify(networkConfig.kyberDmmV2, null, 2));
+    await printInfo(tx);
+  }
+}
+
+async function updateKyberSwapV2(kyberSwapV2: KyberSwapV2 | undefined, extraArgs: {from?: string}) {
+  if (!kyberSwapV2 || !networkConfig.kyberSwapV2) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await kyberSwapV2.router()).toLowerCase() === networkConfig.kyberSwapV2.router.toLowerCase()) {
+    log(2, `kyberSwapV2 already up-to-date at ${networkConfig.kyberSwapV2.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await kyberSwapV2.populateTransaction.updateAggregationRouter(networkConfig.kyberSwapV2.router)
+    );
+    log(2, '> updated kyberSwapV2', JSON.stringify(networkConfig.kyberSwapV2, null, 2));
     await printInfo(tx);
   }
 }
