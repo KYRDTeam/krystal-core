@@ -5,6 +5,7 @@ import {PolygonConfig} from './config_polygon';
 import {AvalancheConfig} from './config_avalanche';
 import {FantomConfig} from './config_fantom';
 import {CronosConfig} from './config_cronos';
+import {ArbitrumConfig} from './config_arbitrum';
 import {customNetworkConfig} from '../hardhat.config';
 import {AuroraConfig} from './config_aurora';
 
@@ -16,6 +17,7 @@ const NetworkConfig: Record<string, IConfig> = {
   ...FantomConfig,
   ...CronosConfig,
   ...AuroraConfig,
+  ...ArbitrumConfig,
 };
 
 NetworkConfig.hardhat = {

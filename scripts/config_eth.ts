@@ -47,6 +47,12 @@ export const EthConfig: Record<string, IConfig> = {
       aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
     },
 
+    kyberSwapV2: {
+      router: '0xdf1a1b60f2d438842916c0adc43748768353ec25',
+      aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
+      testingTokens: ['usdc'],
+    },
+
     // Compound
     compound: {
       compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',
@@ -199,6 +205,12 @@ export const EthConfig: Record<string, IConfig> = {
 
     kyberDmm: {
       router: '0x96E8B9E051c81661C36a18dF64ba45F86AC80Aae',
+    },
+
+    kyberSwapV2: {
+      router: '0xdf1a1b60f2d438842916c0adc43748768353ec25',
+      aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
+      testingTokens: ['usdc'],
     },
 
     // Compound
