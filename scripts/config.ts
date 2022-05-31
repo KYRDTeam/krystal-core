@@ -7,6 +7,7 @@ import {FantomConfig} from './config_fantom';
 import {CronosConfig} from './config_cronos';
 import {customNetworkConfig} from '../hardhat.config';
 import {AuroraConfig} from './config_aurora';
+import {KlaytnConfig} from './config_klaytn';
 
 const NetworkConfig: Record<string, IConfig> = {
   ...BscConfig,
@@ -16,6 +17,7 @@ const NetworkConfig: Record<string, IConfig> = {
   ...FantomConfig,
   ...CronosConfig,
   ...AuroraConfig,
+  ...KlaytnConfig,
 };
 
 NetworkConfig.hardhat = {

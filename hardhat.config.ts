@@ -206,6 +206,22 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 1 * 1e9,
   };
+
+  config.networks!.klaytn_mainnet = {
+    url: 'https://public-node-api.klaytnapi.com/v1/cypress',
+    chainId: 8217,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 8500000,
+  };
+
+  config.networks!.klaytn_testnet = {
+    url: 'https://api.baobab.klaytn.net:8651',
+    chainId: 1001,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 8500000,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
