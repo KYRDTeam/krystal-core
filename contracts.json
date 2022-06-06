@@ -159,6 +159,13 @@
     },
     "lendingContracts": {}
   },
+  "klaytn_testnet": {
+    "smartWalletImplementation": "0x1c91AC31B1039379758E24237672f3b66FFaE329",
+    "smartWalletProxy": "0xc59B00B1d455e8D2078aC3BF77d6FE9C2De076dC",
+    "fetchTokenBalances": "0x2917fDBE7b20CC902183a5cad86B398e6b3eD548",
+    "swapContracts": {},
+    "lendingContracts": {}
+  },
   "polygon_mainnet": {
     "smartWalletImplementation": "0x9715975C4C5e3447dC14E07A0d00Ff74A6FaF8CD",
     "smartWalletProxy": "0x70270c228c5b4279d1578799926873aa72446ccd",

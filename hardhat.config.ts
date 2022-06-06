@@ -234,7 +234,7 @@ if (PRIVATE_KEY) {
     chainId: 8217,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 8500000,
+    gasPrice: 250 * 1e9,
   };
 
   config.networks!.klaytn_testnet = {
@@ -242,7 +242,7 @@ if (PRIVATE_KEY) {
     chainId: 1001,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 8500000,
+    gasPrice: 250 * 1e9,
   };
 }
 
