@@ -8,6 +8,7 @@ import {CronosConfig} from './config_cronos';
 import {ArbitrumConfig} from './config_arbitrum';
 import {customNetworkConfig} from '../hardhat.config';
 import {AuroraConfig} from './config_aurora';
+import {KlaytnConfig} from './config_klaytn';
 
 const NetworkConfig: Record<string, IConfig> = {
   ...BscConfig,
@@ -18,6 +19,7 @@ const NetworkConfig: Record<string, IConfig> = {
   ...CronosConfig,
   ...AuroraConfig,
   ...ArbitrumConfig,
+  ...KlaytnConfig,
 };
 
 NetworkConfig.hardhat = {

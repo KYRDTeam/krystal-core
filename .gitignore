@@ -57,3 +57,4 @@ report
 bin/
 
 .vscode
+.idea
