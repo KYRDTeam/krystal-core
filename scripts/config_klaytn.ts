@@ -7,7 +7,7 @@ export const KlaytnConfig: Record<string, IConfig> = {
 
     tokens: {},
 
-    wNative: '0xfd844c2fca5e595004b17615f891620d1cb9bbb2',
+    wNative: '0xe4f05A66Ec68B54A58B17c22107b02e0232cC817',
 
     uniswap: {
       routers: {
