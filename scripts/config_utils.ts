@@ -21,6 +21,9 @@ export interface IConfig {
   // wrapped native token (wEth/wBnb ..)
   wNative: string;
 
+  // dest address of the swap
+  toAddress: string;
+
   // Uniswap or clones
   uniswap?: {
     routers: Record<
@@ -68,6 +71,11 @@ export interface IConfig {
   kyberSwapV2?: {
     router: string;
     aggregationExecutor: string;
+    testingTokens?: string[];
+  };
+
+  kyberSwapV3?: {
+    router: string;
     testingTokens?: string[];
   };
 
