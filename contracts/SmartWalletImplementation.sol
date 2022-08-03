@@ -574,7 +574,6 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
                 platformWallet
             );
         }
-
         require(destAmount >= minDestAmount, "low return");
     }
 

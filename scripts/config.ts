@@ -11,15 +11,15 @@ import {AuroraConfig} from './config_aurora';
 import {KlaytnConfig} from './config_klaytn';
 
 const NetworkConfig: Record<string, IConfig> = {
-  ...BscConfig,
+  // ...BscConfig,
   ...EthConfig,
-  ...PolygonConfig,
-  ...AvalancheConfig,
-  ...FantomConfig,
-  ...CronosConfig,
-  ...AuroraConfig,
-  ...ArbitrumConfig,
-  ...KlaytnConfig,
+  // ...PolygonConfig,
+  // ...AvalancheConfig,
+  // ...FantomConfig,
+  // ...CronosConfig,
+  // ...AuroraConfig,
+  // ...ArbitrumConfig,
+  // ...KlaytnConfig,
 };
 
 NetworkConfig.hardhat = {
