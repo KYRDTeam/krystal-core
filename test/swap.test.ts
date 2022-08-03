@@ -223,7 +223,7 @@ describe('swap test', async () => {
         it('swap from native to token', async () => {
           const impersonatedSigner = await ethers.getImpersonatedSigner('0xDa44200196cFb3416bF011EEd608F354804337Ba');
           let ethBalance = await provider.getBalance(impersonatedSigner.address);
-          console.log('ethBalance of setup.user.address:', ethBalance);
+          console.log('ethBalance of impersonatedSigner before:', ethBalance);
 
           let swapContract = await getSwapContract();
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
@@ -249,28 +249,48 @@ describe('swap test', async () => {
       `);
 
           // Send txn
-          await expect(
-            await setup.proxyInstance.swap(
-              {
-                swapContract,
-                srcAmount: ethAmount1,
-                minDestAmount,
-                tradePath,
-                feeMode: FeeMode.FROM_SOURCE,
-                feeBps: platformFee,
-                platformWallet: setup.network.supportedWallets[0],
-                extraArgs: extraArgs,
-              },
-              {
-                from: setup.user.address,
-                value: ethAmount1,
-              }
-            )
-          ).to.changeEtherBalance(setup.user, BigNumber.from(0).sub(ethAmount1));
+          // await expect(
+          await setup.proxyInstance.connect(impersonatedSigner).swap(
+            {
+              swapContract,
+              srcAmount: ethAmount1,
+              minDestAmount,
+              tradePath,
+              feeMode: FeeMode.FROM_SOURCE,
+              feeBps: platformFee,
+              platformWallet: setup.network.supportedWallets[0],
+              extraArgs: extraArgs,
+            },
+            {
+              value: ethAmount1,
+            }
+          );
+          // ).to.changeEtherBalance(impersonatedSigner, BigNumber.from(0).sub(ethAmount1));
+          console.log('ethBalance of impersonatedSigner after:', ethBalance);
+
+          // // Send txn
+          // await expect(
+          //   await setup.proxyInstance.swap(
+          //     {
+          //       swapContract,
+          //       srcAmount: ethAmount1,
+          //       minDestAmount,
+          //       tradePath,
+          //       feeMode: FeeMode.FROM_SOURCE,
+          //       feeBps: platformFee,
+          //       platformWallet: setup.network.supportedWallets[0],
+          //       extraArgs: extraArgs,
+          //     },
+          //     {
+          //       from: impersonatedSigner.address,
+          //       value: ethAmount1,
+          //     }
+          //   )
+          // ).to.changeEtherBalance(impersonatedSigner, BigNumber.from(0).sub(ethAmount1));
 
           // Missing value
           await expect(
-            setup.proxyInstance.swap(
+            await setup.proxyInstance.connect(impersonatedSigner).swap(
               {
                 swapContract,
                 srcAmount: ethAmount1,
@@ -282,12 +302,32 @@ describe('swap test', async () => {
                 extraArgs: await generateArgsFunc(tradePath, ethAmount1, FeeMode.FROM_SOURCE),
               },
               {
-                from: setup.user.address,
                 value: 0,
               }
             )
           ).to.be.revertedWith('wrong msg value');
         });
+
+        // Missing value
+        //   await expect(
+        //     setup.proxyInstance.swap(
+        //       {
+        //         swapContract,
+        //         srcAmount: ethAmount1,
+        //         minDestAmount,
+        //         tradePath,
+        //         feeMode: FeeMode.FROM_SOURCE,
+        //         feeBps: platformFee,
+        //         platformWallet: setup.network.supportedWallets[0],
+        //         extraArgs: await generateArgsFunc(tradePath, ethAmount1, FeeMode.FROM_SOURCE),
+        //       },
+        //       {
+        //         from: setup.user.address,
+        //         value: 0,
+        //       }
+        //     )
+        //   ).to.be.revertedWith('wrong msg value');
+        // });
 
         it('swap from token to native/other tokens', async () => {
           let swapContract = await getSwapContract();
