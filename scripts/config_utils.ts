@@ -22,7 +22,7 @@ export interface IConfig {
   wNative: string;
 
   // dest address of the swap
-  toAddress: string;
+  // toAddress: string;
 
   // Uniswap or clones
   uniswap?: {

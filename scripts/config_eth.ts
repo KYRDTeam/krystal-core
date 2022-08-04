@@ -13,7 +13,7 @@ export const EthConfig: Record<string, IConfig> = {
 
     wNative: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 
-    toAddress: '0x60680fedc6c891cac14e27b56ebf202cad369b7d',
+    // toAddress: '0x60680fedc6c891cac14e27b56ebf202cad369b7d',
 
     // Uniswap & clones
     // uniswap: {

@@ -27,8 +27,6 @@ import {arrayify, hexConcat, hexlify} from 'ethers/lib/utils';
 import axios from 'axios';
 import {apiMock} from './api_helper';
 
-let provider = ethers.getDefaultProvider();
-
 describe('swap test', async () => {
   let platformFee = 8;
   let setup: IInitialSetup;
@@ -38,9 +36,6 @@ describe('swap test', async () => {
     .pow(BigNumber.from(nativeTokenDecimals))
     .div(networkSetting.nativeUsdRate)
     .mul(10);
-
-  // 1 eth
-  let ethAmount1 = BigNumber.from(10).pow(BigNumber.from(nativeTokenDecimals));
 
   function executeSwapTest({
     name,
@@ -118,7 +113,7 @@ describe('swap test', async () => {
       tradePath: string[],
       feeMode: FeeMode
     ): Promise<BigNumber> => {
-      if (name == '1inch' || name == 'kyberDmmV2' || name === 'kyberSwapV2' || name === 'kyberSwapV3') {
+      if (name == '1inch' || name == 'kyberDmmV2' || name === 'kyberSwapV2') {
         return BigNumber.from(100);
       }
       const extraArgs = await generateArgsFunc(tradePath, srcAmount, feeMode);
@@ -200,134 +195,78 @@ describe('swap test', async () => {
         });
 
         it('get expected rate correctly', async () => {
-          if (name === '1inch' || name === 'kyberDmmV2' || name === 'kyberSwapV2' || name === 'kyberSwapV3') {
+          if (name === '1inch' || name === 'kyberDmmV2' || name === 'kyberSwapV2') {
             return;
           }
           let swapContract = await getSwapContract();
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
-          await testGetExpectedRate(swapContract, ethAmount1, tradePath, FeeMode.BY_PROTOCOL);
-          await testGetExpectedRate(swapContract, ethAmount1, tradePath, FeeMode.FROM_DEST);
-          await testGetExpectedRate(swapContract, ethAmount1, tradePath, FeeMode.FROM_SOURCE);
+          await testGetExpectedRate(swapContract, nativeAmount10, tradePath, FeeMode.BY_PROTOCOL);
+          await testGetExpectedRate(swapContract, nativeAmount10, tradePath, FeeMode.FROM_DEST);
+          await testGetExpectedRate(swapContract, nativeAmount10, tradePath, FeeMode.FROM_SOURCE);
         });
 
         it('get price impact correctly', async () => {
-          if (name === '1inch' || name === 'kyberDmmV2' || name === 'kyberSwapV2' || name === 'kyberSwapV3') {
+          if (name === '1inch' || name === 'kyberDmmV2' || name === 'kyberSwapV2') {
             return;
           }
           let swapContract = await getSwapContract();
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
-          let amount = ethAmount1.mul(100000); // Big amount to have high price impact
+          let amount = nativeAmount10.mul(100000); // Big amount to have high price impact
           await testGetPriceImpact(swapContract, amount, tradePath, FeeMode.FROM_SOURCE);
         });
 
         it('swap from native to token', async () => {
-          const impersonatedSigner = await ethers.getImpersonatedSigner('0xDa44200196cFb3416bF011EEd608F354804337Ba');
-          let ethBalance = await provider.getBalance(impersonatedSigner.address);
-          console.log('ethBalance of impersonatedSigner before:', ethBalance);
-
           let swapContract = await getSwapContract();
           let tradePath = [setup.network.wNative, address]; // get rate needs to use wbnb
-          const destAmount = await testGetExpectedRate(swapContract, ethAmount1, tradePath, FeeMode.FROM_SOURCE);
-          // const minDestAmount = destAmount.mul(97).div(100);
-          const minDestAmount = 1600000000;
+          const destAmount = await testGetExpectedRate(swapContract, nativeAmount10, tradePath, FeeMode.FROM_SOURCE);
+          const minDestAmount = destAmount.mul(97).div(100);
 
           tradePath[0] = nativeTokenAddress; // trade needs to use bnb address
-          const extraArgs = await generateArgsFunc(tradePath, ethAmount1, FeeMode.FROM_SOURCE);
+          const extraArgs = await generateArgsFunc(tradePath, nativeAmount10, FeeMode.FROM_SOURCE);
           if (extraArgs == '') {
             return;
           }
 
-          console.log(`
-          swapContract: ${swapContract}
-          srcAmount: ${ethAmount1}
-          minDestAmount: ${minDestAmount}
-          tradePath: ${tradePath}
-          feeMode: ${FeeMode.FROM_SOURCE}
-          feeBps: ${platformFee}
-          platformWallet: ${setup.network.supportedWallets[0]}
-          extraArgs: ${extraArgs}
-      `);
-
           // Send txn
-          // await expect(
-          await setup.proxyInstance.connect(impersonatedSigner).swap(
-            {
-              swapContract,
-              srcAmount: ethAmount1,
-              minDestAmount,
-              tradePath,
-              feeMode: FeeMode.FROM_SOURCE,
-              feeBps: platformFee,
-              platformWallet: setup.network.supportedWallets[0],
-              extraArgs: extraArgs,
-            },
-            {
-              value: ethAmount1,
-            }
-          );
-          // ).to.changeEtherBalance(impersonatedSigner, BigNumber.from(0).sub(ethAmount1));
-          console.log('ethBalance of impersonatedSigner after:', ethBalance);
-
-          // // Send txn
-          // await expect(
-          //   await setup.proxyInstance.swap(
-          //     {
-          //       swapContract,
-          //       srcAmount: ethAmount1,
-          //       minDestAmount,
-          //       tradePath,
-          //       feeMode: FeeMode.FROM_SOURCE,
-          //       feeBps: platformFee,
-          //       platformWallet: setup.network.supportedWallets[0],
-          //       extraArgs: extraArgs,
-          //     },
-          //     {
-          //       from: impersonatedSigner.address,
-          //       value: ethAmount1,
-          //     }
-          //   )
-          // ).to.changeEtherBalance(impersonatedSigner, BigNumber.from(0).sub(ethAmount1));
-
-          // Missing value
           await expect(
-            await setup.proxyInstance.connect(impersonatedSigner).swap(
+            await setup.proxyInstance.swap(
               {
                 swapContract,
-                srcAmount: ethAmount1,
+                srcAmount: nativeAmount10,
                 minDestAmount,
                 tradePath,
                 feeMode: FeeMode.FROM_SOURCE,
                 feeBps: platformFee,
                 platformWallet: setup.network.supportedWallets[0],
-                extraArgs: await generateArgsFunc(tradePath, ethAmount1, FeeMode.FROM_SOURCE),
+                extraArgs: extraArgs,
               },
               {
+                from: setup.user.address,
+                value: nativeAmount10,
+              }
+            )
+          ).to.changeEtherBalance(setup.user, BigNumber.from(0).sub(nativeAmount10));
+
+          // Missing value
+          await expect(
+            setup.proxyInstance.swap(
+              {
+                swapContract,
+                srcAmount: nativeAmount10,
+                minDestAmount,
+                tradePath,
+                feeMode: FeeMode.FROM_SOURCE,
+                feeBps: platformFee,
+                platformWallet: setup.network.supportedWallets[0],
+                extraArgs: await generateArgsFunc(tradePath, nativeAmount10, FeeMode.FROM_SOURCE),
+              },
+              {
+                from: setup.user.address,
                 value: 0,
               }
             )
           ).to.be.revertedWith('wrong msg value');
         });
-
-        // Missing value
-        //   await expect(
-        //     setup.proxyInstance.swap(
-        //       {
-        //         swapContract,
-        //         srcAmount: ethAmount1,
-        //         minDestAmount,
-        //         tradePath,
-        //         feeMode: FeeMode.FROM_SOURCE,
-        //         feeBps: platformFee,
-        //         platformWallet: setup.network.supportedWallets[0],
-        //         extraArgs: await generateArgsFunc(tradePath, ethAmount1, FeeMode.FROM_SOURCE),
-        //       },
-        //       {
-        //         from: setup.user.address,
-        //         value: 0,
-        //       }
-        //     )
-        //   ).to.be.revertedWith('wrong msg value');
-        // });
 
         it('swap from token to native/other tokens', async () => {
           let swapContract = await getSwapContract();
@@ -336,7 +275,7 @@ describe('swap test', async () => {
           let tokenUnit = BigNumber.from(10).pow(tokenDec);
 
           // Get some fund first .i.e 100$ worth of tokens
-          let fundAmount = ethAmount1.mul(10);
+          let fundAmount = nativeAmount10.mul(10);
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
           let extraArgs = await generateArgsFunc(tradePath, fundAmount, FeeMode.FROM_SOURCE);
@@ -420,8 +359,9 @@ describe('swap test', async () => {
               );
             }).to.changeTokenBalance(token, setup.user, BigNumber.from(0).sub(tokenAmount));
             console.log(`swapped from ${token.address} -> ${targetToken}`);
+
             // Extra value not needed
-            await expect(async () => {
+            await expect(
               setup.proxyInstance.swap(
                 {
                   swapContract,
@@ -437,8 +377,8 @@ describe('swap test', async () => {
                   from: setup.user.address,
                   value: BigNumber.from(1),
                 }
-              );
-            }).to.be.revertedWith('bad msg value');
+              )
+            ).to.be.revertedWith('bad msg value');
           }
         });
       });
@@ -454,9 +394,7 @@ describe('swap test', async () => {
 
   if (networkSetting.uniswap) {
     for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.uniswap.routers)) {
-      console.log('univ2/clones address', address);
       const routerContract = (await ethers.getContractAt('IUniswapV2Router02', address)) as IUniswapV2Router02;
-      console.log('univ2/clones routerContract', address);
       const factoryAddr = await routerContract.factory();
       const factoryContract = (await ethers.getContractAt('IUniswapV2Factory', factoryAddr)) as IUniswapV2Factory;
 
@@ -837,76 +775,6 @@ describe('swap test', async () => {
       maxDiffAllowed: 10,
       getExpectedInSupported: false,
       testingTokens: networkSetting.kyberSwapV2.testingTokens ?? Object.keys(networkSetting.tokens),
-      expectedPriceImpactFn: null,
-    });
-  }
-
-  if (networkSetting.kyberSwapV3) {
-    executeSwapTest({
-      name: 'kyberSwapV3',
-      getSwapContract: async () => {
-        return setup.krystalContracts.swapContracts!.kyberSwapV3!.address;
-      },
-      router: networkSetting.kyberSwapV3!.router,
-      generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
-        let tokenIn = tradePath[0];
-        let tokenOut = tradePath[1];
-        if (tradePath[0] == nativeTokenAddress) {
-          tokenIn = setup.network.wNative;
-        }
-        if (tradePath[1] == nativeTokenAddress) {
-          tokenOut = setup.network.wNative;
-        }
-        console.log(`
-        tokenIn: ${tokenIn}
-        tokenOut: ${tokenOut}`);
-        let amount = srcAmount;
-        if (feeMode === FeeMode.FROM_SOURCE) {
-          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
-          amount = srcAmount?.sub(fee);
-        }
-
-        let toAddress = setup.network.toAddress;
-
-        const url = `https://aggregator-api.kyberswap.com/ethereum/route/encode?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&to=${toAddress}`;
-        console.log('getActualRate url', url);
-        const data = apiMock[url];
-
-        if (data.swaps.length == 0) {
-          return '';
-        }
-        const result = data.encodedSwapData;
-        console.log('encoded result: ', result);
-
-        return result;
-      },
-      platformFee,
-      getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
-        let tokenIn = tradePath[0];
-        let tokenOut = tradePath[1];
-        if (tradePath[0] == nativeTokenAddress) {
-          tokenIn = setup.network.wNative;
-        }
-        if (tradePath[1] == nativeTokenAddress) {
-          tokenOut = setup.network.wNative;
-        }
-        let amount = srcAmount;
-        if (feeMode === FeeMode.FROM_SOURCE) {
-          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
-          amount = srcAmount?.sub(fee);
-        }
-
-        let toAddress = setup.network.toAddress;
-
-        const url = `https://aggregator-api.kyberswap.com/ethereum/route/encode?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&to=${toAddress}`;
-        console.log('getActualRate url', url);
-        const data = apiMock[url];
-
-        return BigNumber.from(data.outputAmount);
-      },
-      maxDiffAllowed: 10,
-      getExpectedInSupported: false,
-      testingTokens: networkSetting.kyberSwapV3.testingTokens ?? Object.keys(networkSetting.tokens),
       expectedPriceImpactFn: null,
     });
   }
