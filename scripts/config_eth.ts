@@ -13,47 +13,45 @@ export const EthConfig: Record<string, IConfig> = {
 
     wNative: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 
-    // toAddress: '0x60680fedc6c891cac14e27b56ebf202cad369b7d',
-
     // Uniswap & clones
-    // uniswap: {
-    //   routers: {
-    //     univ2: {
-    //       address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-    //       testingTokens: ['dai', 'usdt', 'usdc'],
-    //     },
-    //     sushiswap: {
-    //       address: '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f',
-    //     },
-    //   },
-    // },
+    uniswap: {
+      routers: {
+        univ2: {
+          address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+          testingTokens: ['dai', 'usdt', 'usdc'],
+        },
+        sushiswap: {
+          address: '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f',
+        },
+      },
+    },
 
-    // uniswapV3: {
-    //   routers: [
-    //     '0xe592427a0aece92de3edee1f18e0157c05861564', // univ3
-    //   ],
-    //   testingTokens: ['dai', 'usdt', 'usdc'],
-    // },
+    uniswapV3: {
+      routers: [
+        '0xe592427a0aece92de3edee1f18e0157c05861564', // univ3
+      ],
+      testingTokens: ['dai', 'usdt', 'usdc'],
+    },
 
-    // kyberDmm: {
-    //   router: '0x1c87257f5e8609940bc751a07bb085bb7f8cdbe6',
-    //   testingTokens: ['dai', 'usdt', 'usdc'],
-    // },
+    kyberDmm: {
+      router: '0x1c87257f5e8609940bc751a07bb085bb7f8cdbe6',
+      testingTokens: ['dai', 'usdt', 'usdc'],
+    },
 
-    // oneInch: {
-    //   router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
-    // },
+    oneInch: {
+      router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
+    },
 
-    // kyberDmmV2: {
-    //   router: '0x1Fc3607fa67B58DedDB0fAf7a116F417a20C551c',
-    //   aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
-    // },
+    kyberDmmV2: {
+      router: '0x1Fc3607fa67B58DedDB0fAf7a116F417a20C551c',
+      aggregationExecutor: '0x276e31882AD6C784858CdE5770B21eE09d79b744',
+    },
 
-    // kyberSwapV2: {
-    //   router: '0xdf1a1b60f2d438842916c0adc43748768353ec25',
-    //   aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
-    //   testingTokens: ['usdc'],
-    // },
+    kyberSwapV2: {
+      router: '0xdf1a1b60f2d438842916c0adc43748768353ec25',
+      aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
+      testingTokens: ['usdc'],
+    },
 
     kyberSwapV3: {
       router: '0x00555513Acf282B42882420E5e5bA87b44D8fA6E',
