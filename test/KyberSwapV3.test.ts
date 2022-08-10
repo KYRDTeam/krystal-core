@@ -1,8 +1,8 @@
 import {expect} from 'chai';
 import {BigNumber} from 'ethers';
-import {FeeMode, nativeTokenDecimals} from './helper';
+import {FeeMode} from './helper';
 import {apiMock} from './api_helper';
-import hre from 'hardhat';
+import hre, {ethers} from 'hardhat';
 import {SmartWalletImplementation, SmartWalletProxy} from '../typechain';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {loadFixture} from 'ethereum-waffle';
@@ -31,12 +31,15 @@ describe('KyberSwapV3', async function () {
     await kyberSwapV3.updateProxyContract(krystalProxyAddr);
 
     // update swap contract
-    const krystalAdmin = await hre.ethers.getImpersonatedSigner('0x4ef7c0ecd6ebf8379b0448546972acd7d67ebff6');
     let proxy = (await hre.ethers.getContractAt('SmartWalletProxy', krystalProxyAddr)) as SmartWalletProxy;
-    await proxy.updateSupportedSwaps({
-      addresses: [kyberSwapV3.address],
-      isSupported: true,
+    const krystalAdminAddr = await proxy.admin();
+    const krystalAdmin = await hre.ethers.getImpersonatedSigner(krystalAdminAddr);
+
+    await admin.sendTransaction({
+      to: krystalAdmin.address,
+      value: BigNumber.from('10000000000000000000'),
     });
+    await proxy.connect(krystalAdmin).updateSupportedSwaps([kyberSwapV3.address], true);
 
     return {kyberSwapV3};
   }
@@ -84,20 +87,22 @@ describe('KyberSwapV3', async function () {
   it('Should swap native to token successfully', async function () {
     const {kyberSwapV3} = await loadFixture(deployKyberSwapV3);
 
-    // TODO refactor
-    const url = `https://aggregator-api.kyberswap.com/ethereum/route/encode?tokenIn=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=1000000000000000000&saveGas=0&gasInclude=0&gasPrice=14000000000&slippageTolerance=50&deadline=1660127660&to=0x320849EC0aDffCd6fb0212B59a2EC936cdEF5fCa&chargeFeeBy=&feeReceiver=&isInBps=&feeAmount=&clientData=%7B%22source%22%3A%22kyberswap%22%7D`;
+    // TODO refactor this as the encodedSwapData from mock could easily change when the MAINNET_FORK_BLOCK change
+    const url = `https://aggregator-api.kyberswap.com/ethereum/route/encode?tokenIn=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=999200000000000000&saveGas=0&gasInclude=0&gasPrice=14000000000&slippageTolerance=50&to=0x320849EC0aDffCd6fb0212B59a2EC936cdEF5fCa&chargeFeeBy=&feeReceiver=&isInBps=&feeAmount=&clientData=%7B%22source%22%3A%22kyberswap%22%7D`;
     const data = apiMock[url];
 
-    let tokenIn = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+    let tokenIn = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
     let tokenOut = '0xdac17f958d2ee523a2206206994597c13d831ec7';
     let srcAmount = BigNumber.from('1000000000000000000');
     let tradePath = [tokenIn, tokenOut];
-    let minDestAmount = BigNumber.from(169380000);
+    let minDestAmount = BigNumber.from(1820000000);
 
+    // TODO refactor this hardcode
     let platformWallet = '0x5250b8202AEBca35328E2c217C687E894d70Cd31';
 
-    await expect(
-      krystalProxy.swap(
+    // TODO refactor this expect, it looks ugly
+    expect(
+      await krystalProxy.swap(
         {
           swapContract: kyberSwapV3.address,
           srcAmount: srcAmount,
@@ -112,6 +117,6 @@ describe('KyberSwapV3', async function () {
           value: srcAmount,
         }
       )
-    ).to.be.revertedWith('something went wrong');
+    ).to.changeEtherBalance(admin, BigNumber.from('-1000000000000000000'));
   });
 });
