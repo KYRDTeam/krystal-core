@@ -1,17 +1,31 @@
 import {expect} from 'chai';
 import {BigNumber} from 'ethers';
-import {FeeMode} from './helper';
+import {FeeMode, BPS} from './helper';
 import {apiMock} from './api_helper';
-import hre, {ethers} from 'hardhat';
-import {SmartWalletImplementation, SmartWalletProxy} from '../typechain';
+import hre from 'hardhat';
+import {SmartWalletImplementation, SmartWalletProxy, IERC20Ext} from '../typechain';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {loadFixture} from 'ethereum-waffle';
-// import {helpers} from '@nomicfoundation/hardhat-network-helpers';
+import axios from 'axios';
 
+// This tests (swaps) can only run with forked Ethereum mainnet at certain block
+// (because of liquidity/pricing/slippage condition)
+// MAINNET_FORK_BLOCK=15319272
 describe('KyberSwapV3', async function () {
   let signers: SignerWithAddress[];
   let admin: SignerWithAddress;
   let platformFee = 8;
+
+  // TODO refactor this hardcode
+  let platformWallet = '0x5250b8202AEBca35328E2c217C687E894d70Cd31'; // iOS wallet
+  let receiver = '0x320849EC0aDffCd6fb0212B59a2EC936cdEF5fCa'; // receive fund after swap
+  let ETHAddr = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+  let USDTAddr = '0xdac17f958d2ee523a2206206994597c13d831ec7';
+  let USDCAddr = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+  let USDCHolderAddr = '0x55FE002aefF02F77364de339a1292923A15844B8';
+  let slippage = 50; // in BPS unit, which is 0.5%
+  let usdcContract: IERC20Ext;
+  let usdcDecimals = 6;
 
   // TODO: refactor this hardcoded address
   const krystalProxyAddr = '0x70270C228c5B4279d1578799926873aa72446CcD';
@@ -37,7 +51,7 @@ describe('KyberSwapV3', async function () {
 
     await admin.sendTransaction({
       to: krystalAdmin.address,
-      value: BigNumber.from('10000000000000000000'),
+      value: hre.ethers.utils.parseEther('1.0'),
     });
     await proxy.connect(krystalAdmin).updateSupportedSwaps([kyberSwapV3.address], true);
 
@@ -52,6 +66,11 @@ describe('KyberSwapV3', async function () {
       'SmartWalletImplementation',
       krystalProxyAddr
     )) as SmartWalletImplementation;
+
+    usdcContract = (await hre.ethers.getContractAt('IERC20Ext', USDCAddr)) as IERC20Ext;
+
+    const usdcHolder = await hre.ethers.getImpersonatedSigner(USDCHolderAddr);
+    await usdcContract.connect(usdcHolder).transfer(admin.address, hre.ethers.utils.parseUnits('1000000.0', 6));
   });
 
   it('Should revert with getExpectedReturn_notSupported', async function () {
@@ -84,30 +103,22 @@ describe('KyberSwapV3', async function () {
     ).to.be.revertedWith('getExpectedReturnWithImpact_notSupported');
   });
 
-  it('Should swap native to token successfully', async function () {
+  it('Should swap native to token successfully (ETH -> USDT)', async function () {
     const {kyberSwapV3} = await loadFixture(deployKyberSwapV3);
 
-    // TODO refactor this as the encodedSwapData from mock could easily change when the MAINNET_FORK_BLOCK change
-    const url = `https://aggregator-api.kyberswap.com/ethereum/route/encode?tokenIn=0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee&tokenOut=0xdac17f958d2ee523a2206206994597c13d831ec7&amountIn=999200000000000000&saveGas=0&gasInclude=0&gasPrice=14000000000&slippageTolerance=50&to=0x320849EC0aDffCd6fb0212B59a2EC936cdEF5fCa&chargeFeeBy=&feeReceiver=&isInBps=&feeAmount=&clientData=%7B%22source%22%3A%22kyberswap%22%7D`;
-    const data = apiMock[url];
+    const srcAmount = hre.ethers.utils.parseEther('1.0'); // 1 ETH
+    const amount = srcAmount.mul(BPS.sub(platformFee)).div(BPS); // amount to KyberSwap contract, fee deducted
 
-    let tokenIn = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-    let tokenOut = '0xdac17f958d2ee523a2206206994597c13d831ec7';
-    let srcAmount = BigNumber.from('1000000000000000000');
-    let tradePath = [tokenIn, tokenOut];
-    let minDestAmount = BigNumber.from(1820000000);
+    const data = await getKyberSwapData(ETHAddr, USDTAddr, amount, slippage, receiver);
 
-    // TODO refactor this hardcode
-    let platformWallet = '0x5250b8202AEBca35328E2c217C687E894d70Cd31';
-
-    // TODO refactor this expect, it looks ugly
-    expect(
+    // TODO refactor this expect, it might need to check the received amount too :D
+    await expect(
       await krystalProxy.swap(
         {
           swapContract: kyberSwapV3.address,
           srcAmount: srcAmount,
-          minDestAmount: minDestAmount,
-          tradePath: tradePath,
+          minDestAmount: BigNumber.from(data.outputAmount).mul(BPS.sub(slippage)).div(BPS),
+          tradePath: [ETHAddr, USDTAddr],
           feeMode: FeeMode.FROM_SOURCE,
           feeBps: platformFee,
           platformWallet: platformWallet,
@@ -117,6 +128,90 @@ describe('KyberSwapV3', async function () {
           value: srcAmount,
         }
       )
-    ).to.changeEtherBalance(admin, BigNumber.from('-1000000000000000000'));
+    ).to.changeEtherBalance(admin, (-srcAmount).toString());
+  });
+
+  it('Should swap token to token successfully (USDC -> USDT)', async function () {
+    const {kyberSwapV3} = await loadFixture(deployKyberSwapV3);
+
+    const srcAmount = hre.ethers.utils.parseUnits('1000.0', usdcDecimals);
+    const amount = srcAmount.mul(BPS.sub(platformFee)).div(BPS);
+
+    const data = await getKyberSwapData(USDCAddr, USDTAddr, amount, slippage, receiver);
+
+    // approve
+    await usdcContract.approve(krystalProxy.address, srcAmount);
+
+    // TODO refactor this expect, it might need to check the received amount too :D
+    await expect(() =>
+      krystalProxy.swap({
+        swapContract: kyberSwapV3.address,
+        srcAmount: srcAmount,
+        minDestAmount: BigNumber.from(data.outputAmount).mul(BPS.sub(slippage)).div(BPS),
+        tradePath: [USDCAddr, USDTAddr],
+        feeMode: FeeMode.FROM_SOURCE,
+        feeBps: platformFee,
+        platformWallet: platformWallet,
+        extraArgs: data.encodedSwapData,
+      })
+    ).to.changeTokenBalance(usdcContract, admin, -srcAmount);
+  });
+
+  it('Should swap token to native successfully (USDC -> ETH)', async function () {
+    const {kyberSwapV3} = await loadFixture(deployKyberSwapV3);
+
+    const srcAmount = hre.ethers.utils.parseUnits('1000.0', usdcDecimals);
+    const amount = srcAmount.mul(BPS.sub(platformFee)).div(BPS);
+
+    const data = await getKyberSwapData(USDCAddr, ETHAddr, amount, slippage, receiver);
+
+    // approve
+    await usdcContract.approve(krystalProxy.address, srcAmount);
+
+    // TODO refactor this expect, it might need to check the received amount too :D
+    await expect(() =>
+      krystalProxy.swap({
+        swapContract: kyberSwapV3.address,
+        srcAmount: srcAmount,
+        minDestAmount: BigNumber.from(data.outputAmount).mul(BPS.sub(slippage)).div(BPS),
+        tradePath: [USDCAddr, ETHAddr],
+        feeMode: FeeMode.FROM_SOURCE,
+        feeBps: platformFee,
+        platformWallet: platformWallet,
+        extraArgs: data.encodedSwapData,
+      })
+    ).to.changeTokenBalance(usdcContract, admin, -srcAmount);
   });
 });
+
+async function getKyberSwapData(
+  tokenIn: string,
+  tokenOut: string,
+  srcAmount: BigNumber,
+  slippage: number,
+  receiver: string
+) {
+  const url = `https://aggregator-api.kyberswap.com/ethereum/route/encode?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${srcAmount}&slippageTolerance=${slippage}&to=${receiver}`;
+  return await getMockData(url);
+}
+
+async function getMockData(url: string) {
+  let data = apiMock[url];
+  if (data == null) {
+    console.log(`missing  mock data for ${url}`);
+
+    // TODO:
+    // - should refactor this on/off by a flag, like --capture
+    // - should find a way to save it into apiMock automatically
+    // e.g: save the data into a json file
+
+    const resp = await axios.get(url);
+    if (resp.status == 200) {
+      data = resp.data;
+      console.log('received data: ');
+      console.log(JSON.stringify(data));
+    }
+  }
+
+  return data;
+}
