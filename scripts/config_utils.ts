@@ -21,9 +21,6 @@ export interface IConfig {
   // wrapped native token (wEth/wBnb ..)
   wNative: string;
 
-  // dest address of the swap
-  // toAddress: string;
-
   // Uniswap or clones
   uniswap?: {
     routers: Record<
