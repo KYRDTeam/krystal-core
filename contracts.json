@@ -66,7 +66,8 @@
       "uniSwap": "0x759baFEdce842E56C3aB743e7004af8E80aDa541",
       "kyberDmm": "0x2f0f7e11B2662CDf6e648D28A57a9A1544F0FD2F",
       "kyberDmmV2": "0x3210a8b8206bc205840c983499aB92DB0f4F3C6e",
-      "kyberSwapV2": "0x85D53990CcB093De7fE1D14D21048F23cBC46004"
+      "kyberSwapV2": "0x85D53990CcB093De7fE1D14D21048F23cBC46004",
+      "kyberSwapV3": "0x0E67ef7aF621F90Bc94E5566E25a55ba0822e2Bb"
     },
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
