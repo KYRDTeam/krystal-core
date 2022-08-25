@@ -62,7 +62,7 @@ export const BscConfig: Record<string, IConfig> = {
     },
 
     kyberSwapV3: {
-      router: '0x00555513Acf282B42882420E5e5bA87b44D8fA6E',
+      router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
     },
 
     // Venus protocol

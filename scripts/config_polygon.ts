@@ -51,6 +51,10 @@ export const PolygonConfig: Record<string, IConfig> = {
       testingTokens: ['usdc'],
     },
 
+    kyberSwapV3: {
+      router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
+    },
+
     oneInch: {
       router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
       testingTokens: ['weth'],
