@@ -53,6 +53,11 @@ export const EthConfig: Record<string, IConfig> = {
       testingTokens: ['usdc'],
     },
 
+    kyberSwapV3: {
+      router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
+      testingTokens: ['usdc'],
+    },
+
     // Compound
     compound: {
       compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',

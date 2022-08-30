@@ -61,6 +61,10 @@ export const BscConfig: Record<string, IConfig> = {
       testingTokens: ['busd'],
     },
 
+    kyberSwapV3: {
+      router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
+    },
+
     // Venus protocol
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',

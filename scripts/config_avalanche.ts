@@ -43,6 +43,10 @@ export const AvalancheConfig: Record<string, IConfig> = {
       testingTokens: ['knc'],
     },
 
+    kyberSwapV3: {
+      router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 70,
 

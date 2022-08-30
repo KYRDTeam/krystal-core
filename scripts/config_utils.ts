@@ -71,6 +71,11 @@ export interface IConfig {
     testingTokens?: string[];
   };
 
+  kyberSwapV3?: {
+    router: string;
+    testingTokens?: string[];
+  };
+
   // Compound or clones
   compound?: {
     compTroller: string;

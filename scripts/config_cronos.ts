@@ -19,6 +19,10 @@ export const CronosConfig: Record<string, IConfig> = {
       aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
     },
 
+    kyberSwapV3: {
+      router: '0x00555513Acf282B42882420E5e5bA87b44D8fA6E',
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 1,
   },
