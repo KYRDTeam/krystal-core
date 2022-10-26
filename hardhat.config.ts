@@ -98,6 +98,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       mainnet: ETHERSCAN_KEY,
       ropsten: ETHERSCAN_KEY,
+      goerli: ETHERSCAN_KEY,
       rinkeby: ETHERSCAN_KEY,
 
       // binance smart chain
@@ -296,6 +297,14 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     accounts: [PRIVATE_KEY],
     timeout: 20000,
     gasPrice: 15 * 1e9,
+  };
+
+  config.networks!.eth_goerli = {
+    url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 5,
+    accounts: [PRIVATE_KEY],
+    timeout: 2000,
+    gasPrice: 1 * 1e9,
   };
 
   config.networks!.eth_mainnet = {
