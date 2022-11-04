@@ -550,23 +550,23 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         {
             // to avoid stack too deep
             // who will receive the swapped token
-            recipient = feeMode == FeeMode.FROM_DEST ? address(this) : recipient;
-            
-            uint256 destBalanceBefore = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), recipient);
+            // address _recipient = feeMode == FeeMode.FROM_DEST ? address(this) : recipient;
+            uint256 delta = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), feeMode == FeeMode.FROM_DEST ? address(this) : recipient);
 
             destAmount = ISwap(swapContract).swap(
                 ISwap.SwapParams({
                     srcAmount: srcAmount,
                     minDestAmount: minDestAmount,
                     tradePath: tradePath,
-                    recipient: recipient,
+                    recipient: feeMode == FeeMode.FROM_DEST ? address(this) : recipient,
                     feeBps: feeMode == FeeMode.BY_PROTOCOL ? platformFee : 0,
                     feeReceiver: platformWallet,
                     extraArgs: extraArgs
                 })
             );
 
-            require(getBalance(IERC20Ext(tradePath[tradePath.length - 1]), recipient) == destBalanceBefore + destAmount, "return amount not enough");
+            delta = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), feeMode == FeeMode.FROM_DEST ? address(this) : recipient) - delta;
+            require(delta >= destAmount, "return amount not enough");
         }
 
         if (feeMode == FeeMode.FROM_DEST) {
