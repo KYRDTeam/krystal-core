@@ -175,7 +175,7 @@
     "lendingContracts": {}
   },
   "klaytn_mainnet": {
-    "smartWalletImplementation": "0xe6eD54B6C7723f27300e247B2C7aA18B35586232",
+    "smartWalletImplementation": "0xb3f1ffe07f77a9b123503e54e6808330c0bf77b9",
     "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
     "fetchTokenBalances": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
     "swapContracts": {
