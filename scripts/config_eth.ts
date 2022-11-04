@@ -177,6 +177,28 @@ export const EthConfig: Record<string, IConfig> = {
     nativeUsdRate: 3000,
   },
 
+  eth_goerli: {
+    autoVerifyContract: true,
+
+    tokens: {
+      usdc: {symbol: 'usdc', address: '0xA2025B15a1757311bfD68cb14eaeFCc237AF5b43', usdRate: 1},
+    },
+
+    wNative: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+
+    // Uniswap & clones
+    uniswap: {
+      routers: {
+        univ2: {
+          address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+        },
+      },
+    },
+
+    supportedWallets: commonPlatformWallets,
+    nativeUsdRate: 5, // swap 5 eth each for every token
+  },
+
   eth_ropsten: {
     autoVerifyContract: true,
 

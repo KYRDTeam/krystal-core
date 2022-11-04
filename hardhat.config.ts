@@ -26,6 +26,7 @@ const {
   FANTOMSCAN_KEY,
   AURORASCAN_KEY,
   ARBISCAN_KEY,
+  OPTIMISTICSCAN_KEY,
   MAINNET_ID,
   MAINNET_FORK,
   MAINNET_FORK_BLOCK,
@@ -97,6 +98,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       mainnet: ETHERSCAN_KEY,
       ropsten: ETHERSCAN_KEY,
+      goerli: ETHERSCAN_KEY,
       rinkeby: ETHERSCAN_KEY,
 
       // binance smart chain
@@ -122,6 +124,9 @@ const config: HardhatUserConfig = {
       // arbitrum
       arbitrumOne: ARBISCAN_KEY,
       arbitrumTestnet: ARBISCAN_KEY,
+
+      // optimism
+      optimisticEthereum: OPTIMISTICSCAN_KEY,
     },
   },
 
@@ -294,12 +299,36 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     gasPrice: 15 * 1e9,
   };
 
+  config.networks!.eth_goerli = {
+    url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
+    chainId: 5,
+    accounts: [PRIVATE_KEY],
+    timeout: 2000,
+    gasPrice: 1 * 1e9,
+  };
+
   config.networks!.eth_mainnet = {
     url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
     chainId: 1,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
     gasPrice: 63 * 1e9,
+  };
+
+  config.networks!.optimism_mainnet = {
+    url: `https://mainnet.optimism.io/`,
+    chainId: 10,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 0.001 * 1e9,
+  };
+
+  config.networks!.optimism_testnet = {
+    url: `https://goerli.optimism.io/`,
+    chainId: 420,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 0.001 * 1e9,
   };
 }
 
