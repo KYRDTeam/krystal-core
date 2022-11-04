@@ -107,6 +107,16 @@
     },
     "lendingContracts": {}
   },
+  "eth_goerli": {
+    "smartWalletImplementation": "0xFa182dF059684cA906C71e1e120F2035a6359Af2",
+    "smartWalletProxy": "0xa0Af2A2ABD276843f65B8c117406Da9335F39364",
+    "fetchTokenBalances": "0xc57bfadD18BCf84efB5AcfaAEe63B8eAf1A627Bb",
+    "fetchAaveDataWrapper": "0x3b2a1129e7e33BADCb372a764d858F94Ac4BA493",
+    "swapContracts": {
+      "uniSwap": "0x34f6c91d2Af45EfC5a743E009143541204e12eb9"
+    },
+    "lendingContracts": {}
+  },
   "eth_mainnet": {
     "smartWalletProxy": "0x70270C228c5B4279d1578799926873aa72446CcD",
     "fetchTokenBalances": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
@@ -179,6 +189,26 @@
     "fetchTokenBalances": "0x2917fDBE7b20CC902183a5cad86B398e6b3eD548",
     "swapContracts": {
       "uniSwap": "0x9505044719C74257cF20fA0bC202acf6b0C7F5f8"
+    },
+    "lendingContracts": {}
+  },
+  "optimism_mainnet": {
+    "smartWalletImplementation": "0x55abE1518005a297d3cF76C99cB94cCA572e5c99",
+    "smartWalletProxy": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e",
+    "fetchTokenBalances": "0xfA5d8aAF312c96b42Ac4355B13D9D28fB10b305c",
+    "fetchAaveDataWrapper": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93",
+    "swapContracts": {
+      "kyberSwapV3": "0x6917812739D8Cc378ABd80569D6045Fff349d224"
+    },
+    "lendingContracts": {}
+  },
+  "optimism_testnet": {
+    "smartWalletImplementation": "0x74bA0aC76fdd7668fFb72ce83673991415e2A976",
+    "smartWalletProxy": "0xdBED35BD0Cfe441a9Cd83152FA2C91b03482eD3c",
+    "fetchTokenBalances": "0x64585728b5E0b20A1a130C99D77d7D9596b6699D",
+    "fetchAaveDataWrapper": "0x985B32905094fC336B1Ac90d831F9E8d99AE66Bc",
+    "swapContracts": {
+      "kyberSwapV3": "0x0e7Da5b9686F7D053f75C9CF7AD6536A38173621"
     },
     "lendingContracts": {}
   },

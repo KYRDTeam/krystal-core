@@ -1,16 +1,16 @@
 #!/bin/sh
 
-usage="yarn <deploy,test> [-h] [-c <eth,bsc,polygon,avalanche,fantom,cronos,aurora,arbitrum,klaytn>] [-n <mainnet,testnet,ropsten,rinkeby,staging,fuji>] -- to run test on specific chain and network
+usage="yarn <deploy,test> [-h] [-c <eth,bsc,polygon,avalanche,fantom,cronos,aurora,arbitrum,klaytn>] [-n <mainnet,testnet,ropsten,goerli,rinkeby,staging,fuji>] -- to run test on specific chain and network
 
 where:
     -h  show this help text
     -c  which chain to run, supported <eth,bsc,polygon>
-    -n  which network to run, supported <mainnet,testnet,ropsten,mumbai>
+    -n  which network to run, supported <mainnet,testnet,ropsten,goerli,mumbai>
     -f  specific test to run if any"
 
 # Default chain and network
 CHAIN="eth"
-NETWORK="ropsten"
+NETWORK="goerli"
 CMD="test"
 
 while getopts ":hc:n:f:x:" option; do
@@ -20,14 +20,14 @@ while getopts ":hc:n:f:x:" option; do
       exit
       ;;
     c) 
-      if [[ ! "$OPTARG" =~ ^(eth|bsc|polygon|avalanche|fantom|cronos|aurora|arbitrum|klaytn)$ ]]; then
+      if [[ ! "$OPTARG" =~ ^(eth|bsc|polygon|avalanche|fantom|cronos|aurora|arbitrum|klaytn|optimism)$ ]]; then
           printf "invalid value for -%s\n" "$option" >&2
           echo "$usage" >&2
           exit 1
       fi
       CHAIN=$OPTARG;;      
     n) 
-      if [[ ! "$OPTARG" =~ ^(mainnet|ropsten|rinkeby|testnet|mumbai|staging|fuji)$ ]]; then
+      if [[ ! "$OPTARG" =~ ^(mainnet|ropsten|goerli|rinkeby|testnet|mumbai|staging|fuji)$ ]]; then
           printf "invalid value for -%s\n" "$option" >&2
           echo "$usage" >&2
           exit 1
