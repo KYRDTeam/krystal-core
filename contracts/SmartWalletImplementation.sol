@@ -538,7 +538,7 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
 
         validateSourceAmount(tradePath[0], srcAmount);
 
-        srcAmount = safeTransferWithFee(
+        uint256 actualSrcAmount = safeTransferWithFee(
             msg.sender,
             swapContract,
             tradePath[0],
@@ -555,7 +555,7 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
 
             destAmount = ISwap(swapContract).swap(
                 ISwap.SwapParams({
-                    srcAmount: srcAmount,
+                    srcAmount: actualSrcAmount,
                     minDestAmount: minDestAmount,
                     tradePath: tradePath,
                     recipient: feeMode == FeeMode.FROM_DEST ? address(this) : recipient,
