@@ -204,5 +204,10 @@ interface ISmartWalletImplementation {
         IERC20Ext[] calldata tokens
     ) external;
 
+    function adminClaimPlatformFeesUrgent(
+        address[] calldata platformWallets,
+        IERC20Ext[] calldata tokens
+    ) external;
+
     function setAdminFeeCollector(address feeCollector) external;
 }

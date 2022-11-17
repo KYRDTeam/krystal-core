@@ -64,6 +64,29 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         emit ClaimedPlatformFees(platformWallets, tokens, msg.sender);
     }
 
+
+    /// [Urgent] Claim fee using admin right, claim everything and set the fee to 0
+    function adminClaimPlatformFeesUrgent(address[] calldata platformWallets, IERC20Ext[] calldata tokens)
+        external
+        override
+        nonReentrant
+        onlyAdmin
+    {
+        require(adminFeeCollector != address(0), "require admin fee collector");
+
+        for (uint256 j = 0; j < tokens.length; j++) {
+            uint256 bal = getBalance(IERC20Ext(tokens[j]), address(this));
+            if (bal > 0) {
+                transferToken(payable(adminFeeCollector), tokens[j], bal);
+
+                for (uint256 i = 0; i < platformWallets.length; i++) {
+                    platformWalletFees[platformWallets[i]][tokens[j]] = 0;
+                }
+            }
+        }
+        emit ClaimedPlatformFees(platformWallets, tokens, msg.sender);
+    }
+
     function setAdminFeeCollector(address feeCollector) external override onlyAdmin {
         adminFeeCollector = feeCollector;
     }
@@ -550,18 +573,23 @@ contract SmartWalletImplementation is SmartWalletStorageV2, ISmartWalletImplemen
         {
             // to avoid stack too deep
             // who will receive the swapped token
-            address _recipient = feeMode == FeeMode.FROM_DEST ? address(this) : recipient;
+            // address _recipient = feeMode == FeeMode.FROM_DEST ? address(this) : recipient;
+            uint256 delta = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), feeMode == FeeMode.FROM_DEST ? address(this) : recipient);
+
             destAmount = ISwap(swapContract).swap(
                 ISwap.SwapParams({
                     srcAmount: actualSrcAmount,
                     minDestAmount: minDestAmount,
                     tradePath: tradePath,
-                    recipient: _recipient,
+                    recipient: feeMode == FeeMode.FROM_DEST ? address(this) : recipient,
                     feeBps: feeMode == FeeMode.BY_PROTOCOL ? platformFee : 0,
                     feeReceiver: platformWallet,
                     extraArgs: extraArgs
                 })
             );
+
+            delta = getBalance(IERC20Ext(tradePath[tradePath.length - 1]), feeMode == FeeMode.FROM_DEST ? address(this) : recipient) - delta;
+            require(delta >= destAmount, "return amount not enough");
         }
 
         if (feeMode == FeeMode.FROM_DEST) {

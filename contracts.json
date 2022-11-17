@@ -10,7 +10,7 @@
     "FetchTokenBalances": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
   },
   "arbitrum_mainnet": {
-    "smartWalletImplementation": "0xe6eD54B6C7723f27300e247B2C7aA18B35586232",
+    "smartWalletImplementation": "0x0db7d2b6148A40871741D953aC428dDaB59F80a3",
     "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
     "fetchTokenBalances": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
     "swapContracts": {
@@ -30,7 +30,7 @@
     "lendingContracts": {}
   },
   "aurora_mainnet": {
-    "smartWalletImplementation": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
+    "smartWalletImplementation": "0x533f9E9CfBea647a445a337955496668029621Fb",
     "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
     "fetchTokenBalances": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
     "swapContracts": {
@@ -47,7 +47,7 @@
     "lendingContracts": {}
   },
   "avalanche_mainnet": {
-    "smartWalletImplementation": "0xf5a40993852e6C47B4981bEAC1659BF09B83C521",
+    "smartWalletImplementation": "0x0d2fB643a7Ba8497E7f1100B4b8b38BC52e60DF8",
     "smartWalletProxy": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",
     "fetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B",
     "swapContracts": {
@@ -60,7 +60,7 @@
     "lendingContracts": {}
   },
   "bsc_mainnet": {
-    "smartWalletImplementation": "0x69B325aF8c8aCfF1dA62d1A6962691A41dbB7b32",
+    "smartWalletImplementation": "0x3de69846092D21088F25959e941d621eE95F36eD",
     "smartWalletProxy": "0x051DC16b2ECB366984d1074dCC07c342a9463999",
     "fetchTokenBalances": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
     "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
@@ -97,7 +97,7 @@
     "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3"
   },
   "cronos_mainnet": {
-    "smartWalletImplementation": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
+    "smartWalletImplementation": "0x938f1bf9d93204506FCaC41B99D93a17077BBBe1",
     "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchTokenBalances": "0x0C816D6C4C37294186CBCA0E514Fc56F0c34d059",
     "swapContracts": {
@@ -118,7 +118,7 @@
     "lendingContracts": {}
   },
   "eth_mainnet": {
-    "smartWalletImplementation": "0xfd5904626c103A9bE91635DF823B442f0b77EC88",
+    "smartWalletImplementation": "0x5583795ad3D58f4c00B499f83F6FED58389D2167",
     "smartWalletProxy": "0x70270C228c5B4279d1578799926873aa72446CcD",
     "fetchTokenBalances": "0xA526388721De4cB8206ff4D0b1A1948696b5d073",
     "fetchAaveDataWrapper": "0x0C816D6C4C37294186CBCA0E514Fc56F0c34d059",
@@ -165,7 +165,7 @@
     "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3"
   },
   "fantom_mainnet": {
-    "smartWalletImplementation": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
+    "smartWalletImplementation": "0x938f1bf9d93204506FCaC41B99D93a17077BBBe1",
     "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B",
     "swapContracts": {
@@ -176,7 +176,7 @@
     "lendingContracts": {}
   },
   "klaytn_mainnet": {
-    "smartWalletImplementation": "0xe6eD54B6C7723f27300e247B2C7aA18B35586232",
+    "smartWalletImplementation": "0xb3f1ffe07f77a9b123503e54e6808330c0bf77b9",
     "smartWalletProxy": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
     "fetchTokenBalances": "0xbf8Af96D0De8AC9cdd3a70b9b7c68A467e59433B",
     "swapContracts": {
@@ -194,7 +194,7 @@
     "lendingContracts": {}
   },
   "optimism_mainnet": {
-    "smartWalletImplementation": "0x55abE1518005a297d3cF76C99cB94cCA572e5c99",
+    "smartWalletImplementation": "0x76b5CeFf236FFCD1E6405CB03Dbaac78C4E2D7E4",
     "smartWalletProxy": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e",
     "fetchTokenBalances": "0xfA5d8aAF312c96b42Ac4355B13D9D28fB10b305c",
     "fetchAaveDataWrapper": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93",
@@ -214,7 +214,7 @@
     "lendingContracts": {}
   },
   "polygon_mainnet": {
-    "smartWalletImplementation": "0x9715975C4C5e3447dC14E07A0d00Ff74A6FaF8CD",
+    "smartWalletImplementation": "0x4f60e2310d5471d5C12dB71643B7dD8B1B464b23",
     "smartWalletProxy": "0x70270c228c5b4279d1578799926873aa72446ccd",
     "fetchTokenBalances": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchAaveDataWrapper": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",
