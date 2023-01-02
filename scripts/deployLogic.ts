@@ -15,6 +15,8 @@ import {
   FetchAaveDataWrapper,
   KrystalCollectibles,
   KrystalCollectiblesImpl,
+  KrystalCharacterProxy,
+  KrystalCharacterImpl,
   OneInch,
   KyberDmmV2,
   KyberSwapV2,
@@ -61,6 +63,9 @@ export interface KrystalContracts {
 
   nft?: KrystalCollectibles;
   nftImplementation?: KrystalCollectiblesImpl;
+
+  dino?: KrystalCharacterProxy;
+  dinoImplementation?: KrystalCharacterImpl;
 }
 
 export const deploy = async (
@@ -375,6 +380,36 @@ async function deployContracts(
     )) as KrystalCollectibles;
   }
 
+  let dino, dinoImplementation;
+  if (networkConfig.dino?.enabled) {
+    dinoImplementation = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalCharacterImpl',
+      existingContract?.['dinoImplementation'],
+      'contracts/dino/KrystalCharacterImpl.sol:KrystalCharacterImpl'
+    )) as KrystalCharacterImpl;
+
+    let initData =
+      (
+        await dinoImplementation.populateTransaction['initialize(string,string,string)'](
+          networkConfig.dino.name,
+          networkConfig.dino.symbol,
+          networkConfig.dino.uri
+        )
+      ).data?.toString() ?? '0x';
+    dino = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalCharacterProxy',
+      existingContract?.['dino'],
+      'contracts/dino/KrystalCharacter.sol:KrystalCharacterProxy',
+      dinoImplementation.address,
+      networkConfig.proxyAdminMultisig ?? contractAdmin,
+      initData
+    )) as KrystalCharacterProxy;
+  }
+
   return {
     smartWalletImplementation,
     smartWalletProxy,
@@ -384,6 +419,8 @@ async function deployContracts(
     lendingContracts,
     nft,
     nftImplementation,
+    dino,
+    dinoImplementation,
   };
 }
 

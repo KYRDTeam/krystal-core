@@ -74,7 +74,6 @@
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
     },
-    "nft": "0x9e81428F5672EDCea83F5bf58b6B2cD968df8EE6",
     "nftImplementation": "0x029B41cD39Ccb4131807AaB24C2ae5c948Da56f9"
   },
   "bsc_staging": {
@@ -115,7 +114,11 @@
     "swapContracts": {
       "uniSwap": "0x34f6c91d2Af45EfC5a743E009143541204e12eb9"
     },
-    "lendingContracts": {}
+    "lendingContracts": {},
+    "nft": "0xC10F7D0929425D67E6F82D806Bf8576a27a64D8f",
+    "nftImplementation": "0x6808c6b2ADC29De729bF631e64b124fd09Caf28B",
+    "dino": "0x0423201045c9A6d8474d14B66605a8A1C27d4161",
+    "dinoImplementation": "0xf953Be730A7ed9fe39DdA8225233F1001d52d0f5"
   },
   "eth_mainnet": {
     "smartWalletImplementation": "0x5583795ad3D58f4c00B499f83F6FED58389D2167",
