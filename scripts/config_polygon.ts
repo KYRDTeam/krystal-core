@@ -1,4 +1,4 @@
-import {commonPlatformWallets, IConfig} from './config_utils';
+import {commonPlatformWallets, IConfig, commonNftConfig} from './config_utils';
 
 export const PolygonConfig: Record<string, IConfig> = {
   polygon_mainnet: {
@@ -87,6 +87,13 @@ export const PolygonConfig: Record<string, IConfig> = {
 
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 1,
+
+    dino: {
+      ...commonNftConfig,
+      uri: 'https://loyalty-api.krystal.app/v1/nft/characters/',
+      name: 'Krystal Dino',
+      verifier: '0x1386a07Bb50731b77d13f2C96b6379ab65D46aA0',
+    },
   },
 
   polygon_staging: {
@@ -192,5 +199,12 @@ export const PolygonConfig: Record<string, IConfig> = {
 
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 1,
+
+    dino: {
+      ...commonNftConfig,
+      uri: 'https://loyalty-api.krystal.app/v1/nft/characters/',
+      name: 'Krystal Dino',
+      verifier: '0x1386a07Bb50731b77d13f2C96b6379ab65D46aA0',
+    },
   },
 };

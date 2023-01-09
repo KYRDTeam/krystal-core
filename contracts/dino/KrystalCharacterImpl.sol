@@ -5,31 +5,34 @@ import "./KrystalCharacterStorage.sol";
 import "./IKrystalCharacter.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract KrystalCharacterImpl is KrystalCharacterStorage, IKrystalCharacter {
+contract KrystalCharacterImpl is KrystalCharacterStorage {
     using Strings for uint256;
 
     function initialize(
         string memory _name,
         string memory _symbol,
         string memory _uri,
-        address _admin,
         address _verifier
     ) public initializer {
         super.initialize(_name, _symbol, _uri);
-        _setupRole(DEFAULT_ADMIN_ROLE, _admin);
 
         tokenUriPrefix = _uri;
         verifier = _verifier;
     }
 
-    // ERC-721 Compatible
-    function tokenUri(uint256 tokenId) external view returns (string memory) {
-        return string(abi.encodePacked(tokenUriPrefix, tokenId.toString()));
-    }
-
     modifier onlyAdmin() {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "unauthorized: admin required");
         _;
+    }
+
+    modifier onlyCharacterOwner(uint256 characterId) {
+        require(ownerOf(characterId) == msg.sender, "Character: not character owner");
+        _;
+    }
+
+    // ERC-721 Compatible
+    function tokenUri(uint256 tokenId) external view returns (string memory) {
+        return string(abi.encodePacked(tokenUriPrefix, tokenId.toString()));
     }
 
     function setMinter(address _minter) external onlyAdmin {
@@ -42,58 +45,74 @@ contract KrystalCharacterImpl is KrystalCharacterStorage, IKrystalCharacter {
         tokenUriPrefix = newuri;
     }
 
-    function setVerifier(address _verifier) external onlyAdmin {
-        verifier = _verifier;
-        emit SetVerifier(_verifier);
+    function getCharacter(
+        uint256 characterId
+    ) external view returns (string memory name, uint level) {
+        Character memory character = _characters[characterId];
+        name = character.name;
+        level = character.level;
     }
 
-    function purchase(
-        address buyer,
-        uint256[] calldata bodyPartIds,
-        bytes memory signature
-    ) external payable {
-        {
-            bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-            bytes32 message = keccak256(
-                abi.encodePacked(
-                    prefix,
-                    keccak256(
-                        abi.encodePacked(
-                            buyer,
-                            bodyPartIds[0],
-                            bodyPartIds[1],
-                            bodyPartIds[2],
-                            bodyPartIds[3],
-                            bodyPartIds[4]
-                        )
-                    )
-                )
-            );
-            _verifyMessage(message, signature);
+    function changeCharacterName(
+        uint256 characterId,
+        string memory newName
+    ) external onlyCharacterOwner(characterId) {
+        require(_validateStr(newName), "Character: invalid name");
+        require(reservedName[newName] == false, "Character: name already exists");
+
+        Character storage character = _characters[characterId];
+        if (bytes(character.name).length > 0) {
+            reservedName[character.name] = false;
         }
 
-        // verify bodyParts
-        for (uint256 i = 0; i < bodyPartIds.length; i += 1) {
-            require(minted[bodyPartIds[i]] != true, "mint: part minted");
-            minted[bodyPartIds[i]] = true;
-        }
+        character.name = newName;
+        reservedName[newName] = true;
 
-        super.mint(buyer);
+        emit NameChanged(characterId, newName);
     }
 
-    function _verifyMessage(bytes32 message, bytes memory signature) private view {
-        bytes32 r;
-        bytes32 s;
-        uint8 v;
-        assembly {
-            // First 32 bytes is for the length
-            r := mload(add(signature, 32))
-            s := mload(add(signature, 64))
-            v := and(mload(add(signature, 65)), 255)
-        }
-        // Arbitrary EVM magic .i.e 27 and 28 for the version
-        if (v < 27) v += 27;
+    function mintCharacter(address _receiver) public {
+        mint(_receiver);
+        _characters.push(Character("", 1));
+        uint characterId = _characters.length - 1;
 
-        require(ecrecover(message, v, r, s) == verifier, "verify: failed");
+        emit CreateCharacter(characterId);
+    }
+
+    /**
+     * @dev Check if the name string is valid (Alphanumeric and spaces without leading or trailing space)
+     */
+    function _validateStr(string memory str) internal pure returns (bool) {
+        bytes memory b = bytes(str);
+        if (b.length < 1) return false;
+        if (b.length > 20) return false;
+
+        // Leading space
+        if (b[0] == 0x20) return false;
+
+        // Trailing space
+        if (b[b.length - 1] == 0x20) return false;
+
+        bytes1 lastChar = b[0];
+
+        for (uint i; i < b.length; i++) {
+            bytes1 char = b[i];
+
+            // Cannot contain continuous spaces
+            if (char == 0x20 && lastChar == 0x20) return false;
+
+            if (
+                !(char >= 0x30 && char <= 0x39) && //9-0
+                !(char >= 0x41 && char <= 0x5A) && //A-Z
+                !(char >= 0x61 && char <= 0x7A) && //a-z
+                !(char == 0x20) //space
+            ) {
+                return false;
+            }
+
+            lastChar = char;
+        }
+
+        return true;
     }
 }

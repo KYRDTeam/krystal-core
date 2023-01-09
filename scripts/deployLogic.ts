@@ -17,6 +17,7 @@ import {
   KrystalCollectiblesImpl,
   KrystalCharacterProxy,
   KrystalCharacterImpl,
+  KrystalCharacterMinter,
   OneInch,
   KyberDmmV2,
   KyberSwapV2,
@@ -66,6 +67,7 @@ export interface KrystalContracts {
 
   dino?: KrystalCharacterProxy;
   dinoImplementation?: KrystalCharacterImpl;
+  dinoMinter?: KrystalCharacterMinter;
 }
 
 export const deploy = async (
@@ -85,41 +87,41 @@ export const deploy = async (
   // log(0, '======================\n');
   // await updateProxy(deployedContracts, extraArgs);
 
-  log(0, 'Updating swaps/lendings linking');
-  log(0, '======================\n');
-  await updateChildContracts(deployedContracts, extraArgs);
+  // log(0, 'Updating swaps/lendings linking');
+  // log(0, '======================\n');
+  // await updateChildContracts(deployedContracts, extraArgs);
 
-  log(0, 'Updating uniswap/clones config');
-  log(0, '======================\n');
-  await updateUniSwap(deployedContracts.swapContracts?.uniSwap, extraArgs);
+  // log(0, 'Updating uniswap/clones config');
+  // log(0, '======================\n');
+  // await updateUniSwap(deployedContracts.swapContracts?.uniSwap, extraArgs);
 
-  log(0, 'Updating uniswapV3/clones config');
-  log(0, '======================\n');
-  await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
+  // log(0, 'Updating uniswapV3/clones config');
+  // log(0, '======================\n');
+  // await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
 
-  log(0, 'Updating kyberProxy config');
-  log(0, '======================\n');
-  await updateKyberProxy(deployedContracts.swapContracts?.kyberProxy, extraArgs);
+  // log(0, 'Updating kyberProxy config');
+  // log(0, '======================\n');
+  // await updateKyberProxy(deployedContracts.swapContracts?.kyberProxy, extraArgs);
 
-  log(0, 'Updating kyberDmm config');
-  log(0, '======================\n');
-  await updateKyberDmm(deployedContracts.swapContracts?.kyberDmm, extraArgs);
+  // log(0, 'Updating kyberDmm config');
+  // log(0, '======================\n');
+  // await updateKyberDmm(deployedContracts.swapContracts?.kyberDmm, extraArgs);
 
-  log(0, 'Updating oneInch config');
-  log(0, '======================\n');
-  await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
+  // log(0, 'Updating oneInch config');
+  // log(0, '======================\n');
+  // await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
 
-  log(0, 'Updating kyberDmm config');
-  log(0, '======================\n');
-  await updateKyberDmmV2(deployedContracts.swapContracts?.kyberDmmV2, extraArgs);
+  // log(0, 'Updating kyberDmm config');
+  // log(0, '======================\n');
+  // await updateKyberDmmV2(deployedContracts.swapContracts?.kyberDmmV2, extraArgs);
 
-  log(0, 'Updating kyberSwapv2 config');
-  log(0, '======================\n');
-  await updateKyberSwapV2(deployedContracts.swapContracts?.kyberSwapV2, extraArgs);
+  // log(0, 'Updating kyberSwapv2 config');
+  // log(0, '======================\n');
+  // await updateKyberSwapV2(deployedContracts.swapContracts?.kyberSwapV2, extraArgs);
 
-  log(0, 'Updating kyberSwapv3 config');
-  log(0, '======================\n');
-  await updateKyberSwapV3(deployedContracts.swapContracts?.kyberSwapV3, extraArgs);
+  // log(0, 'Updating kyberSwapv3 config');
+  // log(0, '======================\n');
+  // await updateKyberSwapV3(deployedContracts.swapContracts?.kyberSwapV3, extraArgs);
 
   // log(0, 'Updating compound/clones config');
   // log(0, '======================\n');
@@ -380,7 +382,7 @@ async function deployContracts(
     )) as KrystalCollectibles;
   }
 
-  let dino, dinoImplementation;
+  let dino, dinoImplementation, dinoMinter;
   if (networkConfig.dino?.enabled) {
     dinoImplementation = (await deployContract(
       ++step,
@@ -389,6 +391,14 @@ async function deployContracts(
       existingContract?.['dinoImplementation'],
       'contracts/dino/KrystalCharacterImpl.sol:KrystalCharacterImpl'
     )) as KrystalCharacterImpl;
+
+    dinoMinter = (await deployContract(
+      ++step,
+      networkConfig.autoVerifyContract,
+      'KrystalCharacterMinter',
+      existingContract?.['dinoMinter'],
+      'contracts/dino/KrystalCharacterMinter.sol:KrystalCharacterMinter'
+    )) as KrystalCharacterMinter;
 
     let initData =
       (
@@ -408,6 +418,22 @@ async function deployContracts(
       networkConfig.proxyAdminMultisig ?? contractAdmin,
       initData
     )) as KrystalCharacterProxy;
+
+    // init the deployed contracts
+    await dinoImplementation['initialize(string,string,string,address)'](
+      networkConfig.dino.name,
+      networkConfig.dino.symbol,
+      networkConfig.dino.uri,
+      networkConfig.dino.verifier
+    );
+
+    await dinoMinter['initialize(address,address,address)'](
+      '0xE63f21774280388D2717691d91F981543F711d22',
+      networkConfig.dino.verifier,
+      dinoImplementation.address
+    );
+
+    // await dinoImplementation.setMinter(dinoMinter.address);
   }
 
   return {
@@ -421,6 +447,7 @@ async function deployContracts(
     nftImplementation,
     dino,
     dinoImplementation,
+    dinoMinter,
   };
 }
 

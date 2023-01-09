@@ -74,7 +74,11 @@
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
     },
-    "nftImplementation": "0x029B41cD39Ccb4131807AaB24C2ae5c948Da56f9"
+    "nft": "0x3209286B92060D2f5e88565E7194ccB5aA831606",
+    "nftImplementation": "0x029B41cD39Ccb4131807AaB24C2ae5c948Da56f9",
+    "dino": "0x084106801790430842d252EfD317587baE72b633",
+    "dinoImplementation": "0x6bbe4686fa0cbf7d3235ed5836e1ada0dd41cc1e",
+    "dinoMinter": "0x53958DEe926A4E0D610257e937B92edcE9631dC0"
   },
   "bsc_staging": {
     "nft": "0x0993A84E5bdad44f2Cb49C8eB8CEC81Bc8791d6B",
@@ -93,7 +97,10 @@
       "compoundLending": "0xb455810945407Ad3146B74Aa3773df1cDaD61b11"
     },
     "nft": "0x3209286B92060D2f5e88565E7194ccB5aA831606",
-    "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3"
+    "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3",
+    "dino": "0xC743AEfbA999FDC2B158A1BB1aEb3975d618A589",
+    "dinoImplementation": "0xE105e5477bE89AC66FEFcB9BEEcc40505a6eecD8",
+    "dinoMinter": "0xe8460c21a842817d8CCaA4941c2dC44eF1cD1BE4"
   },
   "cronos_mainnet": {
     "smartWalletImplementation": "0x938f1bf9d93204506FCaC41B99D93a17077BBBe1",
@@ -116,9 +123,7 @@
     },
     "lendingContracts": {},
     "nft": "0xC10F7D0929425D67E6F82D806Bf8576a27a64D8f",
-    "nftImplementation": "0x6808c6b2ADC29De729bF631e64b124fd09Caf28B",
-    "dino": "0x0423201045c9A6d8474d14B66605a8A1C27d4161",
-    "dinoImplementation": "0xf953Be730A7ed9fe39DdA8225233F1001d52d0f5"
+    "nftImplementation": "0x6808c6b2ADC29De729bF631e64b124fd09Caf28B"
   },
   "eth_mainnet": {
     "smartWalletImplementation": "0x5583795ad3D58f4c00B499f83F6FED58389D2167",

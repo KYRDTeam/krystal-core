@@ -111,6 +111,7 @@ export interface IConfig {
     name: string;
     symbol: string;
     uri: string;
+    verifier: string;
   };
 
   // For proxy admin

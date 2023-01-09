@@ -153,6 +153,7 @@ if (PRIVATE_KEY) {
     chainId: 97,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
+    gasPrice: 10 * 1e9,
   };
 
   config.networks!.bsc_mainnet = {
@@ -249,23 +250,13 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 250 * 1e9,
   };
-}
 
-if (PRIVATE_KEY && INFURA_API_KEY) {
   config.networks!.polygon_mainnet = {
-    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://polygon.kyberengineering.io`,
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 35 * 1e9,
-  };
-
-  config.networks!.polygon_staging = {
-    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
-    chainId: 137,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 35 * 1e9,
+    gasPrice: 400 * 1e9,
   };
 
   config.networks!.polygon_mumbai = {
@@ -273,63 +264,89 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 80001,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 2 * 1e9,
-  };
-
-  config.networks!.eth_kovan = {
-    url: `https://kovan.infura.io/v3/${INFURA_API_KEY}`,
-    chainId: 42,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-  };
-
-  config.networks!.eth_rinkeby = {
-    url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
-    chainId: 4,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 10 * 1e9,
-  };
-
-  config.networks!.eth_ropsten = {
-    url: `https://ropsten.infura.io/v3/${INFURA_API_KEY}`,
-    chainId: 3,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 15 * 1e9,
-  };
-
-  config.networks!.eth_goerli = {
-    url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
-    chainId: 5,
-    accounts: [PRIVATE_KEY],
-    timeout: 2000,
-    gasPrice: 1 * 1e9,
-  };
-
-  config.networks!.eth_mainnet = {
-    url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
-    chainId: 1,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 13 * 1e9,
-  };
-
-  config.networks!.optimism_mainnet = {
-    url: `https://mainnet.optimism.io/`,
-    chainId: 10,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 0.001 * 1e9,
-  };
-
-  config.networks!.optimism_testnet = {
-    url: `https://goerli.optimism.io/`,
-    chainId: 420,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 0.001 * 1e9,
+    gasPrice: 200 * 1e9,
   };
 }
+
+// if (PRIVATE_KEY && INFURA_API_KEY) {
+//   config.networks!.polygon_mainnet = {
+//     url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 137,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 200 * 1e9,
+//   };
+
+//   config.networks!.polygon_staging = {
+//     url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 137,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 35 * 1e9,
+//   };
+
+//   config.networks!.polygon_mumbai = {
+//     url: `https://polygon-mumbai.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 80001,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 2 * 1e9,
+//   };
+
+//   config.networks!.eth_kovan = {
+//     url: `https://kovan.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 42,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//   };
+
+//   config.networks!.eth_rinkeby = {
+//     url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 4,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 10 * 1e9,
+//   };
+
+//   config.networks!.eth_ropsten = {
+//     url: `https://ropsten.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 3,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 15 * 1e9,
+//   };
+
+//   config.networks!.eth_goerli = {
+//     url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 5,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 2000,
+//     gasPrice: 1 * 1e9,
+//   };
+
+//   config.networks!.eth_mainnet = {
+//     url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
+//     chainId: 1,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 13 * 1e9,
+//   };
+
+//   config.networks!.optimism_mainnet = {
+//     url: `https://mainnet.optimism.io/`,
+//     chainId: 10,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 0.001 * 1e9,
+//   };
+
+//   config.networks!.optimism_testnet = {
+//     url: `https://goerli.optimism.io/`,
+//     chainId: 420,
+//     accounts: [PRIVATE_KEY],
+//     timeout: 20000,
+//     gasPrice: 0.001 * 1e9,
+//   };
+// }
 
 export default config;
