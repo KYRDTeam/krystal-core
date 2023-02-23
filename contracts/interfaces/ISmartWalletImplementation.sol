@@ -69,19 +69,13 @@ interface ISmartWalletImplementation {
         bytes extraArgs;
     }
 
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        returns (uint256 destAmount, uint256 expectedRate);
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view returns (uint256 destAmount, uint256 expectedRate);
 
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        returns (
-            uint256 destAmount,
-            uint256 expectedRate,
-            uint256 priceImpact
-        ); // in BPS
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view returns (uint256 destAmount, uint256 expectedRate, uint256 priceImpact); // in BPS
 
     struct GetExpectedInParams {
         address payable swapContract;
@@ -92,19 +86,13 @@ interface ISmartWalletImplementation {
         bytes extraArgs;
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        returns (uint256 srcAmount, uint256 expectedRate);
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view returns (uint256 srcAmount, uint256 expectedRate);
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        returns (
-            uint256 srcAmount,
-            uint256 expectedRate,
-            uint256 priceImpact
-        );
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view returns (uint256 srcAmount, uint256 expectedRate, uint256 priceImpact);
 
     /// @param swapContract swap contract
     /// @param srcAmount amount of src token
@@ -148,10 +136,9 @@ interface ISmartWalletImplementation {
         bytes extraArgs;
     }
 
-    function swapAndDeposit(SwapAndDepositParams calldata params)
-        external
-        payable
-        returns (uint256 destAmount);
+    function swapAndDeposit(
+        SwapAndDepositParams calldata params
+    ) external payable returns (uint256 destAmount);
 
     /// @param lendingContract lending contract to withdraw token
     /// @param token underlying token to withdraw, e.g ETH, USDT, DAI
@@ -164,9 +151,9 @@ interface ISmartWalletImplementation {
         uint256 minReturn;
     }
 
-    function withdrawFromLendingPlatform(WithdrawFromLendingPlatformParams calldata params)
-        external
-        returns (uint256 returnedAmount);
+    function withdrawFromLendingPlatform(
+        WithdrawFromLendingPlatformParams calldata params
+    ) external returns (uint256 returnedAmount);
 
     /// @param swapContract swap contract
     /// @param lendingContract lending contract
@@ -192,10 +179,9 @@ interface ISmartWalletImplementation {
         bytes extraArgs;
     }
 
-    function swapAndRepay(SwapAndRepayParams calldata params)
-        external
-        payable
-        returns (uint256 destAmount);
+    function swapAndRepay(
+        SwapAndRepayParams calldata params
+    ) external payable returns (uint256 destAmount);
 
     function claimPlatformFee(IERC20Ext[] calldata tokens) external;
 

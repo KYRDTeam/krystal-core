@@ -171,15 +171,13 @@ contract AaveV2Lending is BaseLending {
 
     /** @dev Calculate the current user debt and return
      */
-    function getUserDebtCurrent(address _reserve, address _user)
-        external
-        view
-        override
-        returns (uint256 debt)
-    {
+    function getUserDebtCurrent(
+        address _reserve,
+        address _user
+    ) external view override returns (uint256 debt) {
         (, uint256 stableDebt, uint256 variableDebt, , , , , , ) = aaveData
-        .provider
-        .getUserReserveData(_reserve, _user);
+            .provider
+            .getUserReserveData(_reserve, _user);
         debt = stableDebt > 0 ? stableDebt : variableDebt;
     }
 }

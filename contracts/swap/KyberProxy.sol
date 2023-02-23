@@ -29,13 +29,9 @@ contract KyberProxy is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length == 2, "kyber_invalidTradepath");
         uint256 expectedRate = kyberProxy.getExpectedRateAfterFee(
             IERC20Ext(params.tradePath[0]),
@@ -52,13 +48,9 @@ contract KyberProxy is BaseSwap {
         );
     }
 
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount, uint256 priceImpact)
-    {
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount, uint256 priceImpact) {
         require(params.tradePath.length == 2, "kyber_invalidTradepath");
         uint256 expectedRate = kyberProxy.getExpectedRateAfterFee(
             IERC20Ext(params.tradePath[0]),
@@ -76,23 +68,15 @@ contract KyberProxy is BaseSwap {
         priceImpact = 0;
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount)
-    {
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount) {
         require(false, "getExpectedIn_notSupported");
     }
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount, uint256 priceImpact)
-    {
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount, uint256 priceImpact) {
         require(false, "getExpectedIn_notSupported");
     }
 
@@ -100,13 +84,9 @@ contract KyberProxy is BaseSwap {
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
     /// for UniSwap, fee will be taken in src token
-    function swap(SwapParams calldata params)
-        external
-        payable
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function swap(
+        SwapParams calldata params
+    ) external payable override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length == 2, "kyber_invalidTradepath");
 
         safeApproveAllowance(address(kyberProxy), IERC20Ext(params.tradePath[0]));

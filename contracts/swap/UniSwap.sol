@@ -54,10 +54,10 @@ contract UniSwap is BaseSwap {
         customSwapToEth[_router] = _swapToEth;
     }
 
-    function updateUniRouters(IUniswapV2Router02[] calldata routers, bool isSupported)
-        external
-        onlyAdmin
-    {
+    function updateUniRouters(
+        IUniswapV2Router02[] calldata routers,
+        bool isSupported
+    ) external onlyAdmin {
         for (uint256 i = 0; i < routers.length; i++) {
             if (isSupported) {
                 uniRouters.add(address(routers[i]));
@@ -69,13 +69,9 @@ contract UniSwap is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount) {
         address router = parseExtraArgs(params.extraArgs);
         uint256[] memory amounts = IUniswapV2Router02(router).getAmountsOut(
             params.srcAmount,
@@ -85,13 +81,9 @@ contract UniSwap is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount, uint256 priceImpact)
-    {
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount, uint256 priceImpact) {
         address router = parseExtraArgs(params.extraArgs);
         uint256[] memory amounts = IUniswapV2Router02(router).getAmountsOut(
             params.srcAmount,
@@ -106,13 +98,9 @@ contract UniSwap is BaseSwap {
         );
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount)
-    {
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount) {
         address router = parseExtraArgs(params.extraArgs);
         uint256[] memory amounts = IUniswapV2Router02(router).getAmountsIn(
             params.destAmount,
@@ -121,13 +109,9 @@ contract UniSwap is BaseSwap {
         srcAmount = amounts[0];
     }
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount, uint256 priceImpact)
-    {
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount, uint256 priceImpact) {
         address router = parseExtraArgs(params.extraArgs);
         uint256[] memory amounts = IUniswapV2Router02(router).getAmountsIn(
             params.destAmount,
@@ -169,13 +153,9 @@ contract UniSwap is BaseSwap {
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
     /// for UniSwap, fee will be taken in src token
-    function swap(SwapParams calldata params)
-        external
-        payable
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function swap(
+        SwapParams calldata params
+    ) external payable override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length >= 2, "invalid tradePath");
 
         address router = parseExtraArgs(params.extraArgs);

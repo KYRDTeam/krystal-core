@@ -26,43 +26,27 @@ contract OneInch is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount) {
         require(false, "getExpectedReturn_notSupported");
     }
 
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount, uint256 priceImpact)
-    {
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount, uint256 priceImpact) {
         require(false, "getExpectedReturn_notSupported");
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount)
-    {
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount) {
         require(false, "getExpectedIn_notSupported");
     }
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount, uint256 priceImpact)
-    {
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount, uint256 priceImpact) {
         require(false, "getExpectedIn_notSupported");
     }
 
@@ -70,13 +54,9 @@ contract OneInch is BaseSwap {
     /// @notice
     /// 1inch API will returns data neccessary to build tx
     /// tx's data will be passed by params.extraData
-    function swap(SwapParams calldata params)
-        external
-        payable
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function swap(
+        SwapParams calldata params
+    ) external payable override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length == 2, "oneInch_invalidTradepath");
 
         safeApproveAllowance(address(router), IERC20Ext(params.tradePath[0]));

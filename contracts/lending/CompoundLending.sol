@@ -173,11 +173,10 @@ contract CompoundLending is BaseLending {
     }
 
     /** @dev Calculate the current user debt and return */
-    function getUserDebtCurrent(address _reserve, address _user)
-        external
-        override
-        returns (uint256 debt)
-    {
+    function getUserDebtCurrent(
+        address _reserve,
+        address _user
+    ) external override returns (uint256 debt) {
         ICompErc20 cToken = ICompErc20(compoundData.cTokens[IERC20Ext(_reserve)]);
         debt = cToken.borrowBalanceCurrent(_user);
     }

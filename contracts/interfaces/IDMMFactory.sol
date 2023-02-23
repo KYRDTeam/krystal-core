@@ -9,8 +9,8 @@ interface IDMMFactory {
         uint32 ampBps
     ) external returns (address pool);
 
-    function getPools(IERC20 token0, IERC20 token1)
-        external
-        view
-        returns (address[] memory _tokenPools);
+    function getPools(
+        IERC20 token0,
+        IERC20 token1
+    ) external view returns (address[] memory _tokenPools);
 }

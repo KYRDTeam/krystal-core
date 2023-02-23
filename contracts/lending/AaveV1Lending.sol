@@ -125,12 +125,10 @@ contract AaveV1Lending is BaseLending {
 
     /** @dev Calculate the current user debt and return
      */
-    function getUserDebtCurrent(address _reserve, address _user)
-        external
-        view
-        override
-        returns (uint256 debt)
-    {
+    function getUserDebtCurrent(
+        address _reserve,
+        address _user
+    ) external view override returns (uint256 debt) {
         uint256 originationFee;
         (, debt, , , , , originationFee, , , ) = aaveData.lendingPoolV1.getUserReserveData(
             _reserve,

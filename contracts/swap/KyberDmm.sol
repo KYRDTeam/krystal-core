@@ -31,13 +31,9 @@ contract KyberDmm is BaseSwap {
         emit UpdatedDmmRouter(dmmRouter);
     }
 
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount) {
         address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
         IERC20[] memory tradePathErc = new IERC20[](params.tradePath.length);
         for (uint256 i = 0; i < params.tradePath.length; i++) {
@@ -47,13 +43,9 @@ contract KyberDmm is BaseSwap {
         destAmount = amounts[params.tradePath.length - 1];
     }
 
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount, uint256 priceImpact)
-    {
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount, uint256 priceImpact) {
         address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
         IERC20[] memory tradePathErc = new IERC20[](params.tradePath.length);
         for (uint256 i = 0; i < params.tradePath.length; i++) {
@@ -64,13 +56,9 @@ contract KyberDmm is BaseSwap {
         priceImpact = getPriceImpact(params.srcAmount, destAmount, tradePathErc, pools);
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount)
-    {
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount) {
         address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
         IERC20[] memory tradePathErc = new IERC20[](params.tradePath.length);
         for (uint256 i = 0; i < params.tradePath.length; i++) {
@@ -80,13 +68,9 @@ contract KyberDmm is BaseSwap {
         srcAmount = amounts[0];
     }
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount, uint256 priceImpact)
-    {
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount, uint256 priceImpact) {
         address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
         IERC20[] memory tradePathErc = new IERC20[](params.tradePath.length);
         for (uint256 i = 0; i < params.tradePath.length; i++) {
@@ -123,13 +107,9 @@ contract KyberDmm is BaseSwap {
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
     /// for UniSwap, fee will be taken in src token
-    function swap(SwapParams calldata params)
-        external
-        payable
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function swap(
+        SwapParams calldata params
+    ) external payable override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length >= 2, "invalid tradePath");
 
         address[] memory pools = parseExtraArgs(params.tradePath.length - 1, params.extraArgs);
@@ -187,11 +167,10 @@ contract KyberDmm is BaseSwap {
     }
 
     /// @param extraArgs expecting <[20B] address pool1><[20B] address pool2><[20B] address pool3>...
-    function parseExtraArgs(uint256 poolLength, bytes calldata extraArgs)
-        internal
-        pure
-        returns (address[] memory pools)
-    {
+    function parseExtraArgs(
+        uint256 poolLength,
+        bytes calldata extraArgs
+    ) internal pure returns (address[] memory pools) {
         pools = new address[](poolLength);
         for (uint256 i = 0; i < poolLength; i++) {
             pools[i] = extraArgs.toAddress(i * 20);

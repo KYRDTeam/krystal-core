@@ -10,15 +10,13 @@ interface ISwap {
         bytes extraArgs;
     }
 
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        returns (uint256 destAmount);
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view returns (uint256 destAmount);
 
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        returns (uint256 destAmount, uint256 priceImpact);
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view returns (uint256 destAmount, uint256 priceImpact);
 
     struct GetExpectedInParams {
         uint256 destAmount;
@@ -27,15 +25,13 @@ interface ISwap {
         bytes extraArgs;
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        returns (uint256 srcAmount);
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view returns (uint256 srcAmount);
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        returns (uint256 srcAmount, uint256 priceImpact);
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view returns (uint256 srcAmount, uint256 priceImpact);
 
     struct SwapParams {
         uint256 srcAmount;

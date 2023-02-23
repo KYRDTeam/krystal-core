@@ -28,44 +28,28 @@ contract KyberSwapV2 is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount) {
         require(false, "getExpectedReturn_notSupported");
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount)
-    {
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount) {
         require(false, "getExpectedIn_notSupported");
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount, uint256 priceImpact)
-    {
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount, uint256 priceImpact) {
         require(false, "getExpectedReturnWithImpact_notSupported");
     }
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount, uint256 priceImpact)
-    {
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount, uint256 priceImpact) {
         require(false, "getExpectedInWithImpact_notSupported");
     }
 
@@ -73,13 +57,9 @@ contract KyberSwapV2 is BaseSwap {
     /// @notice
     /// DMM API will returns data neccessary to build tx
     /// tx's data will be passed by params.extraData
-    function swap(SwapParams calldata params)
-        external
-        payable
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function swap(
+        SwapParams calldata params
+    ) external payable override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length == 2, "kyberSwapV2_invalidTradepath");
 
         safeApproveAllowance(address(router), IERC20Ext(params.tradePath[0]));
@@ -121,11 +101,9 @@ contract KyberSwapV2 is BaseSwap {
         return returnAmount;
     }
 
-    function parseExtraArgs(bytes calldata extraArgs)
-        internal
-        pure
-        returns (address aggregationExecutor, bytes memory executorData)
-    {
+    function parseExtraArgs(
+        bytes calldata extraArgs
+    ) internal pure returns (address aggregationExecutor, bytes memory executorData) {
         require(extraArgs.length > 20, "invalid extraArgs");
         aggregationExecutor = extraArgs.toAddress(0);
 
