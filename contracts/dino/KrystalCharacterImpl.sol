@@ -3,6 +3,7 @@ pragma solidity 0.7.6;
 
 import "./KrystalCharacterStorage.sol";
 import "./IKrystalCharacter.sol";
+import "./utils/Verifier.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract KrystalCharacterImpl is KrystalCharacterStorage {
@@ -55,10 +56,21 @@ contract KrystalCharacterImpl is KrystalCharacterStorage {
 
     function changeCharacterName(
         uint256 characterId,
-        string memory newName
+        string memory newName,
+        bytes memory signature
     ) external onlyCharacterOwner(characterId) {
         require(_validateStr(newName), "Character: invalid name");
-        require(reservedName[newName] == false, "Character: name already exists");
+        require(reservedName[newName] == false, "Character: name already existed");
+        {
+            bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+            bytes32 message = keccak256(
+                abi.encodePacked(
+                    prefix,
+                    keccak256(abi.encodePacked(_msgSender(), characterId, newName))
+                )
+            );
+            Verifier.verifyMessage(message, signature, verifier);
+        }
 
         Character storage character = _characters[characterId];
         if (bytes(character.name).length > 0) {
