@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract KrystalCharacterImpl is KrystalCharacterStorage {
     using Strings for uint256;
+    uint256 public maxLevel = 10;
 
     function initialize(
         string memory _name,
@@ -44,6 +45,14 @@ contract KrystalCharacterImpl is KrystalCharacterStorage {
     function setURI(string memory newuri) external onlyAdmin {
         super._setBaseURI(newuri);
         tokenUriPrefix = newuri;
+    }
+
+    function mintCharacter(address _receiver) public {
+        mint(_receiver);
+        _characters.push(Character("", 1));
+        uint characterId = _characters.length - 1;
+
+        emit CreateCharacter(characterId);
     }
 
     function getCharacter(
@@ -83,12 +92,28 @@ contract KrystalCharacterImpl is KrystalCharacterStorage {
         emit NameChanged(characterId, newName);
     }
 
-    function mintCharacter(address _receiver) public {
-        mint(_receiver);
-        _characters.push(Character("", 1));
-        uint characterId = _characters.length - 1;
+    function levelUp(
+        uint256 characterId,
+        uint256 newLevel,
+        bytes memory signature
+    ) external onlyCharacterOwner(characterId) {
+        {
+            bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+            bytes32 message = keccak256(
+                abi.encodePacked(
+                    prefix,
+                    keccak256(abi.encodePacked(_msgSender(), characterId, newLevel))
+                )
+            );
+            Verifier.verifyMessage(message, signature, verifier);
+        }
 
-        emit CreateCharacter(characterId);
+        Character storage character = _characters[characterId];
+        require(newLevel > character.level, "Character: invalid level");
+        require(newLevel <= maxLevel, "Character: max level reached");
+        character.level = newLevel;
+
+        emit CharacterLeveledUp(characterId, newLevel);
     }
 
     /**

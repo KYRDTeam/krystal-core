@@ -98,9 +98,9 @@
     },
     "nft": "0x3209286B92060D2f5e88565E7194ccB5aA831606",
     "nftImplementation": "0xF7f2964E08A2a2aFA43c70D176b08Af52a75A8A3",
-    "dino": "0xb8672B78AE87F0013475f209830F7DA87e57b466",
-    "dinoImplementation": "0xad77DfB38A7D116DdA114d435e84Bed36180e922",
-    "dinoMinter": "0x792B2655EEB69f4733F93A3b0613bfE4284D1EbF"
+    "dino": "0x14f799e37eA25207578CD47E7e44933B4AFA166F",
+    "dinoImplementation": "0x83e13A71f2f1264d6adeF3BEf4A060D36ec57a58",
+    "dinoMinter": "0x787852F505785590580aaCf46E8E5FCE5Cfda77E"
   },
   "cronos_mainnet": {
     "smartWalletImplementation": "0x938f1bf9d93204506FCaC41B99D93a17077BBBe1",

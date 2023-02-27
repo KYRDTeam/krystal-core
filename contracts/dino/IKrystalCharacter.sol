@@ -13,4 +13,5 @@ interface IKrystalCharacter {
     event SetCharacterContract(address _character);
     event NameChanged(uint256 characterId, string newName);
     event CreateCharacter(uint256 characterId);
+    event CharacterLeveledUp(uint256 characterId, uint newLevel);
 }
