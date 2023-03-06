@@ -101,6 +101,7 @@
     "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchTokenBalances": "0x0C816D6C4C37294186CBCA0E514Fc56F0c34d059",
     "swapContracts": {
+      "uniSwap": "0x4E3F56056d6Ab2078ef6F1b23F837174DccFC70a",
       "kyberDmmV2": "0x2FA1e7dF142665320cA916AFDA9DFD9A97C9b986",
       "kyberSwapV2": "0x413D6B35E2daED79D30EB51EEA1BE6b3C47d3e54",
       "kyberSwapV3": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93"
@@ -169,6 +170,7 @@
     "smartWalletProxy": "0xf351Dd5EC89e5ac6c9125262853c74E714C1d56a",
     "fetchTokenBalances": "0x465661625B3B96b102a49e07E2Eb31cC9F5cE58B",
     "swapContracts": {
+      "uniSwap": "0x848c15AB2330285Bbe0740f11B97b2ac530FB881",
       "kyberDmmV2": "0x60fc810EA972809d729FCE0043B82a58766596ee",
       "kyberSwapV2": "0xFA773737d274873c4E575591bcf2ff408F737c70",
       "kyberSwapV3": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5"
@@ -199,6 +201,7 @@
     "fetchTokenBalances": "0xfA5d8aAF312c96b42Ac4355B13D9D28fB10b305c",
     "fetchAaveDataWrapper": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93",
     "swapContracts": {
+      "uniSwap": "0x4f60e2310d5471d5C12dB71643B7dD8B1B464b23",
       "kyberSwapV3": "0x6917812739D8Cc378ABd80569D6045Fff349d224"
     },
     "lendingContracts": {}

@@ -15,7 +15,7 @@ export const AuroraConfig: Record<string, IConfig> = {
     },
 
     kyberSwapV3: {
-      router: '0x00555513acf282b42882420e5e5ba87b44d8fa6e',
+      router: '0x6131B5fae19EA4f9D964eAc0408E4408b66337b5',
     },
 
     supportedWallets: commonPlatformWallets,
