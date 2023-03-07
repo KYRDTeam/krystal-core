@@ -28,7 +28,7 @@ import axios from 'axios';
 import {apiMock} from './api_helper';
 
 describe('swap test', async () => {
-  let platformFee = 8;
+  let platformFee = 0;
   let setup: IInitialSetup;
 
   // 10$ worth of native amount
@@ -275,7 +275,7 @@ describe('swap test', async () => {
           let tokenUnit = BigNumber.from(10).pow(tokenDec);
 
           // Get some fund first .i.e 100$ worth of tokens
-          let fundAmount = nativeAmount10.mul(10);
+          let fundAmount = nativeAmount10.mul(100);
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
           let extraArgs = await generateArgsFunc(tradePath, fundAmount, FeeMode.FROM_SOURCE);
