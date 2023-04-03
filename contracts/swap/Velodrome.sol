@@ -138,15 +138,18 @@ contract Velodrome is BaseSwap {
         uint256 destAmount,
         address[] memory path
     ) private view returns (uint256 priceImpact) {
+        uint256 tradeLen = path.length;
+        require(tradeLen > 1, "trade path must be greater than 1");
+        Route[] memory routes = new Route[](tradeLen - 1);
+        if (path[0] == address(ETH_TOKEN_ADDRESS)) {
+            path[0] = wEth;
+        }
+        if (path[tradeLen - 1] == address(ETH_TOKEN_ADDRESS)) {
+            path[tradeLen - 1] = wEth;
+        }
         uint256 quote = srcAmount;
-        for (uint256 i; i < path.length - 1; i++) {
+        for (uint256 i; i < tradeLen - 1; i++) {
             bool stable = isStablePair(path[i], path[i + 1]);
-            if (path[i] == address(ETH_TOKEN_ADDRESS)) {
-                path[i] = wEth;
-            }
-            if (path[i + 1] == address(ETH_TOKEN_ADDRESS)) {
-                path[i + 1] = wEth;
-            }
             (uint256 reserveIn, uint256 reserveOut) = IVelodromeRouter(router).getReserves(
                 path[i],
                 path[i + 1],
@@ -298,16 +301,17 @@ contract Velodrome is BaseSwap {
         view
         returns (Route[] memory routes)
     {
-        require(tradePath.length > 1, "trade path must be greater than 1");
-        Route[] memory routes = new Route[](tradePath.length - 1);
-        for (uint256 i = 0; i < tradePath.length - 1; i++) {
+        uint256 tradeLen = tradePath.length;
+        require(tradeLen > 1, "trade path must be greater than 1");
+        Route[] memory routes = new Route[](tradeLen - 1);
+        if (tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
+            tradePath[0] = wEth;
+        }
+        if (tradePath[tradeLen - 1] == address(ETH_TOKEN_ADDRESS)) {
+            tradePath[tradeLen - 1] = wEth;
+        }
+        for (uint256 i = 0; i < tradeLen - 1; i++) {
             bool stable = isStablePair(tradePath[i], tradePath[i + 1]);
-            if (tradePath[i] == address(ETH_TOKEN_ADDRESS)) {
-                tradePath[i] = wEth;
-            }
-            if (tradePath[i + 1] == address(ETH_TOKEN_ADDRESS)) {
-                tradePath[i + 1] = wEth;
-            }
             routes[i] = Route({from: tradePath[i], to: tradePath[i + 1], stable: stable});
         }
         return routes;
