@@ -27,6 +27,7 @@ const {
   AURORASCAN_KEY,
   ARBISCAN_KEY,
   OPTIMISTICSCAN_KEY,
+  CRONOSCAN_KEY,
   MAINNET_ID,
   MAINNET_FORK,
   MAINNET_FORK_BLOCK,
@@ -96,38 +97,51 @@ const config: HardhatUserConfig = {
     // Your API key for bscscan / ethscan
     // Obtain one at https://bscscan.io/
     apiKey: {
-      mainnet: ETHERSCAN_KEY,
-      ropsten: ETHERSCAN_KEY,
-      goerli: ETHERSCAN_KEY,
-      rinkeby: ETHERSCAN_KEY,
+      mainnet: ETHERSCAN_KEY as string,
+      ropsten: ETHERSCAN_KEY as string,
+      goerli: ETHERSCAN_KEY as string,
+      rinkeby: ETHERSCAN_KEY as string,
 
       // binance smart chain
-      bsc: BSCSCAN_KEY,
-      bscTestnet: BSCSCAN_KEY,
+      bsc: BSCSCAN_KEY as string,
+      bscTestnet: BSCSCAN_KEY as string,
 
       // fantom mainnet
-      opera: FANTOMSCAN_KEY,
-      ftmTestnet: FANTOMSCAN_KEY,
+      opera: FANTOMSCAN_KEY as string,
+      ftmTestnet: FANTOMSCAN_KEY as string,
 
       // polygon
-      polygon: POLYGONSCAN_KEY,
-      polygonMumbai: POLYGONSCAN_KEY,
+      polygon: POLYGONSCAN_KEY as string,
+      polygonMumbai: POLYGONSCAN_KEY as string,
 
       // avalanche
-      avalanche: AVAXSCAN_KEY,
-      avalancheFujiTestnet: AVAXSCAN_KEY,
+      avalanche: AVAXSCAN_KEY as string,
+      avalancheFujiTestnet: AVAXSCAN_KEY as string,
 
       // aurora
-      aurora: AURORASCAN_KEY,
-      auroraTestnet: AURORASCAN_KEY,
+      aurora: AURORASCAN_KEY as string,
+      auroraTestnet: AURORASCAN_KEY as string,
 
       // arbitrum
-      arbitrumOne: ARBISCAN_KEY,
-      arbitrumTestnet: ARBISCAN_KEY,
+      arbitrumOne: ARBISCAN_KEY as string,
+      arbitrumTestnet: ARBISCAN_KEY as string,
 
       // optimism
-      optimisticEthereum: OPTIMISTICSCAN_KEY,
+      optimisticEthereum: OPTIMISTICSCAN_KEY as string,
+
+      // cronos
+      cronos: CRONOSCAN_KEY as string,
     },
+    customChains: [
+      {
+        network: 'cronos',
+        chainId: 25,
+        urls: {
+          apiURL: 'https://api.cronoscan.com/api',
+          browserURL: 'https://cronoscan.com',
+        },
+      },
+    ],
   },
 
   typechain: {
@@ -191,7 +205,7 @@ if (PRIVATE_KEY) {
     chainId: 250,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 301 * 1e9,
+    gasPrice: 40 * 1e9,
   };
 
   config.networks!.arbitrum_mainnet = {
@@ -215,7 +229,7 @@ if (PRIVATE_KEY) {
     chainId: 25,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 5000 * 1e9,
+    gasPrice: 4800 * 1e9,
   };
 
   config.networks!.aurora_mainnet = {

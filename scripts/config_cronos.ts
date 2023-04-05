@@ -20,7 +20,16 @@ export const CronosConfig: Record<string, IConfig> = {
     },
 
     kyberSwapV3: {
-      router: '0x00555513Acf282B42882420E5e5bA87b44D8fA6E',
+      router: '0x6131B5fae19EA4f9D964eAc0408E4408b66337b5',
+    },
+
+    // VVSFinance
+    uniswap: {
+      routers: {
+        vvsfinance: {
+          address: '0x145863Eb42Cf62847A6Ca784e6416C1682b1b2Ae',
+        },
+      },
     },
 
     supportedWallets: commonPlatformWallets,

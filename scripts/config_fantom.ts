@@ -20,7 +20,16 @@ export const FantomConfig: Record<string, IConfig> = {
     },
 
     kyberSwapV3: {
-      router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
+      router: '0x6131B5fae19EA4f9D964eAc0408E4408b66337b5',
+    },
+
+    // Spooky swap
+    uniswap: {
+      routers: {
+        spookyswap: {
+          address: '0xF491e7B69E4244ad4002BC14e878a34207E38c29',
+        },
+      },
     },
 
     supportedWallets: commonPlatformWallets,
