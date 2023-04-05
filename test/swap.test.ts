@@ -21,6 +21,8 @@ import {
   ISwapRouterInternal,
   IUniswapV3Factory,
   IUniswapV3Pool,
+  IVelodromeRouter,
+  SmartWalletProxy,
 } from '../typechain';
 import {ethers} from 'hardhat';
 import {arrayify, hexConcat, hexlify} from 'ethers/lib/utils';
@@ -275,7 +277,7 @@ describe('swap test', async () => {
           let tokenUnit = BigNumber.from(10).pow(tokenDec);
 
           // Get some fund first .i.e 100$ worth of tokens
-          let fundAmount = nativeAmount10.mul(10);
+          let fundAmount = nativeAmount10.mul(100);
           let beforeFunded = await token.balanceOf(setup.user.address);
           let tradePath = [nativeTokenAddress, token.address];
           let extraArgs = await generateArgsFunc(tradePath, fundAmount, FeeMode.FROM_SOURCE);
@@ -777,5 +779,45 @@ describe('swap test', async () => {
       testingTokens: networkSetting.kyberSwapV2.testingTokens ?? Object.keys(networkSetting.tokens),
       expectedPriceImpactFn: null,
     });
+  }
+
+  if (networkSetting.velodrome) {
+    for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.velodrome.routers)) {
+      executeSwapTest({
+        name: 'velodrome',
+        getSwapContract: async () => {
+          return setup.krystalContracts.smartWalletProxy?.address!;
+        },
+        router: routerName,
+        generateArgsFunc: async () => hexlify(arrayify(address)),
+        platformFee,
+        getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+          const expectedReturn = await setup.krystalContracts.smartWalletImplementation?.getExpectedReturn({
+            swapContract: setup.krystalContracts.swapContracts?.velodrome?.address!,
+            srcAmount: sourceAmount,
+            tradePath: tradePath,
+            feeMode: feeMode,
+            feeBps: 0,
+            extraArgs: await hexlify(arrayify(address)),
+          });
+          return expectedReturn?.[0]!;
+        },
+        maxDiffAllowed: 0,
+        getExpectedInSupported: true,
+        testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
+        expectedPriceImpactFn: async (srcAmount: BigNumber, tradePath: string[]) => {
+          const expectedReturnWithImpact =
+            await setup.krystalContracts.smartWalletImplementation?.getExpectedReturnWithImpact({
+              swapContract: setup.krystalContracts.swapContracts?.velodrome?.address!,
+              srcAmount: srcAmount,
+              tradePath: tradePath,
+              feeMode: FeeMode.FROM_SOURCE,
+              feeBps: 0,
+              extraArgs: await hexlify(arrayify(address)),
+            });
+          return expectedReturnWithImpact?.[0]!;
+        },
+      });
+    }
   }
 });
