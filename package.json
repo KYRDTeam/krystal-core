@@ -8,7 +8,7 @@
   "scripts": {
     "test": "./cmd.sh -x test",
     "t": "yarn test",
-    "compile": "export NODE_OPTIONS=--max-old-space-size=4096 && yarn hardhat compile",
+    "compile": "export NODE_OPTIONS=--max-old-space-size=4096 && yarn hardhat compile --show-stack-traces",
     "c": "yarn compile",
     "coverage": "yarn hardhat coverage",
     "deploy": "./cmd.sh -x deploy",

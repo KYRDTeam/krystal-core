@@ -5,7 +5,21 @@ export const FantomConfig: Record<string, IConfig> = {
     diabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
-    tokens: {},
+    uniswap: {
+      routers: {
+        spookyswap: {
+          address: '0xF491e7B69E4244ad4002BC14e878a34207E38c29',
+          testingTokens: ['usdc', 'dai', 'fusdt', 'boo'],
+        },
+      },
+    },
+
+    tokens: {
+      usdc: {symbol: 'usdc', address: '0x04068da6c83afcfa0e13ba15a6696662335d5b75', usdRate: 1},
+      dai: {symbol: 'dai', address: '0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E', usdRate: 1},
+      fusdt: {symbol: 'fusdt', address: '0x049d68029688eAbF473097a2fC38ef61633A3C7A', usdRate: 1},
+      boo: {symbol: 'boo', address: '0x841fad6eae12c286d1fd18d1d525dffa75c7effe', usdRate: 2},
+    },
 
     wNative: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',
 

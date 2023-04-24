@@ -30,7 +30,7 @@ import axios from 'axios';
 import {apiMock} from './api_helper';
 
 describe('swap test', async () => {
-  let platformFee = 8;
+  let platformFee = 0;
   let setup: IInitialSetup;
 
   // 10$ worth of native amount
