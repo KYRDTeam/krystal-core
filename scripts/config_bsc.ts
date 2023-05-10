@@ -45,6 +45,13 @@ export const BscConfig: Record<string, IConfig> = {
       },
     },
 
+    uniswapV3: {
+      routers: [
+        '0x1b81D678ffb9C0263b24A97847620C99d213eB14', // pancakeswapV3
+      ],
+      testingTokens: ['eth', 'busd', 'busd'],
+    },
+
     kyberDmm: {
       router: '0x78df70615ffc8066cc0887917f2Cd72092C86409',
     },
