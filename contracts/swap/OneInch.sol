@@ -6,21 +6,21 @@ import "./BaseSwap.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
-import "../interfaces/IAggregationRouter.sol";
+import "../interfaces/OneInchV5AggregationRouter.sol";
 
 contract OneInch is BaseSwap {
     using SafeERC20 for IERC20Ext;
     using Address for address;
 
-    IAggregationRouter public router;
+    OneInchV5AggregationRouter public router;
 
-    event UpdatedAggregationRouter(IAggregationRouter router);
+    event UpdatedAggregationRouter(OneInchV5AggregationRouter router);
 
-    constructor(address _admin, IAggregationRouter _router) BaseSwap(_admin) {
+    constructor(address _admin, OneInchV5AggregationRouter _router) BaseSwap(_admin) {
         router = _router;
     }
 
-    function updateAggregationRouter(IAggregationRouter _router) external onlyAdmin {
+    function updateAggregationRouter(OneInchV5AggregationRouter _router) external onlyAdmin {
         router = _router;
         emit UpdatedAggregationRouter(router);
     }
@@ -85,10 +85,10 @@ contract OneInch is BaseSwap {
             (bytes4(params.extraArgs[1]) >> 8) |
             (bytes4(params.extraArgs[2]) >> 16) |
             (bytes4(params.extraArgs[3]) >> 24);
-        if (methodId == IAggregationRouter.unoswap.selector) {
+        if (methodId == OneInchV5AggregationRouter.unoswap.selector) {
             return doUnoswap(params);
         }
-        if (methodId == IAggregationRouter.swap.selector) {
+        if (methodId == OneInchV5AggregationRouter.swap.selector) {
             return doSwap(params);
         }
 
@@ -105,8 +105,8 @@ contract OneInch is BaseSwap {
             srcToken = params.tradePath[0];
             callValue = 0;
         }
-        bytes32[] memory data;
-        (, , , data) = abi.decode(params.extraArgs[4:], (address, uint256, uint256, bytes32[]));
+        uint256[] memory data;
+        (, , , data) = abi.decode(params.extraArgs[4:], (address, uint256, uint256, uint256[]));
 
         destAmount = router.unoswap{value: callValue}(
             srcToken,
@@ -135,26 +135,27 @@ contract OneInch is BaseSwap {
         }
 
         address aggregationExecutor;
-        IAggregationRouter.SwapDescription memory desc;
+        OneInchV5AggregationRouter.SwapDescription memory desc;
         bytes memory data;
+        bytes memory permit;
 
-        (aggregationExecutor, desc, data) = abi.decode(
+        (aggregationExecutor, desc, permit, data) = abi.decode(
             params.extraArgs[4:],
-            (address, IAggregationRouter.SwapDescription, bytes)
+            (address, OneInchV5AggregationRouter.SwapDescription, bytes, bytes)
         );
 
         (destAmount, ) = router.swap{value: callValue}(
             aggregationExecutor,
-            IAggregationRouter.SwapDescription({
+            OneInchV5AggregationRouter.SwapDescription({
                 srcToken: params.tradePath[0],
                 dstToken: params.tradePath[1],
                 srcReceiver: desc.srcReceiver,
                 dstReceiver: params.recipient,
                 amount: params.srcAmount,
                 minReturnAmount: params.minDestAmount,
-                flags: desc.flags,
-                permit: desc.permit
+                flags: desc.flags
             }),
+            permit,
             data
         );
     }

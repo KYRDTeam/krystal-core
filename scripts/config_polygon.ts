@@ -165,6 +165,11 @@ export const PolygonConfig: Record<string, IConfig> = {
       },
     },
 
+    oneInch: {
+      router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
+      testingTokens: ['weth'],
+    },
+
     // Compound
     // compound: {
     //   compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',
