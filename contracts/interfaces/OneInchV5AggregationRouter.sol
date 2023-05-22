@@ -26,4 +26,21 @@ interface OneInchV5AggregationRouter {
         bytes calldata permit,
         bytes calldata data
     ) external payable returns (uint256 returnAmount, uint256 spentAmount); // 0x12aa3caf
+
+    function uniswapV3Swap(
+        uint256 amount,
+        uint256 minReturn,
+        uint256[] calldata /* pools */
+    ) external payable returns (uint256 returnAmount); // 0xe449022e
+
+    function clipperSwap(
+        address clipperExchange,
+        address srcToken,
+        address dstToken,
+        uint256 inputAmount,
+        uint256 outputAmount,
+        uint256 goodUntil,
+        bytes32 r,
+        bytes32 vs
+    ) external payable returns (uint256 returnAmount); // 0x84bd6d29
 }

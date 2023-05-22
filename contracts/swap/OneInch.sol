@@ -85,11 +85,17 @@ contract OneInch is BaseSwap {
             (bytes4(params.extraArgs[1]) >> 8) |
             (bytes4(params.extraArgs[2]) >> 16) |
             (bytes4(params.extraArgs[3]) >> 24);
+
         if (methodId == OneInchV5AggregationRouter.unoswap.selector) {
             return doUnoswap(params);
         }
+
         if (methodId == OneInchV5AggregationRouter.swap.selector) {
             return doSwap(params);
+        }
+
+        if (methodId == OneInchV5AggregationRouter.uniswapV3Swap.selector) {
+            return doUniswapV3Swap(params);
         }
 
         require(false, "oneInch_invalidExtraArgs");
@@ -158,5 +164,70 @@ contract OneInch is BaseSwap {
             permit,
             data
         );
+    }
+
+    function doUniswapV3Swap(SwapParams calldata params) private returns (uint256 destAmount) {
+        uint256 callValue;
+        if (params.tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
+            callValue = params.srcAmount;
+        } else {
+            callValue = 0;
+        }
+
+        uint256[] memory data;
+        (, , , data) = abi.decode(params.extraArgs[4:], (uint256, uint256, uint256[]));
+
+        destAmount = router.uniswapV3Swap{value: callValue}(
+            params.srcAmount,
+            params.minDestAmount,
+            data
+        );
+
+        if (params.tradePath[1] == address(ETH_TOKEN_ADDRESS)) {
+            (bool success, ) = params.recipient.call{value: destAmount}("");
+        } else {
+            IERC20Ext(params.tradePath[1]).safeTransfer(params.recipient, destAmount);
+        }
+    }
+
+    function doClipperSwap(SwapParams calldata params) private returns (uint256 destAmount) {
+        uint256 callValue;
+        if (params.tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
+            callValue = params.srcAmount;
+        } else {
+            callValue = 0;
+        }
+
+        uint256[] memory data;
+        (clipperExchange, , , , outputAmount, goodUntil, r, vs) = abi.decode(
+            params.extraArgs[4:],
+            (
+                OneInchV5AggregationRouter.IClipperExchangeInterface,
+                address,
+                address,
+                uint256,
+                uint256,
+                uint256,
+                bytes32,
+                bytes32
+            )
+        );
+
+        destAmount = router.clipperSwap{value: callValue}(
+            clipperExchange,
+            params.tradePath[0],
+            params.tradePath[1],
+            params.srcAmount,
+            outputAmount,
+            goodUntil,
+            r,
+            vs
+        );
+
+        if (params.tradePath[1] == address(ETH_TOKEN_ADDRESS)) {
+            (bool success, ) = params.recipient.call{value: destAmount}("");
+        } else {
+            IERC20Ext(params.tradePath[1]).safeTransfer(params.recipient, destAmount);
+        }
     }
 }
