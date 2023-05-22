@@ -175,7 +175,7 @@ contract OneInch is BaseSwap {
         }
 
         uint256[] memory data;
-        (, , , data) = abi.decode(params.extraArgs[4:], (uint256, uint256, uint256[]));
+        (, , data) = abi.decode(params.extraArgs[4:], (uint256, uint256, uint256[]));
 
         destAmount = router.uniswapV3Swap{value: callValue}(
             params.srcAmount,
@@ -198,19 +198,14 @@ contract OneInch is BaseSwap {
             callValue = 0;
         }
 
-        uint256[] memory data;
+        address clipperExchange;
+        uint256 outputAmount;
+        uint256 goodUntil;
+        bytes32 r;
+        bytes32 vs;
         (clipperExchange, , , , outputAmount, goodUntil, r, vs) = abi.decode(
             params.extraArgs[4:],
-            (
-                OneInchV5AggregationRouter.IClipperExchangeInterface,
-                address,
-                address,
-                uint256,
-                uint256,
-                uint256,
-                bytes32,
-                bytes32
-            )
+            (address, address, address, uint256, uint256, uint256, bytes32, bytes32)
         );
 
         destAmount = router.clipperSwap{value: callValue}(
