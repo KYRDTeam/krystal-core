@@ -656,7 +656,7 @@ export const apiMock: {[url: string]: any} = {
       swaps: [],
       tokens: {},
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -696,7 +696,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '146402845416',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -736,7 +736,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '128923851422',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'DAI',
@@ -777,7 +777,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '150230770819',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'DAI',
@@ -817,7 +817,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '128923851422',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -857,7 +857,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '120767611484',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -897,7 +897,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '128923851422',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDC',
@@ -938,7 +938,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDC',
@@ -978,7 +978,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '128923851422',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDC',
@@ -1026,7 +1026,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDC',
@@ -1066,7 +1066,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -1105,7 +1105,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '150230770819',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -1144,7 +1144,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '127622222045',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDT',
@@ -1184,7 +1184,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDT',
@@ -1224,7 +1224,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDT',
@@ -1271,7 +1271,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '127622222045',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=4996000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'USDT',
@@ -1310,7 +1310,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=3330666666666663&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -1349,7 +1349,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '127622222045',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=33306666666666633&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'ETH',
@@ -1388,7 +1388,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '127622222045',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'KNC',
@@ -1436,7 +1436,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'KNC',
@@ -1484,7 +1484,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '127622222045',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'KNC',
@@ -1531,7 +1531,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '115639645970',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=2498000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'KNC',
@@ -1570,7 +1570,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '127622222045',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'DAI',
@@ -1618,7 +1618,7 @@ export const apiMock: {[url: string]: any} = {
         gasPrice: '136625181623',
       },
     },
-  'https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
+  'https://api.1inch.io/v5.0/1/swap?fromTokenAddress=0x6b175474e89094c44da98b954eedeac495271d0f&toTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&amount=4996000000000000000&fromAddress=0xc783df8a850f42e7F7e57013759C285caa701eB6&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false':
     {
       fromToken: {
         symbol: 'DAI',
