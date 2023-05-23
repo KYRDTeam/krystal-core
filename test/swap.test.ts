@@ -394,49 +394,49 @@ describe('swap test', async () => {
   // Need at least 1 test to be recognized as the test suite
   it('swap test should be initialized', async () => {});
 
-  // if (networkSetting.uniswap) {
-  //   for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.uniswap.routers)) {
-  //     const routerContract = (await ethers.getContractAt('IUniswapV2Router02', address)) as IUniswapV2Router02;
-  //     const factoryAddr = await routerContract.factory();
-  //     const factoryContract = (await ethers.getContractAt('IUniswapV2Factory', factoryAddr)) as IUniswapV2Factory;
+  if (networkSetting.uniswap) {
+    for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.uniswap.routers)) {
+      const routerContract = (await ethers.getContractAt('IUniswapV2Router02', address)) as IUniswapV2Router02;
+      const factoryAddr = await routerContract.factory();
+      const factoryContract = (await ethers.getContractAt('IUniswapV2Factory', factoryAddr)) as IUniswapV2Factory;
 
-  //     executeSwapTest({
-  //       name: 'univ2/clones',
-  //       getSwapContract: async () => {
-  //         return setup.krystalContracts.swapContracts!.uniSwap!.address;
-  //       },
-  //       router: routerName,
-  //       generateArgsFunc: async () => hexlify(arrayify(address)),
-  //       platformFee,
-  //       getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
-  //         const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
-  //         return amounts[amounts.length - 1];
-  //       },
-  //       maxDiffAllowed: 0,
-  //       getExpectedInSupported: true,
-  //       testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
-  //       expectedPriceImpactFn: async (srcAmount: BigNumber, tradePath: string[]) => {
-  //         let amountsOut = await routerContract.getAmountsOut(srcAmount, tradePath);
-  //         let amountOut = amountsOut[amountsOut.length - 1];
-  //         let quote = srcAmount;
-  //         let reserve1: BigNumber;
-  //         for (let i = 0; i < tradePath.length - 1; i++) {
-  //           const pair = await factoryContract.getPair(tradePath[i], tradePath[i + 1]);
-  //           const pairContract = (await ethers.getContractAt('IUniswapV2Pair', pair)) as IUniswapV2Pair;
-  //           const token0 = await pairContract.token0();
-  //           let [r0, r1] = await pairContract.getReserves();
-  //           if (token0.toLowerCase() !== tradePath[i].toLowerCase()) {
-  //             [r0, r1] = [r1, r0];
-  //           }
-  //           reserve1 = r1;
+      executeSwapTest({
+        name: 'univ2/clones',
+        getSwapContract: async () => {
+          return setup.krystalContracts.swapContracts!.uniSwap!.address;
+        },
+        router: routerName,
+        generateArgsFunc: async () => hexlify(arrayify(address)),
+        platformFee,
+        getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+          const amounts = await routerContract.getAmountsOut(sourceAmount, tradePath);
+          return amounts[amounts.length - 1];
+        },
+        maxDiffAllowed: 0,
+        getExpectedInSupported: true,
+        testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
+        expectedPriceImpactFn: async (srcAmount: BigNumber, tradePath: string[]) => {
+          let amountsOut = await routerContract.getAmountsOut(srcAmount, tradePath);
+          let amountOut = amountsOut[amountsOut.length - 1];
+          let quote = srcAmount;
+          let reserve1: BigNumber;
+          for (let i = 0; i < tradePath.length - 1; i++) {
+            const pair = await factoryContract.getPair(tradePath[i], tradePath[i + 1]);
+            const pairContract = (await ethers.getContractAt('IUniswapV2Pair', pair)) as IUniswapV2Pair;
+            const token0 = await pairContract.token0();
+            let [r0, r1] = await pairContract.getReserves();
+            if (token0.toLowerCase() !== tradePath[i].toLowerCase()) {
+              [r0, r1] = [r1, r0];
+            }
+            reserve1 = r1;
 
-  //           quote = quote.mul(997).mul(r1).div(r0).div(1000);
-  //         }
-  //         return quote.sub(amountOut).mul(BPS).div(quote);
-  //       },
-  //     });
-  //   }
-  // }
+            quote = quote.mul(997).mul(r1).div(r0).div(1000);
+          }
+          return quote.sub(amountOut).mul(BPS).div(quote);
+        },
+      });
+    }
+  }
 
   if (networkSetting.uniswapV3) {
     for (let router of networkSetting.uniswapV3.routers) {
