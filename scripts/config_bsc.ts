@@ -60,11 +60,10 @@ export const BscConfig: Record<string, IConfig> = {
       aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
       testingTokens: ['busd'],
     },
-    /*
+
     kyberSwapV3: {
       router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
     },
-    */
 
     uniSwapV3Bsc: {
       routers: ['0xca59f346DfFDb6170276050a0b9E0F0c77530eF8'],

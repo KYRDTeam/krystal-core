@@ -502,322 +502,322 @@ describe('swap test', async () => {
   }
  */
 
-  // if (networkSetting.kyberDmm) {
-  //   const generatePools = async (dmmRouter: IDMMRouter, tradePath: string[]): Promise<string[]> => {
-  //     const dmmFactoryAddresss = await dmmRouter.factory();
-  //     const dmmFactory = (await ethers.getContractAt('IDMMFactory', dmmFactoryAddresss)) as IDMMFactory;
+  if (networkSetting.kyberDmm) {
+    const generatePools = async (dmmRouter: IDMMRouter, tradePath: string[]): Promise<string[]> => {
+      const dmmFactoryAddresss = await dmmRouter.factory();
+      const dmmFactory = (await ethers.getContractAt('IDMMFactory', dmmFactoryAddresss)) as IDMMFactory;
 
-  //     const convertedTradePath = tradePath.map((tk) =>
-  //       tk.toLowerCase() === nativeTokenAddress.toLowerCase() ? networkSetting.wNative : tk
-  //     );
-  //     const pools = [];
-  //     for (let i = 0; i < convertedTradePath.length - 1; i += 1) {
-  //       let availablePools = await dmmFactory.getPools(convertedTradePath[i], convertedTradePath[i + 1]);
-  //       if (availablePools.length == 0) {
-  //         console.log(`Pool not exist: ${tradePath[i]} - ${tradePath[i + 1]}`);
-  //         process.exit(1);
-  //       }
-  //       pools.push(availablePools[0]);
-  //     }
-  //     return pools;
-  //   };
+      const convertedTradePath = tradePath.map((tk) =>
+        tk.toLowerCase() === nativeTokenAddress.toLowerCase() ? networkSetting.wNative : tk
+      );
+      const pools = [];
+      for (let i = 0; i < convertedTradePath.length - 1; i += 1) {
+        let availablePools = await dmmFactory.getPools(convertedTradePath[i], convertedTradePath[i + 1]);
+        if (availablePools.length == 0) {
+          console.log(`Pool not exist: ${tradePath[i]} - ${tradePath[i + 1]}`);
+          process.exit(1);
+        }
+        pools.push(availablePools[0]);
+      }
+      return pools;
+    };
 
-  //   executeSwapTest({
-  //     name: 'kyberDmm',
-  //     getSwapContract: async () => {
-  //       return setup.krystalContracts.swapContracts!.kyberDmm!.address;
-  //     },
-  //     router: networkSetting.kyberDmm.router,
-  //     generateArgsFunc: async (tradePath: string[]) => {
-  //       // Generate pools extraArgs for kyberDmm
-  //       const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
-  //       let pools = await generatePools(dmmRouter, tradePath);
-  //       return hexConcat(pools);
-  //     },
-  //     platformFee,
-  //     getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
-  //       const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
-  //       let pools = await generatePools(dmmRouter, tradePath);
-  //       const amounts = await dmmRouter.getAmountsOut(sourceAmount, pools, tradePath);
-  //       return amounts[amounts.length - 1];
-  //     },
-  //     maxDiffAllowed: 0,
-  //     getExpectedInSupported: true,
-  //     testingTokens: networkSetting.kyberDmm.testingTokens ?? Object.keys(networkSetting.tokens),
-  //     expectedPriceImpactFn: null,
-  //   });
-  // }
+    executeSwapTest({
+      name: 'kyberDmm',
+      getSwapContract: async () => {
+        return setup.krystalContracts.swapContracts!.kyberDmm!.address;
+      },
+      router: networkSetting.kyberDmm.router,
+      generateArgsFunc: async (tradePath: string[]) => {
+        // Generate pools extraArgs for kyberDmm
+        const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
+        let pools = await generatePools(dmmRouter, tradePath);
+        return hexConcat(pools);
+      },
+      platformFee,
+      getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+        const dmmRouter = (await ethers.getContractAt('IDMMRouter', networkSetting.kyberDmm!.router)) as IDMMRouter;
+        let pools = await generatePools(dmmRouter, tradePath);
+        const amounts = await dmmRouter.getAmountsOut(sourceAmount, pools, tradePath);
+        return amounts[amounts.length - 1];
+      },
+      maxDiffAllowed: 0,
+      getExpectedInSupported: true,
+      testingTokens: networkSetting.kyberDmm.testingTokens ?? Object.keys(networkSetting.tokens),
+      expectedPriceImpactFn: null,
+    });
+  }
 
-  // if (networkSetting.oneInch) {
-  //   executeSwapTest({
-  //     name: '1inch',
-  //     getSwapContract: async () => {
-  //       return setup.krystalContracts.swapContracts!.oneInch!.address;
-  //     },
-  //     router: networkSetting.oneInch!.router,
-  //     generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
-  //       const chainIdHex = await getChain();
-  //       const chainId = BigNumber.from(chainIdHex).toString();
-  //       let amount = srcAmount;
-  //       if (feeMode === FeeMode.FROM_SOURCE) {
-  //         amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
-  //       }
-  //       const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
-  //         tradePath[1]
-  //       }&amount=${amount?.toString()}&fromAddress=${
-  //         setup.user.address
-  //       }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
+  if (networkSetting.oneInch) {
+    executeSwapTest({
+      name: '1inch',
+      getSwapContract: async () => {
+        return setup.krystalContracts.swapContracts!.oneInch!.address;
+      },
+      router: networkSetting.oneInch!.router,
+      generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
+        const chainIdHex = await getChain();
+        const chainId = BigNumber.from(chainIdHex).toString();
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
+        }
+        const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
+          tradePath[1]
+        }&amount=${amount?.toString()}&fromAddress=${
+          setup.user.address
+        }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
 
-  //       // const resp = (await axios.get(url)) as any;
-  //       // const data = resp.data;
-  //       const data = apiMock[url];
+        // const resp = (await axios.get(url)) as any;
+        // const data = resp.data;
+        const data = apiMock[url];
 
-  //       return data.tx.data as string;
-  //     },
-  //     platformFee,
-  //     getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
-  //       const chainIdHex = await getChain();
-  //       const chainId = BigNumber.from(chainIdHex).toString();
-  //       let amount = srcAmount;
-  //       if (feeMode === FeeMode.FROM_SOURCE) {
-  //         amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
-  //       }
-  //       const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
-  //         tradePath[1]
-  //       }&amount=${amount?.toString()}&fromAddress=${
-  //         setup.user.address
-  //       }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
+        return data.tx.data as string;
+      },
+      platformFee,
+      getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+        const chainIdHex = await getChain();
+        const chainId = BigNumber.from(chainIdHex).toString();
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
+        }
+        const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
+          tradePath[1]
+        }&amount=${amount?.toString()}&fromAddress=${
+          setup.user.address
+        }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
 
-  //       // const resp = (await axios.get(url)) as any;
-  //       // const data = resp.data;
-  //       const data = apiMock[url];
-  //       if (data == null) {
-  //         console.log(url);
-  //       }
+        // const resp = (await axios.get(url)) as any;
+        // const data = resp.data;
+        const data = apiMock[url];
+        if (data == null) {
+          console.log(url);
+        }
 
-  //       return BigNumber.from(data.toTokenAmount);
-  //     },
-  //     maxDiffAllowed: 0,
-  //     getExpectedInSupported: false,
-  //     testingTokens: networkSetting.oneInch.testingTokens ?? Object.keys(networkSetting.tokens),
-  //     expectedPriceImpactFn: null,
-  //   });
-  // }
+        return BigNumber.from(data.toTokenAmount);
+      },
+      maxDiffAllowed: 0,
+      getExpectedInSupported: false,
+      testingTokens: networkSetting.oneInch.testingTokens ?? Object.keys(networkSetting.tokens),
+      expectedPriceImpactFn: null,
+    });
+  }
 
-  // if (networkSetting.kyberDmmV2) {
-  //   executeSwapTest({
-  //     name: 'kyberDmmV2',
-  //     getSwapContract: async () => {
-  //       return setup.krystalContracts.swapContracts!.kyberDmmV2!.address;
-  //     },
-  //     router: networkSetting.kyberDmmV2!.router,
-  //     generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
-  //       let tokenIn = tradePath[0];
-  //       let tokenOut = tradePath[1];
-  //       if (tradePath[0] == nativeTokenAddress) {
-  //         tokenIn = setup.network.wNative;
-  //       }
-  //       if (tradePath[1] == nativeTokenAddress) {
-  //         tokenOut = setup.network.wNative;
-  //       }
-  //       let amount = srcAmount;
-  //       if (feeMode === FeeMode.FROM_SOURCE) {
-  //         const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
-  //         amount = srcAmount?.sub(fee);
-  //       }
+  if (networkSetting.kyberDmmV2) {
+    executeSwapTest({
+      name: 'kyberDmmV2',
+      getSwapContract: async () => {
+        return setup.krystalContracts.swapContracts!.kyberDmmV2!.address;
+      },
+      router: networkSetting.kyberDmmV2!.router,
+      generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
+        let tokenIn = tradePath[0];
+        let tokenOut = tradePath[1];
+        if (tradePath[0] == nativeTokenAddress) {
+          tokenIn = setup.network.wNative;
+        }
+        if (tradePath[1] == nativeTokenAddress) {
+          tokenOut = setup.network.wNative;
+        }
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
+          amount = srcAmount?.sub(fee);
+        }
 
-  //       const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
-  //       const data = apiMock[url];
-  //       // const data = ((await axios.get(url)) as any).data;
+        const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
+        const data = apiMock[url];
+        // const data = ((await axios.get(url)) as any).data;
 
-  //       if (data.swaps.length == 0) {
-  //         return '';
-  //       }
-  //       // console.log(resp);
-  //       const abiCoder = new ethers.utils.AbiCoder();
-  //       const swapSequences: Array<Array<any>> = [];
-  //       for (const swaps of data.swaps) {
-  //         const sq = [];
-  //         for (const swap of swaps) {
-  //           const tokenIn = swap.tokenIn;
-  //           const tokenOut = swap.tokenOut;
-  //           const pool = swap.pool;
-  //           const swapAmount = swap.swapAmount;
-  //           const dexOptions = 1;
-  //           const swapSequenceData = abiCoder.encode(
-  //             ['address', 'address', 'address', 'uint256', 'uint256'],
-  //             [pool, tokenIn, tokenOut, swapAmount, '0']
-  //           );
-  //           sq.push({
-  //             data: swapSequenceData,
-  //             dexOption: dexOptions,
-  //           });
-  //         }
-  //         swapSequences.push(sq);
-  //       }
+        if (data.swaps.length == 0) {
+          return '';
+        }
+        // console.log(resp);
+        const abiCoder = new ethers.utils.AbiCoder();
+        const swapSequences: Array<Array<any>> = [];
+        for (const swaps of data.swaps) {
+          const sq = [];
+          for (const swap of swaps) {
+            const tokenIn = swap.tokenIn;
+            const tokenOut = swap.tokenOut;
+            const pool = swap.pool;
+            const swapAmount = swap.swapAmount;
+            const dexOptions = 1;
+            const swapSequenceData = abiCoder.encode(
+              ['address', 'address', 'address', 'uint256', 'uint256'],
+              [pool, tokenIn, tokenOut, swapAmount, '0']
+            );
+            sq.push({
+              data: swapSequenceData,
+              dexOption: dexOptions,
+            });
+          }
+          swapSequences.push(sq);
+        }
 
-  //       const executorData = abiCoder.encode(
-  //         ['tuple(tuple(bytes data,uint16 dexOption)[][], address, address, uint256, address, uint256)'],
-  //         [[swapSequences, tradePath[0], tradePath[1], '1', setup.user.address, '2000000000']]
-  //       );
-  //       const result = networkSetting.kyberDmmV2?.aggregationExecutor + executorData.substring(2);
-  //       return result;
-  //     },
-  //     platformFee,
-  //     getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
-  //       let tokenIn = tradePath[0];
-  //       let tokenOut = tradePath[1];
-  //       if (tradePath[0] == nativeTokenAddress) {
-  //         tokenIn = setup.network.wNative;
-  //       }
-  //       if (tradePath[1] == nativeTokenAddress) {
-  //         tokenOut = setup.network.wNative;
-  //       }
-  //       let amount = srcAmount;
-  //       if (feeMode === FeeMode.FROM_SOURCE) {
-  //         const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
-  //         amount = srcAmount?.sub(fee);
-  //       }
+        const executorData = abiCoder.encode(
+          ['tuple(tuple(bytes data,uint16 dexOption)[][], address, address, uint256, address, uint256)'],
+          [[swapSequences, tradePath[0], tradePath[1], '1', setup.user.address, '2000000000']]
+        );
+        const result = networkSetting.kyberDmmV2?.aggregationExecutor + executorData.substring(2);
+        return result;
+      },
+      platformFee,
+      getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+        let tokenIn = tradePath[0];
+        let tokenOut = tradePath[1];
+        if (tradePath[0] == nativeTokenAddress) {
+          tokenIn = setup.network.wNative;
+        }
+        if (tradePath[1] == nativeTokenAddress) {
+          tokenOut = setup.network.wNative;
+        }
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
+          amount = srcAmount?.sub(fee);
+        }
 
-  //       const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
-  //       const data = apiMock[url];
+        const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
+        const data = apiMock[url];
 
-  //       return BigNumber.from(data.outputAmount);
-  //     },
-  //     maxDiffAllowed: 10,
-  //     getExpectedInSupported: false,
-  //     testingTokens: networkSetting.kyberDmmV2.testingTokens ?? Object.keys(networkSetting.tokens),
-  //     expectedPriceImpactFn: null,
-  //   });
-  // }
+        return BigNumber.from(data.outputAmount);
+      },
+      maxDiffAllowed: 10,
+      getExpectedInSupported: false,
+      testingTokens: networkSetting.kyberDmmV2.testingTokens ?? Object.keys(networkSetting.tokens),
+      expectedPriceImpactFn: null,
+    });
+  }
 
-  // if (networkSetting.kyberSwapV2) {
-  //   executeSwapTest({
-  //     name: 'kyberSwapV2',
-  //     getSwapContract: async () => {
-  //       return setup.krystalContracts.swapContracts!.kyberSwapV2!.address;
-  //     },
-  //     router: networkSetting.kyberSwapV2!.router,
-  //     generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
-  //       let tokenIn = tradePath[0];
-  //       let tokenOut = tradePath[1];
-  //       if (tradePath[0] == nativeTokenAddress) {
-  //         tokenIn = setup.network.wNative;
-  //       }
-  //       if (tradePath[1] == nativeTokenAddress) {
-  //         tokenOut = setup.network.wNative;
-  //       }
-  //       let amount = srcAmount;
-  //       if (feeMode === FeeMode.FROM_SOURCE) {
-  //         const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
-  //         amount = srcAmount?.sub(fee);
-  //       }
+  if (networkSetting.kyberSwapV2) {
+    executeSwapTest({
+      name: 'kyberSwapV2',
+      getSwapContract: async () => {
+        return setup.krystalContracts.swapContracts!.kyberSwapV2!.address;
+      },
+      router: networkSetting.kyberSwapV2!.router,
+      generateArgsFunc: async (tradePath: string[], srcAmount?: BigNumber, feeMode?: FeeMode) => {
+        let tokenIn = tradePath[0];
+        let tokenOut = tradePath[1];
+        if (tradePath[0] == nativeTokenAddress) {
+          tokenIn = setup.network.wNative;
+        }
+        if (tradePath[1] == nativeTokenAddress) {
+          tokenOut = setup.network.wNative;
+        }
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
+          amount = srcAmount?.sub(fee);
+        }
 
-  //       const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
-  //       const data = apiMock[url];
+        const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
+        const data = apiMock[url];
 
-  //       if (data.swaps.length == 0) {
-  //         return '';
-  //       }
-  //       // console.log(resp);
-  //       const abiCoder = new ethers.utils.AbiCoder();
-  //       const swapSequences: Array<Array<any>> = [];
-  //       for (const swaps of data.swaps) {
-  //         const sq = [];
+        if (data.swaps.length == 0) {
+          return '';
+        }
+        // console.log(resp);
+        const abiCoder = new ethers.utils.AbiCoder();
+        const swapSequences: Array<Array<any>> = [];
+        for (const swaps of data.swaps) {
+          const sq = [];
 
-  //         for (const swap of swaps) {
-  //           const tokenIn = swap.tokenIn;
-  //           const tokenOut = swap.tokenOut;
-  //           const pool = swap.pool;
-  //           const swapAmount = swap.swapAmount;
-  //           const dexOptions = 1;
-  //           const swapSequenceData = abiCoder.encode(
-  //             ['address', 'address', 'address', 'address', 'uint256', 'uint256'],
-  //             [pool, tokenIn, tokenOut, networkSetting.kyberSwapV2?.aggregationExecutor, swapAmount, '0']
-  //           );
-  //           sq.push({
-  //             data: swapSequenceData,
-  //             dexOption: dexOptions,
-  //           });
-  //         }
-  //         swapSequences.push(sq);
-  //       }
+          for (const swap of swaps) {
+            const tokenIn = swap.tokenIn;
+            const tokenOut = swap.tokenOut;
+            const pool = swap.pool;
+            const swapAmount = swap.swapAmount;
+            const dexOptions = 1;
+            const swapSequenceData = abiCoder.encode(
+              ['address', 'address', 'address', 'address', 'uint256', 'uint256'],
+              [pool, tokenIn, tokenOut, networkSetting.kyberSwapV2?.aggregationExecutor, swapAmount, '0']
+            );
+            sq.push({
+              data: swapSequenceData,
+              dexOption: dexOptions,
+            });
+          }
+          swapSequences.push(sq);
+        }
 
-  //       let executorData = abiCoder.encode(
-  //         ['tuple(tuple(bytes data,uint16 dexOption)[][], address, address, uint256, address, uint256, bytes)'],
-  //         [[swapSequences, tradePath[0], tradePath[1], '1', setup.user.address, '2000000000', '0x']]
-  //       );
+        let executorData = abiCoder.encode(
+          ['tuple(tuple(bytes data,uint16 dexOption)[][], address, address, uint256, address, uint256, bytes)'],
+          [[swapSequences, tradePath[0], tradePath[1], '1', setup.user.address, '2000000000', '0x']]
+        );
 
-  //       const result = networkSetting.kyberSwapV2?.aggregationExecutor + executorData.substring(2);
-  //       console.log('encoded result: ', result);
+        const result = networkSetting.kyberSwapV2?.aggregationExecutor + executorData.substring(2);
+        console.log('encoded result: ', result);
 
-  //       return result;
-  //     },
-  //     platformFee,
-  //     getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
-  //       let tokenIn = tradePath[0];
-  //       let tokenOut = tradePath[1];
-  //       if (tradePath[0] == nativeTokenAddress) {
-  //         tokenIn = setup.network.wNative;
-  //       }
-  //       if (tradePath[1] == nativeTokenAddress) {
-  //         tokenOut = setup.network.wNative;
-  //       }
-  //       let amount = srcAmount;
-  //       if (feeMode === FeeMode.FROM_SOURCE) {
-  //         const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
-  //         amount = srcAmount?.sub(fee);
-  //       }
+        return result;
+      },
+      platformFee,
+      getActualRate: async (srcAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+        let tokenIn = tradePath[0];
+        let tokenOut = tradePath[1];
+        if (tradePath[0] == nativeTokenAddress) {
+          tokenIn = setup.network.wNative;
+        }
+        if (tradePath[1] == nativeTokenAddress) {
+          tokenOut = setup.network.wNative;
+        }
+        let amount = srcAmount;
+        if (feeMode === FeeMode.FROM_SOURCE) {
+          const fee = srcAmount?.mul(platformFee).div(BPS) || BigNumber.from(0);
+          amount = srcAmount?.sub(fee);
+        }
 
-  //       const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
-  //       const data = apiMock[url];
+        const url = `https://aggregator-api.kyberswap.com/ethereum/route?tokenIn=${tokenIn}&tokenOut=${tokenOut}&amountIn=${amount?.toString()}&saveGas=0&gasInclude=0&dexes=uniswap`;
+        const data = apiMock[url];
 
-  //       return BigNumber.from(data.outputAmount);
-  //     },
-  //     maxDiffAllowed: 10,
-  //     getExpectedInSupported: false,
-  //     testingTokens: networkSetting.kyberSwapV2.testingTokens ?? Object.keys(networkSetting.tokens),
-  //     expectedPriceImpactFn: null,
-  //   });
-  // }
+        return BigNumber.from(data.outputAmount);
+      },
+      maxDiffAllowed: 10,
+      getExpectedInSupported: false,
+      testingTokens: networkSetting.kyberSwapV2.testingTokens ?? Object.keys(networkSetting.tokens),
+      expectedPriceImpactFn: null,
+    });
+  }
 
-  // if (networkSetting.velodrome) {
-  //   for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.velodrome.routers)) {
-  //     executeSwapTest({
-  //       name: 'velodrome',
-  //       getSwapContract: async () => {
-  //         return setup.krystalContracts.smartWalletProxy?.address!;
-  //       },
-  //       router: routerName,
-  //       generateArgsFunc: async () => hexlify(arrayify(address)),
-  //       platformFee,
-  //       getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
-  //         const expectedReturn = await setup.krystalContracts.smartWalletImplementation?.getExpectedReturn({
-  //           swapContract: setup.krystalContracts.swapContracts?.velodrome?.address!,
-  //           srcAmount: sourceAmount,
-  //           tradePath: tradePath,
-  //           feeMode: feeMode,
-  //           feeBps: 0,
-  //           extraArgs: await hexlify(arrayify(address)),
-  //         });
-  //         return expectedReturn?.[0]!;
-  //       },
-  //       maxDiffAllowed: 0,
-  //       getExpectedInSupported: true,
-  //       testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
-  //       expectedPriceImpactFn: async (srcAmount: BigNumber, tradePath: string[]) => {
-  //         const expectedReturnWithImpact =
-  //           await setup.krystalContracts.smartWalletImplementation?.getExpectedReturnWithImpact({
-  //             swapContract: setup.krystalContracts.swapContracts?.velodrome?.address!,
-  //             srcAmount: srcAmount,
-  //             tradePath: tradePath,
-  //             feeMode: FeeMode.FROM_SOURCE,
-  //             feeBps: 0,
-  //             extraArgs: await hexlify(arrayify(address)),
-  //           });
-  //         return expectedReturnWithImpact?.[0]!;
-  //       },
-  //     });
-  //   }
-  // }
+  if (networkSetting.velodrome) {
+    for (let [routerName, {address, testingTokens}] of Object.entries(networkSetting.velodrome.routers)) {
+      executeSwapTest({
+        name: 'velodrome',
+        getSwapContract: async () => {
+          return setup.krystalContracts.smartWalletProxy?.address!;
+        },
+        router: routerName,
+        generateArgsFunc: async () => hexlify(arrayify(address)),
+        platformFee,
+        getActualRate: async (sourceAmount: BigNumber, tradePath: string[], feeMode: FeeMode) => {
+          const expectedReturn = await setup.krystalContracts.smartWalletImplementation?.getExpectedReturn({
+            swapContract: setup.krystalContracts.swapContracts?.velodrome?.address!,
+            srcAmount: sourceAmount,
+            tradePath: tradePath,
+            feeMode: feeMode,
+            feeBps: 0,
+            extraArgs: await hexlify(arrayify(address)),
+          });
+          return expectedReturn?.[0]!;
+        },
+        maxDiffAllowed: 0,
+        getExpectedInSupported: true,
+        testingTokens: testingTokens ?? Object.keys(networkSetting.tokens),
+        expectedPriceImpactFn: async (srcAmount: BigNumber, tradePath: string[]) => {
+          const expectedReturnWithImpact =
+            await setup.krystalContracts.smartWalletImplementation?.getExpectedReturnWithImpact({
+              swapContract: setup.krystalContracts.swapContracts?.velodrome?.address!,
+              srcAmount: srcAmount,
+              tradePath: tradePath,
+              feeMode: FeeMode.FROM_SOURCE,
+              feeBps: 0,
+              extraArgs: await hexlify(arrayify(address)),
+            });
+          return expectedReturnWithImpact?.[0]!;
+        },
+      });
+    }
+  }
 });

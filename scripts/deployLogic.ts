@@ -95,9 +95,6 @@ export const deploy = async (
   log(0, 'Updating uniswapV3/clones config');
   log(0, '======================\n');
   await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
-
-  log(0, 'Updating uniswapV3/clones bsc config');
-  log(0, '======================\n');
   await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3Bsc, extraArgs);
 
   log(0, 'Updating kyberProxy config');
