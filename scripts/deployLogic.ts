@@ -20,6 +20,7 @@ import {
   KyberSwapV2,
   KyberSwapV3,
   Velodrome,
+  UniSwapV3Bsc,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -53,6 +54,7 @@ export interface KrystalContracts {
     kyberSwapV2?: KyberSwapV2;
     kyberSwapV3?: KyberSwapV3;
     velodrome?: Velodrome;
+    uniSwapV3Bsc?: UniSwapV3Bsc;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -93,6 +95,10 @@ export const deploy = async (
   log(0, 'Updating uniswapV3/clones config');
   log(0, '======================\n');
   await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
+
+  log(0, 'Updating uniswapV3/clones bsc config');
+  log(0, '======================\n');
+  await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3Bsc, extraArgs);
 
   log(0, 'Updating kyberProxy config');
   log(0, '======================\n');
@@ -219,6 +225,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.uniswapV3.routers
           )) as UniSwapV3),
+      uniSwapV3Bsc: !networkConfig.uniSwapV3Bsc
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'UniSwapV3Bsc',
+            existingContract?.['swapContracts']?.['uniSwapV3Bsc'],
+            undefined,
+            contractAdmin,
+            networkConfig.uniSwapV3Bsc.routers
+          )) as UniSwapV3Bsc),
       kyberProxy: !networkConfig.kyberProxy
         ? undefined
         : ((await deployContract(

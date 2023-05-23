@@ -67,7 +67,7 @@ library TickBitmap {
 }
 
 /// General swap for uniswap v3 and its clones
-contract UniSwapV3 is BaseSwap {
+contract UniSwapV3Bsc is BaseSwap {
     using SafeERC20 for IERC20Ext;
     using Address for address;
     using EnumerableSet for EnumerableSet.AddressSet;

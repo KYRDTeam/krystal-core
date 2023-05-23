@@ -88,7 +88,7 @@
     "fetchAaveDataWrapper": "0x9e81428F5672EDCea83F5bf58b6B2cD968df8EE6",
     "swapContracts": {
       "uniSwap": "0xf2A5A8EA6794aaEaBb1d86Dfd6664c0075bf1a17",
-      "kyberDmm": "0x029B41cD39Ccb4131807AaB24C2ae5c948Da56f9"
+      "uniSwapV3Bsc": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177"
     },
     "lendingContracts": {
       "compoundLending": "0xb455810945407Ad3146B74Aa3773df1cDaD61b11"

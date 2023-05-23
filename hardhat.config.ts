@@ -149,7 +149,7 @@ if (MAINNET_FORK) {
 
 if (PRIVATE_KEY) {
   config.networks!.bsc_testnet = {
-    url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+    url: 'https://bsc-testnet.public.blastapi.io',
     chainId: 97,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
