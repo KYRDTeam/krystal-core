@@ -66,7 +66,7 @@ export const BscConfig: Record<string, IConfig> = {
     },
 
     uniSwapV3Bsc: {
-      routers: ['0xca59f346DfFDb6170276050a0b9E0F0c77530eF8'],
+      routers: ['0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2'],
       testingTokens: ['busd', 'knc'],
     },
 
@@ -103,7 +103,7 @@ export const BscConfig: Record<string, IConfig> = {
     wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
     uniSwapV3Bsc: {
-      routers: ['0xca59f346DfFDb6170276050a0b9E0F0c77530eF8'],
+      routers: ['0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2'],
       testingTokens: ['busd', 'knc'],
     },
 
@@ -127,7 +127,7 @@ export const BscConfig: Record<string, IConfig> = {
     },
 
     uniSwapV3Bsc: {
-      routers: ['0xca59f346DfFDb6170276050a0b9E0F0c77530eF8'],
+      routers: ['0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2'],
       testingTokens: ['busd', 'knc'],
     },
 
