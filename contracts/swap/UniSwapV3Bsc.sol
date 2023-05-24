@@ -336,7 +336,7 @@ contract UniSwapV3 is BaseSwap {
             swapData.recipient = address(0);
             bytes[] memory multicallData = new bytes[](2);
             multicallData[0] = abi.encodeWithSelector(
-                0xc04b8d59, // exactInput
+                0xb858183f, // exactInput
                 swapData
             );
             multicallData[1] = abi.encodeWithSelector(
@@ -375,7 +375,7 @@ contract UniSwapV3 is BaseSwap {
             swapData.recipient = address(0);
             bytes[] memory multicallData = new bytes[](2);
             multicallData[0] = abi.encodeWithSelector(
-                0x414bf389, // exactInputSingle
+                0x04e45aaf, // exactInputSingle
                 swapData
             );
             multicallData[1] = abi.encodeWithSelector(

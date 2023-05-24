@@ -25,7 +25,7 @@ interface ISwapRouterBsc is IUniswapV3SwapCallback {
     function exactInputSingle(ExactInputSingleParams calldata params)
         external
         payable
-        returns (uint256 amountOut);
+        returns (uint256 amountOut); // 0x04e45aaf
 
     struct ExactInputParams {
         bytes path;
@@ -42,7 +42,7 @@ interface ISwapRouterBsc is IUniswapV3SwapCallback {
     function exactInput(ExactInputParams calldata params)
         external
         payable
-        returns (uint256 amountOut);
+        returns (uint256 amountOut); // 0xb858183f
 
     struct ExactOutputSingleParams {
         address tokenIn;
