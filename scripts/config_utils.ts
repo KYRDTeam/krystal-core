@@ -76,6 +76,11 @@ export interface IConfig {
     testingTokens?: string[];
   };
 
+  uniSwapV3Bsc?: {
+    routers: string[];
+    testingTokens?: string[];
+  };
+
   velodrome?: {
     routers: Record<
       string,

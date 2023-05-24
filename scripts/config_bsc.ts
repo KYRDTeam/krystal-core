@@ -65,6 +65,11 @@ export const BscConfig: Record<string, IConfig> = {
       router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
     },
 
+    uniSwapV3Bsc: {
+      routers: ['0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2'],
+      testingTokens: ['busd', 'knc'],
+    },
+
     // Venus protocol
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
@@ -97,6 +102,11 @@ export const BscConfig: Record<string, IConfig> = {
     },
     wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
 
+    uniSwapV3Bsc: {
+      routers: ['0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2'],
+      testingTokens: ['busd', 'knc'],
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 400,
 
@@ -114,6 +124,11 @@ export const BscConfig: Record<string, IConfig> = {
 
     tokens: {
       busd: {symbol: 'busd', address: '0x8301f2213c0eed49a7e28ae4c3e91722919b8b47', usdRate: 1},
+    },
+
+    uniSwapV3Bsc: {
+      routers: ['0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2'],
+      testingTokens: ['busd', 'knc'],
     },
 
     wNative: '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f',
