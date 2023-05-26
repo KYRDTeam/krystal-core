@@ -86,16 +86,20 @@ contract OneInch is BaseSwap {
             (bytes4(params.extraArgs[2]) >> 16) |
             (bytes4(params.extraArgs[3]) >> 24);
 
-        if (methodId == OneInchV5AggregationRouter.unoswap.selector) {
-            return doUnoswap(params);
-        }
-
         if (methodId == OneInchV5AggregationRouter.swap.selector) {
             return doSwap(params);
         }
 
         if (methodId == OneInchV5AggregationRouter.uniswapV3Swap.selector) {
             return doUniswapV3Swap(params);
+        }
+
+        if (methodId == OneInchV5AggregationRouter.clipperSwap.selector) {
+            return doClipperSwap(params);
+        }
+
+        if (methodId == OneInchV5AggregationRouter.unoswap.selector) {
+            return doUnoswap(params);
         }
 
         require(false, "oneInch_invalidExtraArgs");
