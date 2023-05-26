@@ -110,7 +110,7 @@ const config: HardhatUserConfig = {
       ftmTestnet: FANTOMSCAN_KEY,
 
       // polygon
-      polygon: POLYGONSCAN_KEY,
+      polygon: 'ZJB1XFU1DCU36MWJ36YBPCMHZRXYY4H8IK',
       polygonMumbai: POLYGONSCAN_KEY,
 
       // avalanche
