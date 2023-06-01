@@ -21,6 +21,7 @@ import {
   KyberSwapV3,
   Velodrome,
   UniSwapV3Bsc,
+  OpenOcean,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -55,6 +56,7 @@ export interface KrystalContracts {
     kyberSwapV3?: KyberSwapV3;
     velodrome?: Velodrome;
     uniSwapV3Bsc?: UniSwapV3Bsc;
+    openOcean?: OpenOcean;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -108,6 +110,10 @@ export const deploy = async (
   log(0, 'Updating oneInch config');
   log(0, '======================\n');
   await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
+
+  log(0, 'Updating openOcean config');
+  log(0, '======================\n');
+  await updateOpenOcean(deployedContracts.swapContracts?.openOcean, extraArgs);
 
   log(0, 'Updating kyberDmm config');
   log(0, '======================\n');
@@ -266,6 +272,19 @@ async function deployContracts(
             contractAdmin,
             networkConfig.oneInch.router
           )) as OneInch),
+
+      openOcean: !networkConfig.openOcean
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'OpenOcean',
+            existingContract?.['swapContracts']?.['openOcean'],
+            undefined,
+            contractAdmin,
+            networkConfig.openOcean.router
+          )) as OneInch),
+
       kyberDmmV2: !networkConfig.kyberDmmV2
         ? undefined
         : ((await deployContract(
@@ -688,6 +707,24 @@ async function updateOneInch(oneInch: OneInch | undefined, extraArgs: {from?: st
       await oneInch.populateTransaction.updateAggregationRouter(networkConfig.oneInch.router)
     );
     log(2, '> updated oneInch', JSON.stringify(networkConfig.oneInch, null, 2));
+    await printInfo(tx);
+  }
+}
+
+async function updateOpenOcean(openOcean: OpenOcean | undefined, extraArgs: {from?: string}) {
+  if (!openOcean || !networkConfig.openOcean) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await openOcean.router()).toLowerCase() === networkConfig.openOcean.router.toLowerCase()) {
+    log(2, `openOcean already up-to-date at ${networkConfig.openOcean.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await openOcean.populateTransaction.updateAggregationRouter(networkConfig.openOcean.router)
+    );
+    log(2, '> updated openOcean', JSON.stringify(networkConfig.openOcean, null, 2));
     await printInfo(tx);
   }
 }

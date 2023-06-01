@@ -269,7 +269,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
   };
 
   config.networks!.polygon_mumbai = {
-    url: `https://polygon-mumbai.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://rpc.ankr.com/polygon_mumbai`,
     chainId: 80001,
     accounts: [PRIVATE_KEY],
     timeout: 20000,

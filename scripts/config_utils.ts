@@ -65,6 +65,10 @@ export interface IConfig {
     testingTokens?: string[];
   };
 
+  openOcean?: {
+    router: string;
+  };
+
   kyberSwapV2?: {
     router: string;
     aggregationExecutor: string;
