@@ -173,7 +173,8 @@
     "swapContracts": {
       "kyberDmmV2": "0x60fc810EA972809d729FCE0043B82a58766596ee",
       "kyberSwapV2": "0xFA773737d274873c4E575591bcf2ff408F737c70",
-      "kyberSwapV3": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5"
+      "kyberSwapV3": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
+      "firebird": "0x356D5dcc175167cB39B14b329De5eC08B078f95f"
     },
     "lendingContracts": {}
   },

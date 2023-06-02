@@ -71,6 +71,10 @@ export interface IConfig {
     testingTokens?: string[];
   };
 
+  firebird?: {
+    router: string;
+  };
+
   kyberSwapV3?: {
     router: string;
     testingTokens?: string[];
