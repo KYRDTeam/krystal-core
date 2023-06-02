@@ -24,7 +24,7 @@ export const FantomConfig: Record<string, IConfig> = {
     },
 
     firebird: {
-      router: '0xb31D1B1eA48cE4Bf10ed697d44B747287E785Ad4',
+      router: '0xe0C38b2a8D09aAD53f1C67734B9A95E43d5981c0',
     },
 
     supportedWallets: commonPlatformWallets,
