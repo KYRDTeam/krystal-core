@@ -68,7 +68,7 @@ contract OpenOcean is BaseSwap {
 
     /// @dev swap token
     /// @notice
-    /// 1inch API will returns calls neccessary to build tx
+    /// openOcean API will returns calls neccessary to build tx
     /// tx's calls will be passed by params.extraData
     function swap(SwapParams calldata params)
         external
@@ -93,10 +93,10 @@ contract OpenOcean is BaseSwap {
         require(false, "openOcean_invalidExtraArgs");
     }
 
-    /// @dev called when 1inch API returns method AggregationRouter.swap
+    /// @dev called when openOcean API returns method AggregationRouter.swap
     /// @notice AggregationRouter.swap method used a custom calldata.
     /// Since we don't know what included in that calldata, backend must take into account fee
-    /// when calling 1inch API
+    /// when calling openOcean API
     function doSwap(SwapParams calldata params) private returns (uint256 destAmount) {
         uint256 callValue;
         if (params.tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
