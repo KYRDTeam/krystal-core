@@ -68,7 +68,7 @@ contract Firebird is BaseSwap {
 
     /// @dev swap token
     /// @notice
-    /// 1inch API will returns data neccessary to build tx
+    /// firebird API will returns data neccessary to build tx
     /// tx's data will be passed by params.extraData
     function swap(SwapParams calldata params)
         external
@@ -93,10 +93,10 @@ contract Firebird is BaseSwap {
         require(false, "firebird_invalidExtraArgs");
     }
 
-    /// @dev called when 1inch API returns method AggregationRouter.swap
+    /// @dev called when firebird API returns method AggregationRouter.swap
     /// @notice AggregationRouter.swap method used a custom calldata.
     /// Since we don't know what included in that calldata, backend must take into account fee
-    /// when calling 1inch API
+    /// when calling firebird API
     function doSwap(SwapParams calldata params) private returns (uint256 destAmount) {
         uint256 callValue;
         if (params.tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
