@@ -199,7 +199,7 @@ if (PRIVATE_KEY) {
     chainId: 42161,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 1 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.arbitrum_rinkeby = {
@@ -207,7 +207,7 @@ if (PRIVATE_KEY) {
     chainId: 421611,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 1 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.cronos_mainnet = {

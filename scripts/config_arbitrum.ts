@@ -21,6 +21,10 @@ export const ArbitrumConfig: Record<string, IConfig> = {
       aggregationExecutor: '0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77',
     },
 
+    openOcean: {
+      router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
+    },
+
     kyberSwapV3: {
       router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
     },
