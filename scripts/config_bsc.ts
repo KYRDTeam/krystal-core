@@ -70,6 +70,10 @@ export const BscConfig: Record<string, IConfig> = {
       testingTokens: ['busd', 'knc'],
     },
 
+    openOcean: {
+      router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
+    },
+
     // Venus protocol
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',
