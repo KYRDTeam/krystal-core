@@ -25,6 +25,10 @@ export const ArbitrumConfig: Record<string, IConfig> = {
       router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
     },
 
+    firebird: {
+      router: '0x0c6134Abc08A1EafC3E2Dc9A5AD023Bb08Da86C3',
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 2500,
   },

@@ -195,11 +195,11 @@ if (PRIVATE_KEY) {
   };
 
   config.networks!.arbitrum_mainnet = {
-    url: 'https://arb1.arbitrum.io/rpc',
+    url: 'https://arbitrum-one.publicnode.com',
     chainId: 42161,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 1 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.arbitrum_rinkeby = {
@@ -207,7 +207,7 @@ if (PRIVATE_KEY) {
     chainId: 421611,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 1 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.cronos_mainnet = {
@@ -253,7 +253,7 @@ if (PRIVATE_KEY) {
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
   config.networks!.polygon_mainnet = {
-    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://rpc.ankr.com/polygon`,
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
@@ -261,7 +261,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
   };
 
   config.networks!.polygon_staging = {
-    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://rpc.ankr.com/polygon`,
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
@@ -269,7 +269,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
   };
 
   config.networks!.polygon_mumbai = {
-    url: `https://polygon-mumbai.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://rpc.ankr.com/polygon_mumbai`,
     chainId: 80001,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
