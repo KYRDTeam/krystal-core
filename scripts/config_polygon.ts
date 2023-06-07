@@ -91,7 +91,8 @@ export const PolygonConfig: Record<string, IConfig> = {
     dino: {
       ...commonNftConfig,
       uri: 'https://loyalty-api.krystal.app/v1/nft/characters/',
-      name: 'Krystal Dino',
+      name: 'Krystal Dino Collectibles',
+      symbol: 'DINO',
       verifier: '0x1386a07Bb50731b77d13f2C96b6379ab65D46aA0',
     },
   },

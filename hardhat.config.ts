@@ -256,7 +256,7 @@ if (PRIVATE_KEY) {
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 400 * 1e9,
+    gasPrice: 200 * 1e9,
   };
 
   config.networks!.polygon_mumbai = {

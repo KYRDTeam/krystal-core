@@ -236,7 +236,10 @@
     },
     "lendingContracts": {
       "aaveV2": "0x95ceC39Aa053C62d1A49D88B60620a489C241F53"
-    }
+    },
+    "dino": "0x356dA6a7391D1188fd31382810AdcaaC54eE6d48",
+    "dinoImplementation": "0xca6eacF9912571EEdaE32A4C4740208aa499197f",
+    "dinoMinter": "0x3bbcf73846A734fAEaab4985E17BA17FD0970E4f"
   },
   "polygon_mumbai": {
     "smartWalletImplementation": "0x52643C0C0CCABd8C70baF5f1b6842886f0f8b953",

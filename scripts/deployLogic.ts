@@ -427,8 +427,10 @@ async function deployContracts(
       networkConfig.dino.verifier
     );
 
+    await dinoImplementation['setMinter(address)'](dinoMinter.address);
+
     await dinoMinter['initialize(address,address,address)'](
-      '0xE63f21774280388D2717691d91F981543F711d22',
+      '0x3a25d8D4fe76dB055F0A524bFB3693c001588657',
       networkConfig.dino.verifier,
       dinoImplementation.address
     );
