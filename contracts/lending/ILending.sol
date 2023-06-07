@@ -5,11 +5,7 @@ pragma experimental ABIEncoderV2;
 import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 
 interface ILending {
-    function depositTo(
-        address payable onBehalfOf,
-        IERC20Ext token,
-        uint256 amount
-    ) external;
+    function depositTo(address payable onBehalfOf, IERC20Ext token, uint256 amount) external;
 
     function withdrawFrom(
         address payable onBehalfOf,

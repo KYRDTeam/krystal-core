@@ -197,6 +197,20 @@ export const EthConfig: Record<string, IConfig> = {
 
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 5, // swap 5 eth each for every token
+
+    nft: {
+      ...commonNftConfig,
+      uri: 'https://api.krystal.team/nfts/',
+      name: 'Krystal Collectibles Test',
+      enabled: false,
+    },
+
+    dino: {
+      ...commonNftConfig,
+      uri: 'https://api.krystal.team/nfts/',
+      name: 'Krystal Dino Test',
+      verifier: '0xA4a77E0EcD4486eE4Eb978B0E14963FDe4E7e0c6',
+    },
   },
 
   eth_ropsten: {

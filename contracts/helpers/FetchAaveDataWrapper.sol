@@ -14,17 +14,15 @@ import "@kyber.network/utils-sc/contracts/IERC20Ext.sol";
 /// Checkout list deployed AAVE's contracts here
 /// https://docs.aave.com/developers/deployed-contracts/deployed-contract-instances
 contract FetchAaveDataWrapper is Withdrawable, IFetchAaveDataWrapper {
-    uint256 internal constant PRECISION = 10**18;
-    uint256 internal constant RATE_PRECISION = 10**27;
+    uint256 internal constant PRECISION = 10 ** 18;
+    uint256 internal constant RATE_PRECISION = 10 ** 27;
 
     constructor(address _admin) Withdrawable(_admin) {}
 
-    function getReserves(address pool, bool isV1)
-        external
-        view
-        override
-        returns (address[] memory reserves)
-    {
+    function getReserves(
+        address pool,
+        bool isV1
+    ) external view override returns (address[] memory reserves) {
         if (isV1) {
             return ILendingPoolV1(pool).getReserves();
         }
@@ -50,7 +48,7 @@ contract FetchAaveDataWrapper is Withdrawable, IFetchAaveDataWrapper {
                     configsData[i].isActive
                 ) = ILendingPoolV1(pool).getReserveConfigurationData(_reserves[i]);
                 configsData[i].aTokenAddress = ILendingPoolCore(ILendingPoolV1(pool).core())
-                .getReserveATokenAddress(_reserves[i]);
+                    .getReserveATokenAddress(_reserves[i]);
             } else {
                 IProtocolDataProvider provider = IProtocolDataProvider(pool);
                 (
@@ -103,7 +101,7 @@ contract FetchAaveDataWrapper is Withdrawable, IFetchAaveDataWrapper {
                     _reserves[i]
                 );
                 reservesData[i].averageStableBorrowRate = core
-                .getReserveCurrentAverageStableBorrowRate(_reserves[i]);
+                    .getReserveCurrentAverageStableBorrowRate(_reserves[i]);
             }
         } else {
             IProtocolDataProvider provider = IProtocolDataProvider(pool);

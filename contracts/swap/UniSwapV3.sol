@@ -125,10 +125,10 @@ contract UniSwapV3 is BaseSwap {
         }
     }
 
-    function updateUniRouters(ISwapRouterInternal[] calldata routers, bool isSupported)
-        external
-        onlyAdmin
-    {
+    function updateUniRouters(
+        ISwapRouterInternal[] calldata routers,
+        bool isSupported
+    ) external onlyAdmin {
         for (uint256 i = 0; i < routers.length; i++) {
             if (isSupported) {
                 uniRouters.add(address(routers[i]));
@@ -140,13 +140,9 @@ contract UniSwapV3 is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturn(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function getExpectedReturn(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length >= 2, "invalid tradePath");
         (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
             params.tradePath.length - 1,
@@ -166,13 +162,9 @@ contract UniSwapV3 is BaseSwap {
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
-    function getExpectedReturnWithImpact(GetExpectedReturnParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 destAmount, uint256 priceImpact)
-    {
+    function getExpectedReturnWithImpact(
+        GetExpectedReturnParams calldata params
+    ) external view override onlyProxyContract returns (uint256 destAmount, uint256 priceImpact) {
         require(params.tradePath.length >= 2, "invalid tradePath");
         (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
             params.tradePath.length - 1,
@@ -198,13 +190,9 @@ contract UniSwapV3 is BaseSwap {
         }
     }
 
-    function getExpectedIn(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount)
-    {
+    function getExpectedIn(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount) {
         require(params.tradePath.length >= 2, "invalid tradePath");
         (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
             params.tradePath.length - 1,
@@ -223,13 +211,9 @@ contract UniSwapV3 is BaseSwap {
         }
     }
 
-    function getExpectedInWithImpact(GetExpectedInParams calldata params)
-        external
-        view
-        override
-        onlyProxyContract
-        returns (uint256 srcAmount, uint256 priceImpact)
-    {
+    function getExpectedInWithImpact(
+        GetExpectedInParams calldata params
+    ) external view override onlyProxyContract returns (uint256 srcAmount, uint256 priceImpact) {
         require(params.tradePath.length >= 2, "invalid tradePath");
         (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
             params.tradePath.length - 1,
@@ -261,13 +245,9 @@ contract UniSwapV3 is BaseSwap {
     /// @notice for some tokens that are paying fee, for example: DGX
     /// contract will trade with received src token amount (after minus fee)
     /// for UniSwap, fee will be taken in src token
-    function swap(SwapParams calldata params)
-        external
-        payable
-        override
-        onlyProxyContract
-        returns (uint256 destAmount)
-    {
+    function swap(
+        SwapParams calldata params
+    ) external payable override onlyProxyContract returns (uint256 destAmount) {
         require(params.tradePath.length >= 2, "invalid tradePath");
 
         (ISwapRouterInternal router, uint24[] memory fees) = parseExtraArgs(
@@ -393,11 +373,10 @@ contract UniSwapV3 is BaseSwap {
     }
 
     /// @param extraArgs expecting <[20B] address router><[3B] uint24 poolFee1><[3B] uint24 poolFee2>...
-    function parseExtraArgs(uint256 feeLength, bytes calldata extraArgs)
-        internal
-        view
-        returns (ISwapRouterInternal router, uint24[] memory fees)
-    {
+    function parseExtraArgs(
+        uint256 feeLength,
+        bytes calldata extraArgs
+    ) internal view returns (ISwapRouterInternal router, uint24[] memory fees) {
         fees = new uint24[](feeLength);
         router = ISwapRouterInternal(extraArgs.toAddress(0));
         for (uint256 i = 0; i < feeLength; i++) {
@@ -476,19 +455,19 @@ contract UniSwapV3 is BaseSwap {
             step.sqrtPriceNextX96 = TickMath.getSqrtRatioAtTick(step.tickNext);
 
             (state.sqrtPriceX96, step.amountIn, step.amountOut, step.feeAmount) = SwapMath
-            .computeSwapStep(
-                state.sqrtPriceX96,
-                (
-                    zeroForOne
-                        ? step.sqrtPriceNextX96 < sqrtPriceLimitX96
-                        : step.sqrtPriceNextX96 > sqrtPriceLimitX96
-                )
-                    ? sqrtPriceLimitX96
-                    : step.sqrtPriceNextX96,
-                state.liquidity,
-                state.amountSpecifiedRemaining,
-                fee
-            );
+                .computeSwapStep(
+                    state.sqrtPriceX96,
+                    (
+                        zeroForOne
+                            ? step.sqrtPriceNextX96 < sqrtPriceLimitX96
+                            : step.sqrtPriceNextX96 > sqrtPriceLimitX96
+                    )
+                        ? sqrtPriceLimitX96
+                        : step.sqrtPriceNextX96,
+                    state.liquidity,
+                    state.amountSpecifiedRemaining,
+                    fee
+                );
 
             if (exactInput) {
                 state.amountSpecifiedRemaining -= (step.amountIn + step.feeAmount).toInt256();

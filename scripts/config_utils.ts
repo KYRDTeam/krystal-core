@@ -129,6 +129,14 @@ export interface IConfig {
     uri: string;
   };
 
+  dino?: {
+    enabled?: boolean;
+    name: string;
+    symbol: string;
+    uri: string;
+    verifier: string;
+  };
+
   // For proxy admin
   proxyAdminMultisig?: string;
   // For managing the config and admin jobs
@@ -150,7 +158,7 @@ export const commonPlatformWallets = [
 
 export const commonNftConfig = {
   enabled: true,
-  name: 'Krystal Collectibles',
-  symbol: 'KRYS',
-  uri: 'https://api.krystal.app/ethereum/nft/',
+  name: 'Krystal Character',
+  symbol: 'DINO',
+  uri: 'https://api.krystal.app/nfts/',
 };

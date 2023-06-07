@@ -87,6 +87,14 @@ export const BscConfig: Record<string, IConfig> = {
       ...commonNftConfig,
       uri: 'https://api.krystal.app/bsc/nft/',
       name: 'Krystal Collectibles',
+      enabled: false,
+    },
+
+    dino: {
+      ...commonNftConfig,
+      uri: 'https://loyalty-api.krystal.app/v1/nft/characters/',
+      name: 'Krystal Dino',
+      verifier: '0x1386a07Bb50731b77d13f2C96b6379ab65D46aA0',
     },
 
     proxyAdminMultisig: '0xD84f47F60F518C37a07FC7371aC1438F989aE7dc',
@@ -156,6 +164,13 @@ export const BscConfig: Record<string, IConfig> = {
       ...commonNftConfig,
       uri: 'https://staging-krystal-api.knstats.com/bsc/nft/',
       name: 'Krystal Collectibles Test',
+    },
+
+    dino: {
+      ...commonNftConfig,
+      uri: 'https://loyalty-api.krystal.app/v1/nft/characters/',
+      name: 'Krystal Dino',
+      verifier: '0xA4a77E0EcD4486eE4Eb978B0E14963FDe4E7e0c6',
     },
 
     // This is the mainnet one as gnosis doesnt support bsc-testnet, but it doesnt matter on testnet anw

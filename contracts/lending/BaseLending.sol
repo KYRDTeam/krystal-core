@@ -36,11 +36,7 @@ abstract contract BaseLending is ILending, Withdrawable, Utils {
         }
     }
 
-    function transferToken(
-        address payable recipient,
-        IERC20Ext token,
-        uint256 amount
-    ) internal {
+    function transferToken(address payable recipient, IERC20Ext token, uint256 amount) internal {
         if (token == ETH_TOKEN_ADDRESS) {
             (bool success, ) = recipient.call{value: amount}("");
             require(success, "failed to transfer eth");
