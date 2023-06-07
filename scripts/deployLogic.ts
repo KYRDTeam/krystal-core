@@ -22,6 +22,7 @@ import {
   Velodrome,
   UniSwapV3Bsc,
   Firebird,
+  FirebirdArbitrum,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -57,6 +58,7 @@ export interface KrystalContracts {
     velodrome?: Velodrome;
     uniSwapV3Bsc?: UniSwapV3Bsc;
     firebird?: Firebird;
+    firebirdArbitrum?: FirebirdArbitrum;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -102,6 +104,7 @@ export const deploy = async (
   log(0, 'Updating firebird config');
   log(0, '======================\n');
   await updateFirebird(deployedContracts.swapContracts?.firebird, extraArgs);
+  await updateFirebird(deployedContracts.swapContracts?.firebirdArbitrum, extraArgs);
 
   log(0, 'Updating kyberProxy config');
   log(0, '======================\n');
@@ -250,6 +253,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.firebird.router
           )) as Firebird),
+      firebirdArbitrum: !networkConfig.firebirdArbitrum
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'FirebirdArbitrum',
+            existingContract?.['swapContracts']?.['firebirdArbitrum'],
+            undefined,
+            contractAdmin,
+            networkConfig.firebirdArbitrum.router
+          )) as FirebirdArbitrum),
       kyberProxy: !networkConfig.kyberProxy
         ? undefined
         : ((await deployContract(
@@ -655,7 +669,7 @@ async function updateUniSwapV3(uniSwapV3: UniSwapV3 | undefined, extraArgs: {fro
   await updateAddressSet(uniSwapV3.populateTransaction.updateUniRouters, toBeRemoved, toBeAdded, extraArgs);
 }
 
-async function updateFirebird(firebird: Firebird | undefined, extraArgs: {from?: string}) {
+async function updateFirebird(firebird: Firebird | FirebirdArbitrum | undefined, extraArgs: {from?: string}) {
   if (!firebird || !networkConfig.firebird) {
     log(1, 'protocol not supported on this env');
     return;
@@ -663,12 +677,12 @@ async function updateFirebird(firebird: Firebird | undefined, extraArgs: {from?:
   log(1, 'update proxy');
 
   if ((await firebird.router()).toLowerCase() === networkConfig.firebird.router.toLowerCase()) {
-    log(2, `openOcean already up-to-date at ${networkConfig.firebird.router}`);
+    log(2, `firebird already up-to-date at ${networkConfig.firebird.router}`);
   } else {
     const tx = await executeTxnOnBehalfOf(
       await firebird.populateTransaction.updateAggregationRouter(networkConfig.firebird.router)
     );
-    log(2, '> updated openOcean', JSON.stringify(networkConfig.firebird, null, 2));
+    log(2, '> updated firebird', JSON.stringify(networkConfig.firebird, null, 2));
     await printInfo(tx);
   }
 }
