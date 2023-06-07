@@ -70,6 +70,10 @@ export const BscConfig: Record<string, IConfig> = {
       testingTokens: ['busd', 'knc'],
     },
 
+    firebird: {
+      router: '0x92e4F29Be975C1B1eB72E77De24Dccf11432a5bd',
+    },
+
     // Venus protocol
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',

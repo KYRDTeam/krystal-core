@@ -85,6 +85,10 @@ export const PolygonConfig: Record<string, IConfig> = {
       ],
     },
 
+    firebird: {
+      router: '0xb31D1B1eA48cE4Bf10ed697d44B747287E785Ad4',
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 1,
   },
@@ -189,6 +193,10 @@ export const PolygonConfig: Record<string, IConfig> = {
     //     '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', // wmatic
     //   ],
     // },
+
+    firebird: {
+      router: '0xb31D1B1eA48cE4Bf10ed697d44B747287E785Ad4',
+    },
 
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 1,

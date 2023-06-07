@@ -16,7 +16,8 @@
     "swapContracts": {
       "uniSwap": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
       "kyberSwapV2": "0x1F8B6F7eaa0420f8CF827E18425b4F09074538E7",
-      "kyberSwapV3": "0xfEb0bCdef6286c24856641319d25AE73E00de17A"
+      "kyberSwapV3": "0xfEb0bCdef6286c24856641319d25AE73E00de17A",
+      "firebirdArbitrum": "0xb945cB8eeC8530450d39cCDB62D9587992f684Fd"
     },
     "lendingContracts": {}
   },
@@ -70,7 +71,8 @@
       "kyberDmmV2": "0x3210a8b8206bc205840c983499aB92DB0f4F3C6e",
       "kyberSwapV2": "0x85D53990CcB093De7fE1D14D21048F23cBC46004",
       "kyberSwapV3": "0x0E67ef7aF621F90Bc94E5566E25a55ba0822e2Bb",
-      "uniSwapV3Bsc": "0x2cDC7562C207E8A20D91749711B56B80F3f8f71E"
+      "uniSwapV3Bsc": "0x2cDC7562C207E8A20D91749711B56B80F3f8f71E",
+      "firebird": "0x4d9112eCE0c2E34F50414Ceb1cB2Ca20964Db73B"
     },
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
@@ -173,7 +175,8 @@
     "swapContracts": {
       "kyberDmmV2": "0x60fc810EA972809d729FCE0043B82a58766596ee",
       "kyberSwapV2": "0xFA773737d274873c4E575591bcf2ff408F737c70",
-      "kyberSwapV3": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5"
+      "kyberSwapV3": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
+      "firebird": "0x356D5dcc175167cB39B14b329De5eC08B078f95f"
     },
     "lendingContracts": {}
   },
@@ -238,7 +241,8 @@
     "fetchTokenBalances": "0xB8C6Ed80688a2674623D89A0AaBD3a87507B1868",
     "fetchAaveDataWrapper": "0xE7314051BCFD832398e232f2c274278c44121a3f",
     "swapContracts": {
-      "uniSwap": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e"
+      "uniSwap": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e",
+      "firebird": "0x30d97CD9B14926222b3eE73E2D8706c3C2c37739"
     },
     "lendingContracts": {}
   },

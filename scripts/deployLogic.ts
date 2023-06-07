@@ -21,6 +21,8 @@ import {
   KyberSwapV3,
   Velodrome,
   UniSwapV3Bsc,
+  Firebird,
+  FirebirdArbitrum,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -55,6 +57,8 @@ export interface KrystalContracts {
     kyberSwapV3?: KyberSwapV3;
     velodrome?: Velodrome;
     uniSwapV3Bsc?: UniSwapV3Bsc;
+    firebird?: Firebird;
+    firebirdArbitrum?: FirebirdArbitrum;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -96,6 +100,11 @@ export const deploy = async (
   log(0, '======================\n');
   await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
   await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3Bsc, extraArgs);
+
+  log(0, 'Updating firebird config');
+  log(0, '======================\n');
+  await updateFirebird(deployedContracts.swapContracts?.firebird, extraArgs);
+  await updateFirebird(deployedContracts.swapContracts?.firebirdArbitrum, extraArgs);
 
   log(0, 'Updating kyberProxy config');
   log(0, '======================\n');
@@ -233,6 +242,28 @@ async function deployContracts(
             contractAdmin,
             networkConfig.uniSwapV3Bsc.routers
           )) as UniSwapV3Bsc),
+      firebird: !networkConfig.firebird
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'Firebird',
+            existingContract?.['swapContracts']?.['firebird'],
+            undefined,
+            contractAdmin,
+            networkConfig.firebird.router
+          )) as Firebird),
+      firebirdArbitrum: !networkConfig.firebirdArbitrum
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'FirebirdArbitrum',
+            existingContract?.['swapContracts']?.['firebirdArbitrum'],
+            undefined,
+            contractAdmin,
+            networkConfig.firebirdArbitrum.router
+          )) as FirebirdArbitrum),
       kyberProxy: !networkConfig.kyberProxy
         ? undefined
         : ((await deployContract(
@@ -636,6 +667,24 @@ async function updateUniSwapV3(uniSwapV3: UniSwapV3 | undefined, extraArgs: {fro
   let toBeRemoved = existing.filter((add) => !configRouters.includes(add));
   let toBeAdded = configRouters.filter((add) => !existing.includes(add));
   await updateAddressSet(uniSwapV3.populateTransaction.updateUniRouters, toBeRemoved, toBeAdded, extraArgs);
+}
+
+async function updateFirebird(firebird: Firebird | FirebirdArbitrum | undefined, extraArgs: {from?: string}) {
+  if (!firebird || !networkConfig.firebird) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await firebird.router()).toLowerCase() === networkConfig.firebird.router.toLowerCase()) {
+    log(2, `firebird already up-to-date at ${networkConfig.firebird.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await firebird.populateTransaction.updateAggregationRouter(networkConfig.firebird.router)
+    );
+    log(2, '> updated firebird', JSON.stringify(networkConfig.firebird, null, 2));
+    await printInfo(tx);
+  }
 }
 
 async function updateKyberProxy(kyberProxy: KyberProxy | undefined, extraArgs: {from?: string}) {
