@@ -22,6 +22,8 @@ import {
   KyberDmmV2,
   KyberSwapV2,
   KyberSwapV3,
+  Velodrome,
+  UniSwapV3Bsc,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -54,6 +56,8 @@ export interface KrystalContracts {
     kyberDmmV2?: KyberDmmV2;
     kyberSwapV2?: KyberSwapV2;
     kyberSwapV3?: KyberSwapV3;
+    velodrome?: Velodrome;
+    uniSwapV3Bsc?: UniSwapV3Bsc;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -95,9 +99,10 @@ export const deploy = async (
   // log(0, '======================\n');
   // await updateUniSwap(deployedContracts.swapContracts?.uniSwap, extraArgs);
 
-  // log(0, 'Updating uniswapV3/clones config');
-  // log(0, '======================\n');
-  // await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
+  log(0, 'Updating uniswapV3/clones config');
+  log(0, '======================\n');
+  await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
+  await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3Bsc, extraArgs);
 
   // log(0, 'Updating kyberProxy config');
   // log(0, '======================\n');
@@ -122,6 +127,10 @@ export const deploy = async (
   // log(0, 'Updating kyberSwapv3 config');
   // log(0, '======================\n');
   // await updateKyberSwapV3(deployedContracts.swapContracts?.kyberSwapV3, extraArgs);
+
+  log(0, 'Updating velodrome config');
+  log(0, '======================\n');
+  await updateVelodrome(deployedContracts.swapContracts?.velodrome, extraArgs);
 
   // log(0, 'Updating compound/clones config');
   // log(0, '======================\n');
@@ -220,6 +229,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.uniswapV3.routers
           )) as UniSwapV3),
+      uniSwapV3Bsc: !networkConfig.uniSwapV3Bsc
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'UniSwapV3Bsc',
+            existingContract?.['swapContracts']?.['uniSwapV3Bsc'],
+            undefined,
+            contractAdmin,
+            networkConfig.uniSwapV3Bsc.routers
+          )) as UniSwapV3Bsc),
       kyberProxy: !networkConfig.kyberProxy
         ? undefined
         : ((await deployContract(
@@ -286,6 +306,19 @@ async function deployContracts(
             contractAdmin,
             networkConfig.kyberSwapV3.router
           )) as KyberSwapV3),
+      velodrome: !networkConfig.velodrome
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'Velodrome',
+            existingContract?.['swapContracts']?.['velodrome'],
+            undefined,
+            contractAdmin,
+            Object.values(networkConfig.velodrome.routers).map((c) => c.address),
+            Object.values(networkConfig.velodrome.stablecoins).map((c) => c),
+            networkConfig.wNative
+          )) as Velodrome),
     };
 
     lendingContracts = {
@@ -776,6 +809,53 @@ async function updateKyberSwapV3(kyberSwapV3: KyberSwapV3 | undefined, extraArgs
     );
     log(2, '> updated kyberSwapV3', JSON.stringify(networkConfig.kyberSwapV3, null, 2));
     await printInfo(tx);
+  }
+}
+
+async function updateVelodrome(velodrome: Velodrome | undefined, extraArgs: {from?: string}) {
+  if (!velodrome || !networkConfig.velodrome) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update supported routers');
+  let existingRouters = (await velodrome.getAllVelodromeRouters()).map((r) => r.toLowerCase());
+  let configRouters = Object.values(networkConfig.velodrome!.routers).map((r) => r.address.toLowerCase());
+  let toBeRemovedRouters = existingRouters.filter((add) => !configRouters.includes(add));
+  let toBeAddedRouters = configRouters.filter((add) => !existingRouters.includes(add));
+  await updateAddressSet(
+    velodrome.populateTransaction.updateVelodromeRouters,
+    toBeRemovedRouters,
+    toBeAddedRouters,
+    extraArgs
+  );
+
+  log(1, 'update supported stablecoins');
+  let existingStablecoins = (await velodrome.getAllVelodromeStablecoins()).map((r) => r.toLowerCase());
+  let configStablecoins = Object.values(networkConfig.velodrome!.stablecoins).map((r) => r.toLowerCase());
+  let toBeRemovedStablecoins = existingStablecoins.filter((add) => !configStablecoins.includes(add));
+  let toBeAddedStablecoins = configStablecoins.filter((add) => !existingStablecoins.includes(add));
+  await updateAddressSet(
+    velodrome.populateTransaction.updateVelodromeStablecoins,
+    toBeRemovedStablecoins,
+    toBeAddedStablecoins,
+    extraArgs
+  );
+
+  log(1, 'update custom selectors');
+  for (const [router, {swapFromEth, swapToEth}] of Object.entries(networkConfig.velodrome.customSelectors ?? {})) {
+    let swapFromEthSelector = ethers.utils.solidityKeccak256(['string'], [swapFromEth]).slice(0, 10);
+    let swapToEthSelector = ethers.utils.solidityKeccak256(['string'], [swapToEth]).slice(0, 10);
+
+    let selector1 = await velodrome.customSwapFromEth(router);
+    let selector2 = await velodrome.customSwapToEth(router);
+
+    if (!equalHex(selector1, swapFromEthSelector) || !equalHex(selector2, swapToEthSelector)) {
+      const tx = await executeTxnOnBehalfOf(
+        await velodrome.populateTransaction.updateCustomSwapSelector(router, swapFromEthSelector, swapToEthSelector)
+      );
+      log(2, '> Updating selectors:', router, swapFromEthSelector, swapToEthSelector);
+      await printInfo(tx);
+    }
   }
 }
 

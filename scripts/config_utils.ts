@@ -76,6 +76,29 @@ export interface IConfig {
     testingTokens?: string[];
   };
 
+  uniSwapV3Bsc?: {
+    routers: string[];
+    testingTokens?: string[];
+  };
+
+  velodrome?: {
+    routers: Record<
+      string,
+      {
+        address: string;
+        testingTokens?: string[];
+      }
+    >;
+    stablecoins: string[];
+    customSelectors?: Record<
+      string,
+      {
+        swapFromEth: string;
+        swapToEth: string;
+      }
+    >;
+  };
+
   // Compound or clones
   compound?: {
     compTroller: string;
