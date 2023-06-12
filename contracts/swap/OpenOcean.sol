@@ -90,6 +90,14 @@ contract OpenOcean is BaseSwap {
             return doSwap(params);
         }
 
+        if (methodId == IOpenOceanRouter.uniswapV3SwapTo.selector) {
+            return doUniswapV3SwapTo(params);
+        }
+
+        if (methodId == IOpenOceanRouter.callUniswapTo.selector) {
+            return doCallUniswapTo(params);
+        }
+
         require(false, "openOcean_invalidExtraArgs");
     }
 
@@ -129,6 +137,49 @@ contract OpenOcean is BaseSwap {
                 permit: desc.permit
             }),
             calls
+        );
+    }
+
+    function doUniswapV3SwapTo(SwapParams calldata params) private returns (uint256 destAmount) {
+        uint256 callValue;
+        if (params.tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
+            callValue = params.srcAmount;
+        } else {
+            callValue = 0;
+        }
+
+        uint256[] memory pools;
+        (, , , pools) = abi.decode(params.extraArgs[4:], (address, uint256, uint256, uint256[]));
+
+        destAmount = router.uniswapV3SwapTo{value: callValue}(
+            params.recipient,
+            params.srcAmount,
+            params.minDestAmount,
+            pools
+        );
+    }
+
+    function doCallUniswapTo(SwapParams calldata params) private returns (uint256 destAmount) {
+        uint256 callValue;
+        if (params.tradePath[0] == address(ETH_TOKEN_ADDRESS)) {
+            callValue = params.srcAmount;
+        } else {
+            callValue = 0;
+        }
+
+        bytes32[] memory pools;
+        address srcToken;
+        (srcToken, , , pools, ) = abi.decode(
+            params.extraArgs[4:],
+            (address, uint256, uint256, bytes32[], address)
+        );
+
+        destAmount = router.callUniswapTo{value: callValue}(
+            srcToken,
+            params.srcAmount,
+            params.minDestAmount,
+            pools,
+            params.recipient
         );
     }
 }

@@ -28,4 +28,19 @@ interface IOpenOceanRouter {
         SwapDescription calldata desc,
         CallDescription[] calldata calls
     ) external payable returns (uint256 returnAmount); // 0x32af3139
+
+    function uniswapV3SwapTo(
+        address recipient,
+        uint256 amount,
+        uint256 minReturn,
+        uint256[] calldata pools
+    ) external payable returns (uint256 returnAmount); //0xbc80f1a8
+
+    function callUniswapTo(
+        address srcToken,
+        uint256 amount,
+        uint256 minReturn,
+        bytes32[] calldata pools, /* pools */
+        address recipient
+    ) external payable returns (uint256 returnAmount); //0x6b58f2f0
 }
