@@ -148,15 +148,20 @@ contract OpenOcean is BaseSwap {
             callValue = 0;
         }
 
+        IERC20Ext actualDest = IERC20Ext(params.tradePath[params.tradePath.length - 1]);
+        uint256 destBalanceBefore = getBalance(actualDest, params.recipient);
+
         uint256[] memory pools;
         (, , , pools) = abi.decode(params.extraArgs[4:], (address, uint256, uint256, uint256[]));
 
-        destAmount = router.uniswapV3SwapTo{value: callValue}(
+        router.uniswapV3SwapTo{value: callValue}(
             params.recipient,
             params.srcAmount,
             params.minDestAmount,
             pools
         );
+
+        destAmount = getBalance(actualDest, params.recipient) - destBalanceBefore;
     }
 
     function doCallUniswapTo(SwapParams calldata params) private returns (uint256 destAmount) {
