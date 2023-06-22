@@ -5,7 +5,11 @@ export const FantomConfig: Record<string, IConfig> = {
     diabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
-    tokens: {},
+    tokens: {
+      dai: {symbol: 'dai', address: '0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E', usdRate: 1},
+      usdc: {symbol: 'usdc', address: '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75', usdRate: 1},
+      fusdt: {symbol: 'fusdt', address: '0x049d68029688eAbF473097a2fC38ef61633A3C7A', usdRate: 1},
+    },
 
     wNative: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',
 
@@ -25,6 +29,7 @@ export const FantomConfig: Record<string, IConfig> = {
 
     openOcean: {
       router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
+      testingTokens: ['dai', 'usdc', 'fusdt'],
     },
 
     supportedWallets: commonPlatformWallets,

@@ -67,6 +67,7 @@ export interface IConfig {
 
   openOcean?: {
     router: string;
+    testingTokens?: string[];
   };
 
   kyberSwapV2?: {
