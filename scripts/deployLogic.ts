@@ -450,7 +450,9 @@ async function deployContract(
   log(1, `${step}. Deploying '${contractName}'`);
   log(1, '------------------------------------');
 
+  log(1, 'wait to get contract name');
   const factory = await ethers.getContractFactory(contractName);
+
   let contract;
 
   if (contractAddress) {
@@ -459,7 +461,9 @@ async function deployContract(
     // TODO: Transfer admin if needed
     contract = factory.attach(contractAddress);
   } else {
+    log(1, 'wait for factory deploy');
     contract = await factory.deploy(...args);
+    log(1, 'wait for contract deploy');
     const tx = await contract.deployed();
     await printInfo(tx.deployTransaction);
     log(2, `> address:\t${contract.address}`);

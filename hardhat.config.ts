@@ -253,11 +253,11 @@ if (PRIVATE_KEY) {
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
   config.networks!.polygon_mainnet = {
-    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://polygon.rpc.blxrbdn.com`,
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 35 * 1e9,
+    gasPrice: 260 * 1e9,
   };
 
   config.networks!.polygon_staging = {
