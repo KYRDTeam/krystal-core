@@ -204,7 +204,8 @@
     "fetchTokenBalances": "0xfA5d8aAF312c96b42Ac4355B13D9D28fB10b305c",
     "fetchAaveDataWrapper": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93",
     "swapContracts": {
-      "kyberSwapV3": "0x6917812739D8Cc378ABd80569D6045Fff349d224"
+      "kyberSwapV3": "0x6917812739D8Cc378ABd80569D6045Fff349d224",
+      "openOcean": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177"
     },
     "lendingContracts": {}
   },

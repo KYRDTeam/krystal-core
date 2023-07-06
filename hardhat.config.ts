@@ -249,6 +249,22 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 250 * 1e9,
   };
+
+  config.networks!.optimism_mainnet = {
+    url: `https://mainnet.optimism.io/`,
+    chainId: 10,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 0.0000001 * 1e9,
+  };
+
+  config.networks!.optimism_testnet = {
+    url: `https://goerli.optimism.io/`,
+    chainId: 420,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 0.001 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
@@ -313,22 +329,6 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     accounts: [PRIVATE_KEY],
     timeout: 20000,
     gasPrice: 13 * 1e9,
-  };
-
-  config.networks!.optimism_mainnet = {
-    url: `https://mainnet.optimism.io/`,
-    chainId: 10,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 0.001 * 1e9,
-  };
-
-  config.networks!.optimism_testnet = {
-    url: `https://goerli.optimism.io/`,
-    chainId: 420,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 0.001 * 1e9,
   };
 }
 
