@@ -205,6 +205,7 @@
     "fetchAaveDataWrapper": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93",
     "swapContracts": {
       "kyberSwapV3": "0x6917812739D8Cc378ABd80569D6045Fff349d224",
+      "velodrome": "0x2dF3bfD49633b1e0BcA2f154AB0F2268F7Ebc224",
       "openOcean": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177"
     },
     "lendingContracts": {}
