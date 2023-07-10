@@ -333,7 +333,7 @@ contract UniSwapV3Bsc is BaseSwap {
         });
 
         if (tradePath[tradePath.length - 1] == address(ETH_TOKEN_ADDRESS)) {
-            swapData.recipient = address(0);
+            swapData.recipient = address(2); // constant Constants.ADDRESS_THIS in UniswapV3 's SwapRouter02
             bytes[] memory multicallData = new bytes[](2);
             multicallData[0] = abi.encodeWithSelector(
                 0xb858183f, // exactInput
@@ -372,7 +372,7 @@ contract UniSwapV3Bsc is BaseSwap {
         });
 
         if (tradePath[tradePath.length - 1] == address(ETH_TOKEN_ADDRESS)) {
-            swapData.recipient = address(0);
+            swapData.recipient = address(2); // constant Constants.ADDRESS_THIS in UniswapV3 's SwapRouter02
             bytes[] memory multicallData = new bytes[](2);
             multicallData[0] = abi.encodeWithSelector(
                 0x04e45aaf, // exactInputSingle
