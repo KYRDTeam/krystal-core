@@ -265,6 +265,14 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 0.001 * 1e9,
   };
+
+  config.networks!.eth_mainnet = {
+    url: `https://eth-mainnet.public.blastapi.io`,
+    chainId: 1,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 14 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {

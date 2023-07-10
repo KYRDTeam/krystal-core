@@ -53,6 +53,10 @@ export const EthConfig: Record<string, IConfig> = {
       testingTokens: ['usdc'],
     },
 
+    openOcean: {
+      router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
+    },
+
     kyberSwapV3: {
       router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
       testingTokens: ['usdc'],
