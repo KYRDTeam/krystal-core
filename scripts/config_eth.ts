@@ -190,6 +190,10 @@ export const EthConfig: Record<string, IConfig> = {
 
     wNative: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 
+    openOcean: {
+      router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
+    },
+
     // Uniswap & clones
     uniswap: {
       routers: {

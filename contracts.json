@@ -117,7 +117,8 @@
     "fetchTokenBalances": "0xc57bfadD18BCf84efB5AcfaAEe63B8eAf1A627Bb",
     "fetchAaveDataWrapper": "0x3b2a1129e7e33BADCb372a764d858F94Ac4BA493",
     "swapContracts": {
-      "uniSwap": "0x34f6c91d2Af45EfC5a743E009143541204e12eb9"
+      "uniSwap": "0x34f6c91d2Af45EfC5a743E009143541204e12eb9",
+      "openOcean": "0x30d97cd9b14926222b3ee73e2d8706c3c2c37739"
     },
     "lendingContracts": {}
   },
