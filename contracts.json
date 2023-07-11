@@ -56,7 +56,8 @@
       "kyberDmm": "0x867eB83fEe136Be5b35d3554C89eC75D79737368",
       "kyberDmmV2": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e",
       "kyberSwapV2": "0x19CF4725d43477cf7b3a74C309363048dD025aF9",
-      "kyberSwapV3": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e"
+      "kyberSwapV3": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e",
+      "openOcean": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177"
     },
     "lendingContracts": {}
   },

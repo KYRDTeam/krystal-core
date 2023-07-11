@@ -179,11 +179,11 @@ if (PRIVATE_KEY) {
   };
 
   config.networks!.avalanche_mainnet = {
-    url: 'https://api.avax.network/ext/bc/C/rpc',
+    url: 'https://avalanche-c-chain.publicnode.com',
     chainId: 43114,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 75 * 1e9,
+    gasPrice: 30 * 1e9,
   };
 
   config.networks!.fantom_mainnet = {
