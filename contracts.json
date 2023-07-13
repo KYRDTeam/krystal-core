@@ -201,6 +201,15 @@
     },
     "lendingContracts": {}
   },
+  "linea_goerli": {
+    "smartWalletImplementation": "0x0f9332D3bAfdbaAa5be753819356497B8dEfe123",
+    "smartWalletProxy": "0xFaACD9f7E68Bb36c1029Ab87D1d7325919e67cc0",
+    "fetchTokenBalances": "0xfEE93FCD1a26e858325613818dE5C533d94A33b6",
+    "swapContracts": {
+      "openOcean": "0x30d97CD9B14926222b3eE73E2D8706c3C2c37739"
+    },
+    "lendingContracts": {}
+  },
   "optimism_mainnet": {
     "smartWalletImplementation": "0x76b5CeFf236FFCD1E6405CB03Dbaac78C4E2D7E4",
     "smartWalletProxy": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e",

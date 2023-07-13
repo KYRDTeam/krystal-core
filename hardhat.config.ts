@@ -281,6 +281,14 @@ if (PRIVATE_KEY) {
     timeout: 2000,
     gasPrice: 20 * 1e9,
   };
+
+  config.networks!.linea_goerli = {
+    url: `https://rpc.goerli.linea.build`,
+    chainId: 59140,
+    accounts: [PRIVATE_KEY],
+    timeout: 2000,
+    gasPrice: 5 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
