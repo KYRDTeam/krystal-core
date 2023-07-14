@@ -113,6 +113,9 @@ contract OpenOcean is BaseSwap {
             callValue = 0;
         }
 
+        IERC20Ext actualDest = IERC20Ext(params.tradePath[params.tradePath.length - 1]);
+        uint256 destBalanceBefore = getBalance(actualDest, params.recipient);
+
         address caller;
         IOpenOceanRouter.SwapDescription memory desc;
         IOpenOceanRouter.CallDescription[] memory calls;
@@ -122,7 +125,7 @@ contract OpenOcean is BaseSwap {
             (address, IOpenOceanRouter.SwapDescription, IOpenOceanRouter.CallDescription[])
         );
 
-        destAmount = router.swap{value: callValue}(
+        router.swap{value: callValue}(
             caller,
             IOpenOceanRouter.SwapDescription({
                 srcToken: desc.srcToken,
@@ -138,6 +141,8 @@ contract OpenOcean is BaseSwap {
             }),
             calls
         );
+
+        destAmount = getBalance(actualDest, params.recipient) - destBalanceBefore;
     }
 
     function doUniswapV3SwapTo(SwapParams calldata params) private returns (uint256 destAmount) {
@@ -172,6 +177,9 @@ contract OpenOcean is BaseSwap {
             callValue = 0;
         }
 
+        IERC20Ext actualDest = IERC20Ext(params.tradePath[params.tradePath.length - 1]);
+        uint256 destBalanceBefore = getBalance(actualDest, params.recipient);
+
         bytes32[] memory pools;
         address srcToken;
         (srcToken, , , pools, ) = abi.decode(
@@ -179,12 +187,14 @@ contract OpenOcean is BaseSwap {
             (address, uint256, uint256, bytes32[], address)
         );
 
-        destAmount = router.callUniswapTo{value: callValue}(
+        router.callUniswapTo{value: callValue}(
             srcToken,
             params.srcAmount,
             params.minDestAmount,
             pools,
             params.recipient
         );
+
+        destAmount = getBalance(actualDest, params.recipient) - destBalanceBefore;
     }
 }
