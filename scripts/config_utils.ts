@@ -19,6 +19,7 @@ export interface IConfig {
   >;
 
   // wrapped native token (wEth/wBnb ..)
+  //remember to check if this compatible w/ weth that dex used
   wNative: string;
 
   // Uniswap or clones

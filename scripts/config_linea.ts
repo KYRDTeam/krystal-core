@@ -5,7 +5,7 @@ export const LineaConfig: Record<string, IConfig> = {
     autoVerifyContract: true,
     tokens: {},
     //remember to check if this compatible w/ weth that dex used
-    wNative: '0x62c70f9379ac0470da3149d0e1c90d07f313e3dc',
+    wNative: '0x2C1b868d6596a18e32E61B901E4060C872647b6C',
 
     openOcean: {
       router: '0x6352a56caadc4f1e25cd6c75970fa768a3304e64',
@@ -13,6 +13,12 @@ export const LineaConfig: Record<string, IConfig> = {
 
     kyberSwapV3: {
       router: '0xcd9478E0533F6108A036389A4C24E11f191B54D8',
+    },
+
+    uniswapV3: {
+      routers: [
+        '0x6aa397CAB00a2A40025Dbf839a83f16D5EC7c1eB', // univ3
+      ],
     },
 
     // Uniswap & clones
