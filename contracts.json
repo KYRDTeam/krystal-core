@@ -206,7 +206,7 @@
     "smartWalletProxy": "0xFaACD9f7E68Bb36c1029Ab87D1d7325919e67cc0",
     "fetchTokenBalances": "0xfEE93FCD1a26e858325613818dE5C533d94A33b6",
     "swapContracts": {
-      "uniSwap": "0x901a5CCD08D246cd7b404191aF042d890d7506c1",
+      "uniSwap": "0x2cDC7562C207E8A20D91749711B56B80F3f8f71E",
       "openOcean": "0x30d97CD9B14926222b3eE73E2D8706c3C2c37739",
       "kyberSwapV3": "0xdaD041240149AE4F4b133Ed3a6cd582F4F02dE04"
     },
