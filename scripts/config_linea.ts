@@ -1,6 +1,22 @@
 import {commonPlatformWallets, IConfig} from './config_utils';
 
 export const LineaConfig: Record<string, IConfig> = {
+  linea_mainnet: {
+    autoVerifyContract: true,
+    tokens: {},
+    //remember to check if this compatible w/ weth that dex used
+    wNative: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
+
+    openOcean: {
+      router: '0x6352a56caadc4f1e25cd6c75970fa768a3304e64',
+    },
+
+    supportedWallets: commonPlatformWallets,
+    nativeUsdRate: 1870,
+
+    diabledFetchAaveDataWrapper: true,
+  },
+
   linea_goerli: {
     autoVerifyContract: true,
     tokens: {},

@@ -289,6 +289,14 @@ if (PRIVATE_KEY) {
     timeout: 2000,
     gasPrice: 5 * 1e9,
   };
+
+  config.networks!.linea_mainnet = {
+    url: `https://rpc.linea.build`,
+    chainId: 59144,
+    accounts: [PRIVATE_KEY],
+    timeout: 2000,
+    gasPrice: 3 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
