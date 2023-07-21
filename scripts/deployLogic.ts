@@ -2,7 +2,7 @@ import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
 import {
-  FetchTokenBalances,
+  // FetchTokenBalances,
   SmartWalletImplementation,
   SmartWalletProxy,
   UniSwap,
@@ -43,7 +43,7 @@ if (!networkConfig) {
 export interface KrystalContracts {
   smartWalletImplementation?: SmartWalletImplementation;
   smartWalletProxy?: SmartWalletProxy;
-  fetchTokenBalances?: FetchTokenBalances;
+  // fetchTokenBalances?: FetchTokenBalances;
   fetchAaveDataWrapper?: FetchAaveDataWrapper;
   swapContracts?: {
     uniSwap?: UniSwap;
@@ -169,7 +169,7 @@ async function deployContracts(
 
   let smartWalletImplementation,
     smartWalletProxy,
-    fetchTokenBalances,
+    // fetchTokenBalances,
     fetchAaveDataWrapper,
     swapContracts,
     lendingContracts;
@@ -184,14 +184,14 @@ async function deployContracts(
       contractAdmin
     )) as SmartWalletImplementation;
 
-    fetchTokenBalances = (await deployContract(
-      ++step,
-      networkConfig.autoVerifyContract,
-      'FetchTokenBalances',
-      existingContract?.['fetchTokenBalances'],
-      undefined,
-      contractAdmin
-    )) as FetchTokenBalances;
+    // fetchTokenBalances = (await deployContract(
+    //   ++step,
+    //   networkConfig.autoVerifyContract,
+    //   'FetchTokenBalances',
+    //   existingContract?.['fetchTokenBalances'],
+    //   undefined,
+    //   contractAdmin
+    // )) as FetchTokenBalances;
 
     if (!networkConfig.diabledFetchAaveDataWrapper) {
       fetchAaveDataWrapper = (await deployContract(
@@ -430,7 +430,7 @@ async function deployContracts(
   return {
     smartWalletImplementation,
     smartWalletProxy,
-    fetchTokenBalances,
+    // fetchTokenBalances,
     fetchAaveDataWrapper,
     swapContracts,
     lendingContracts,
