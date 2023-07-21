@@ -562,15 +562,18 @@ describe('swap test', async () => {
         if (feeMode === FeeMode.FROM_SOURCE) {
           amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
         }
-        const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
+        const url = `https://api.1inch.io/v5.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
           tradePath[1]
         }&amount=${amount?.toString()}&fromAddress=${
           setup.user.address
         }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
 
-        // const resp = (await axios.get(url)) as any;
-        // const data = resp.data;
-        const data = apiMock[url];
+        const resp = (await axios.get(url)) as any;
+        const data = resp.data;
+        // const data = apiMock[url];
+        if (data == null) {
+          console.log(url);
+        }
 
         return data.tx.data as string;
       },
@@ -582,15 +585,15 @@ describe('swap test', async () => {
         if (feeMode === FeeMode.FROM_SOURCE) {
           amount = srcAmount?.mul(BPS.sub(platformFee)).div(BPS);
         }
-        const url = `https://api.1inch.exchange/v3.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
+        const url = `https://api.1inch.io/v5.0/${chainId}/swap?fromTokenAddress=${tradePath[0]}&toTokenAddress=${
           tradePath[1]
         }&amount=${amount?.toString()}&fromAddress=${
           setup.user.address
         }&slippage=10&disableEstimate=true&fee=0&burnChi=false&allowPartialFill=false`;
 
-        // const resp = (await axios.get(url)) as any;
-        // const data = resp.data;
-        const data = apiMock[url];
+        const resp = (await axios.get(url)) as any;
+        const data = resp.data;
+        // const data = apiMock[url];
         if (data == null) {
           console.log(url);
         }

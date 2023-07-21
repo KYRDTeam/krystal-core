@@ -39,7 +39,7 @@ export const EthConfig: Record<string, IConfig> = {
     },
 
     oneInch: {
-      router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
+      router: '0x1111111254EEB25477B68fb85Ed929f73A960582',
     },
 
     kyberDmmV2: {
