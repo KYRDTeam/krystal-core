@@ -16,7 +16,8 @@
     "swapContracts": {
       "uniSwap": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
       "kyberSwapV2": "0x1F8B6F7eaa0420f8CF827E18425b4F09074538E7",
-      "kyberSwapV3": "0xfEb0bCdef6286c24856641319d25AE73E00de17A"
+      "kyberSwapV3": "0xfEb0bCdef6286c24856641319d25AE73E00de17A",
+      "openOcean": "0x6C08582D1fa4ced1af2584d3326297E74D5115FE"
     },
     "lendingContracts": {}
   },
@@ -55,7 +56,8 @@
       "kyberDmm": "0x867eB83fEe136Be5b35d3554C89eC75D79737368",
       "kyberDmmV2": "0x813718C50df497BC136d5d6dfc0E0aDA8AB0C93e",
       "kyberSwapV2": "0x19CF4725d43477cf7b3a74C309363048dD025aF9",
-      "kyberSwapV3": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e"
+      "kyberSwapV3": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e",
+      "openOcean": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177"
     },
     "lendingContracts": {}
   },
@@ -70,7 +72,8 @@
       "kyberDmmV2": "0x3210a8b8206bc205840c983499aB92DB0f4F3C6e",
       "kyberSwapV2": "0x85D53990CcB093De7fE1D14D21048F23cBC46004",
       "kyberSwapV3": "0x0E67ef7aF621F90Bc94E5566E25a55ba0822e2Bb",
-      "uniSwapV3Bsc": "0x06eD562558653200EF38A2D5a513dcE14552B237"
+      "uniSwapV3Bsc": "0x2cDC7562C207E8A20D91749711B56B80F3f8f71E",
+      "openOcean": "0x35AAe6Df4774D7A191447B492556496DB052a20D"
     },
     "lendingContracts": {
       "compoundLending": "0x6deaAe9d76991db2943064Bca84e00f63c46C0A3"
@@ -115,7 +118,8 @@
     "fetchTokenBalances": "0xc57bfadD18BCf84efB5AcfaAEe63B8eAf1A627Bb",
     "fetchAaveDataWrapper": "0x3b2a1129e7e33BADCb372a764d858F94Ac4BA493",
     "swapContracts": {
-      "uniSwap": "0x34f6c91d2Af45EfC5a743E009143541204e12eb9"
+      "uniSwap": "0x34f6c91d2Af45EfC5a743E009143541204e12eb9",
+      "openOcean": "0x30d97cd9b14926222b3ee73e2d8706c3c2c37739"
     },
     "lendingContracts": {}
   },
@@ -131,7 +135,8 @@
       "oneInch": "0x9e81428f5672edcea83f5bf58b6b2cd968df8ee6",
       "kyberDmmV2": "0xA3f1bD7beE8c6DAE2De8FcF37067a87706517640",
       "kyberSwapV2": "0x1Af8772AC277FE590a0Bde36da607100221A9622",
-      "kyberSwapV3": "0x0a869fe705ecc3986a4d9a77f305fc1667d18d6b"
+      "kyberSwapV3": "0x0a869fe705ecc3986a4d9a77f305fc1667d18d6b",
+      "openOcean": "0xfEE93FCD1a26e858325613818dE5C533d94A33b6"
     },
     "lendingContracts": {
       "compoundLending": "0x8C27aBf05DE1d4847c3924566C3cBAFec6eFb42A",
@@ -173,7 +178,8 @@
     "swapContracts": {
       "kyberDmmV2": "0x60fc810EA972809d729FCE0043B82a58766596ee",
       "kyberSwapV2": "0xFA773737d274873c4E575591bcf2ff408F737c70",
-      "kyberSwapV3": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5"
+      "kyberSwapV3": "0x864F01c5E46b0712643B956BcA607bF883e0dbC5",
+      "openOcean": "0x8F0B1285a01F68621d761dAaa64CC74D8e2ba92d"
     },
     "lendingContracts": {}
   },
@@ -195,13 +201,36 @@
     },
     "lendingContracts": {}
   },
+  "linea_goerli": {
+    "smartWalletImplementation": "0x0f9332D3bAfdbaAa5be753819356497B8dEfe123",
+    "smartWalletProxy": "0xFaACD9f7E68Bb36c1029Ab87D1d7325919e67cc0",
+    "fetchTokenBalances": "0xfEE93FCD1a26e858325613818dE5C533d94A33b6",
+    "swapContracts": {
+      "uniSwap": "0x2cDC7562C207E8A20D91749711B56B80F3f8f71E",
+      "uniSwapV3": "0x39558aEAe4907dD62E7C14bE04b9CC108D4d23D6",
+      "openOcean": "0x30d97CD9B14926222b3eE73E2D8706c3C2c37739",
+      "kyberSwapV3": "0xdaD041240149AE4F4b133Ed3a6cd582F4F02dE04"
+    },
+    "lendingContracts": {}
+  },
+  "linea_mainnet": {
+    "smartWalletImplementation": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177",
+    "smartWalletProxy": "0x30d97CD9B14926222b3eE73E2D8706c3C2c37739",
+    "fetchTokenBalances": "0x0f9332D3bAfdbaAa5be753819356497B8dEfe123",
+    "swapContracts": {
+      "openOcean": "0xfEE93FCD1a26e858325613818dE5C533d94A33b6"
+    },
+    "lendingContracts": {}
+  },
   "optimism_mainnet": {
     "smartWalletImplementation": "0x76b5CeFf236FFCD1E6405CB03Dbaac78C4E2D7E4",
     "smartWalletProxy": "0xf6f2dafa542FefAae22187632Ef30D2dAa252b4e",
     "fetchTokenBalances": "0xfA5d8aAF312c96b42Ac4355B13D9D28fB10b305c",
     "fetchAaveDataWrapper": "0xB95FBBC6cA74bb9BBBFE0f881CFB6AA95B16bB93",
     "swapContracts": {
-      "kyberSwapV3": "0x6917812739D8Cc378ABd80569D6045Fff349d224"
+      "kyberSwapV3": "0x6917812739D8Cc378ABd80569D6045Fff349d224",
+      "velodrome": "0x2dF3bfD49633b1e0BcA2f154AB0F2268F7Ebc224",
+      "openOcean": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177"
     },
     "lendingContracts": {}
   },
@@ -226,7 +255,8 @@
       "oneInch": "0x256dc3c60d039ac57A36287289Fa7486Fd7dd0B3",
       "kyberDmmV2": "0xa21dBda6dEBd04E8D9ecE070c54047D6662E3930",
       "kyberSwapV2": "0x11E2AF1B420970273d5Dbd4bb4e7F3Ef6e8e5974",
-      "kyberSwapV3": "0x938f1bf9d93204506FCaC41B99D93a17077BBBe1"
+      "kyberSwapV3": "0x938f1bf9d93204506FCaC41B99D93a17077BBBe1",
+      "openOcean": "0xFE1bb153b14f3361505417440acee547d38f4e39"
     },
     "lendingContracts": {
       "aaveV2": "0x95ceC39Aa053C62d1A49D88B60620a489C241F53"

@@ -10,6 +10,7 @@ import {customNetworkConfig} from '../hardhat.config';
 import {AuroraConfig} from './config_aurora';
 import {KlaytnConfig} from './config_klaytn';
 import {OptimismConfig} from './config_optimism';
+import {LineaConfig} from './config_linea';
 
 const NetworkConfig: Record<string, IConfig> = {
   ...BscConfig,
@@ -22,6 +23,7 @@ const NetworkConfig: Record<string, IConfig> = {
   ...ArbitrumConfig,
   ...KlaytnConfig,
   ...OptimismConfig,
+  ...LineaConfig,
 };
 
 NetworkConfig.hardhat = {

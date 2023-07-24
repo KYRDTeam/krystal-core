@@ -2,7 +2,7 @@ import {network, ethers, run} from 'hardhat';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
 import {NetworkConfig} from './config';
 import {
-  FetchTokenBalances,
+  // FetchTokenBalances,
   SmartWalletImplementation,
   SmartWalletProxy,
   UniSwap,
@@ -21,6 +21,7 @@ import {
   KyberSwapV3,
   Velodrome,
   UniSwapV3Bsc,
+  OpenOcean,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -42,7 +43,7 @@ if (!networkConfig) {
 export interface KrystalContracts {
   smartWalletImplementation?: SmartWalletImplementation;
   smartWalletProxy?: SmartWalletProxy;
-  fetchTokenBalances?: FetchTokenBalances;
+  // fetchTokenBalances?: FetchTokenBalances;
   fetchAaveDataWrapper?: FetchAaveDataWrapper;
   swapContracts?: {
     uniSwap?: UniSwap;
@@ -55,6 +56,7 @@ export interface KrystalContracts {
     kyberSwapV3?: KyberSwapV3;
     velodrome?: Velodrome;
     uniSwapV3Bsc?: UniSwapV3Bsc;
+    openOcean?: OpenOcean;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -108,6 +110,10 @@ export const deploy = async (
   log(0, 'Updating oneInch config');
   log(0, '======================\n');
   await updateOneInch(deployedContracts.swapContracts?.oneInch, extraArgs);
+
+  log(0, 'Updating openOcean config');
+  log(0, '======================\n');
+  await updateOpenOcean(deployedContracts.swapContracts?.openOcean, extraArgs);
 
   log(0, 'Updating kyberDmm config');
   log(0, '======================\n');
@@ -163,7 +169,7 @@ async function deployContracts(
 
   let smartWalletImplementation,
     smartWalletProxy,
-    fetchTokenBalances,
+    // fetchTokenBalances,
     fetchAaveDataWrapper,
     swapContracts,
     lendingContracts;
@@ -178,14 +184,14 @@ async function deployContracts(
       contractAdmin
     )) as SmartWalletImplementation;
 
-    fetchTokenBalances = (await deployContract(
-      ++step,
-      networkConfig.autoVerifyContract,
-      'FetchTokenBalances',
-      existingContract?.['fetchTokenBalances'],
-      undefined,
-      contractAdmin
-    )) as FetchTokenBalances;
+    // fetchTokenBalances = (await deployContract(
+    //   ++step,
+    //   networkConfig.autoVerifyContract,
+    //   'FetchTokenBalances',
+    //   existingContract?.['fetchTokenBalances'],
+    //   undefined,
+    //   contractAdmin
+    // )) as FetchTokenBalances;
 
     if (!networkConfig.diabledFetchAaveDataWrapper) {
       fetchAaveDataWrapper = (await deployContract(
@@ -266,6 +272,19 @@ async function deployContracts(
             contractAdmin,
             networkConfig.oneInch.router
           )) as OneInch),
+
+      openOcean: !networkConfig.openOcean
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'OpenOcean',
+            existingContract?.['swapContracts']?.['openOcean'],
+            undefined,
+            contractAdmin,
+            networkConfig.openOcean.router
+          )) as OneInch),
+
       kyberDmmV2: !networkConfig.kyberDmmV2
         ? undefined
         : ((await deployContract(
@@ -411,7 +430,7 @@ async function deployContracts(
   return {
     smartWalletImplementation,
     smartWalletProxy,
-    fetchTokenBalances,
+    // fetchTokenBalances,
     fetchAaveDataWrapper,
     swapContracts,
     lendingContracts,
@@ -431,7 +450,9 @@ async function deployContract(
   log(1, `${step}. Deploying '${contractName}'`);
   log(1, '------------------------------------');
 
+  log(1, 'wait to get contract name');
   const factory = await ethers.getContractFactory(contractName);
+
   let contract;
 
   if (contractAddress) {
@@ -440,7 +461,9 @@ async function deployContract(
     // TODO: Transfer admin if needed
     contract = factory.attach(contractAddress);
   } else {
+    log(1, 'wait for factory deploy');
     contract = await factory.deploy(...args);
+    log(1, 'wait for contract deploy');
     const tx = await contract.deployed();
     await printInfo(tx.deployTransaction);
     log(2, `> address:\t${contract.address}`);
@@ -688,6 +711,24 @@ async function updateOneInch(oneInch: OneInch | undefined, extraArgs: {from?: st
       await oneInch.populateTransaction.updateAggregationRouter(networkConfig.oneInch.router)
     );
     log(2, '> updated oneInch', JSON.stringify(networkConfig.oneInch, null, 2));
+    await printInfo(tx);
+  }
+}
+
+async function updateOpenOcean(openOcean: OpenOcean | undefined, extraArgs: {from?: string}) {
+  if (!openOcean || !networkConfig.openOcean) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await openOcean.router()).toLowerCase() === networkConfig.openOcean.router.toLowerCase()) {
+    log(2, `openOcean already up-to-date at ${networkConfig.openOcean.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await openOcean.populateTransaction.updateAggregationRouter(networkConfig.openOcean.router)
+    );
+    log(2, '> updated openOcean', JSON.stringify(networkConfig.openOcean, null, 2));
     await printInfo(tx);
   }
 }

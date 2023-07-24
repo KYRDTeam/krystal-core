@@ -55,6 +55,10 @@ export const PolygonConfig: Record<string, IConfig> = {
       router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
     },
 
+    openOcean: {
+      router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
+    },
+
     oneInch: {
       router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
       testingTokens: ['weth'],

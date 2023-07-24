@@ -30,6 +30,7 @@ const {
   MAINNET_ID,
   MAINNET_FORK,
   MAINNET_FORK_BLOCK,
+  LINEASCAN_KEY,
 } = process.env;
 
 // custom network config for testing. See scripts/config.ts
@@ -96,38 +97,60 @@ const config: HardhatUserConfig = {
     // Your API key for bscscan / ethscan
     // Obtain one at https://bscscan.io/
     apiKey: {
-      mainnet: ETHERSCAN_KEY,
-      ropsten: ETHERSCAN_KEY,
-      goerli: ETHERSCAN_KEY,
-      rinkeby: ETHERSCAN_KEY,
+      mainnet: ETHERSCAN_KEY as string,
+      ropsten: ETHERSCAN_KEY as string,
+      goerli: ETHERSCAN_KEY as string,
+      rinkeby: ETHERSCAN_KEY as string,
 
       // binance smart chain
-      bsc: BSCSCAN_KEY,
-      bscTestnet: BSCSCAN_KEY,
+      bsc: BSCSCAN_KEY as string,
+      bscTestnet: BSCSCAN_KEY as string,
 
       // fantom mainnet
-      opera: FANTOMSCAN_KEY,
-      ftmTestnet: FANTOMSCAN_KEY,
+      opera: FANTOMSCAN_KEY as string,
+      ftmTestnet: FANTOMSCAN_KEY as string,
 
       // polygon
-      polygon: POLYGONSCAN_KEY,
-      polygonMumbai: POLYGONSCAN_KEY,
+      polygon: POLYGONSCAN_KEY as string,
+      polygonMumbai: POLYGONSCAN_KEY as string,
 
       // avalanche
-      avalanche: AVAXSCAN_KEY,
-      avalancheFujiTestnet: AVAXSCAN_KEY,
+      avalanche: AVAXSCAN_KEY as string,
+      avalancheFujiTestnet: AVAXSCAN_KEY as string,
 
       // aurora
-      aurora: AURORASCAN_KEY,
-      auroraTestnet: AURORASCAN_KEY,
+      aurora: AURORASCAN_KEY as string,
+      auroraTestnet: AURORASCAN_KEY as string,
 
       // arbitrum
-      arbitrumOne: ARBISCAN_KEY,
-      arbitrumTestnet: ARBISCAN_KEY,
+      arbitrumOne: ARBISCAN_KEY as string,
+      arbitrumTestnet: ARBISCAN_KEY as string,
 
       // optimism
-      optimisticEthereum: OPTIMISTICSCAN_KEY,
+      optimisticEthereum: OPTIMISTICSCAN_KEY as string,
+
+      // linea
+      // lineaGoerli: 'YourApiKeyToken',
+      linea: LINEASCAN_KEY as string,
     },
+    customChains: [
+      {
+        network: 'lineaGoerli',
+        chainId: 59140,
+        urls: {
+          apiURL: 'https://goerli.lineascan.build/api',
+          browserURL: 'https://goerli.lineascan.build/',
+        },
+      },
+      {
+        network: 'linea',
+        chainId: 59144,
+        urls: {
+          apiURL: 'https://api.lineascan.build/api',
+          browserURL: 'https://lineascan.build/',
+        },
+      },
+    ],
   },
 
   typechain: {
@@ -179,11 +202,11 @@ if (PRIVATE_KEY) {
   };
 
   config.networks!.avalanche_mainnet = {
-    url: 'https://api.avax.network/ext/bc/C/rpc',
+    url: 'https://avalanche-c-chain.publicnode.com',
     chainId: 43114,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 75 * 1e9,
+    gasPrice: 30 * 1e9,
   };
 
   config.networks!.fantom_mainnet = {
@@ -199,7 +222,7 @@ if (PRIVATE_KEY) {
     chainId: 42161,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 1 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.arbitrum_rinkeby = {
@@ -207,7 +230,7 @@ if (PRIVATE_KEY) {
     chainId: 421611,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 1 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.cronos_mainnet = {
@@ -249,15 +272,63 @@ if (PRIVATE_KEY) {
     timeout: 20000,
     gasPrice: 250 * 1e9,
   };
+
+  config.networks!.optimism_mainnet = {
+    url: `https://mainnet.optimism.io/`,
+    chainId: 10,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 0.0000001 * 1e9,
+  };
+
+  config.networks!.optimism_testnet = {
+    url: `https://goerli.optimism.io/`,
+    chainId: 420,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 0.001 * 1e9,
+  };
+
+  config.networks!.eth_mainnet = {
+    url: `https://eth-mainnet.public.blastapi.io`,
+    chainId: 1,
+    accounts: [PRIVATE_KEY],
+    timeout: 20000,
+    gasPrice: 18 * 1e9,
+  };
+
+  config.networks!.eth_goerli = {
+    url: `https://rpc.ankr.com/eth_goerli`,
+    chainId: 5,
+    accounts: [PRIVATE_KEY],
+    timeout: 2000,
+    gasPrice: 20 * 1e9,
+  };
+
+  config.networks!.linea_goerli = {
+    url: `https://rpc.goerli.linea.build`,
+    chainId: 59140,
+    accounts: [PRIVATE_KEY],
+    timeout: 2000,
+    gasPrice: 5 * 1e9,
+  };
+
+  config.networks!.linea_mainnet = {
+    url: `https://rpc.linea.build`,
+    chainId: 59144,
+    accounts: [PRIVATE_KEY],
+    timeout: 2000,
+    gasPrice: 3 * 1e9,
+  };
 }
 
 if (PRIVATE_KEY && INFURA_API_KEY) {
   config.networks!.polygon_mainnet = {
-    url: `https://polygon-mainnet.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://polygon.rpc.blxrbdn.com`,
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 35 * 1e9,
+    gasPrice: 260 * 1e9,
   };
 
   config.networks!.polygon_staging = {
@@ -269,7 +340,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
   };
 
   config.networks!.polygon_mumbai = {
-    url: `https://polygon-mumbai.infura.io/v3/${INFURA_API_KEY}`,
+    url: `https://rpc.ankr.com/polygon_mumbai`,
     chainId: 80001,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
@@ -299,36 +370,12 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     gasPrice: 15 * 1e9,
   };
 
-  config.networks!.eth_goerli = {
-    url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
-    chainId: 5,
-    accounts: [PRIVATE_KEY],
-    timeout: 2000,
-    gasPrice: 1 * 1e9,
-  };
-
   config.networks!.eth_mainnet = {
     url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
     chainId: 1,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
     gasPrice: 13 * 1e9,
-  };
-
-  config.networks!.optimism_mainnet = {
-    url: `https://mainnet.optimism.io/`,
-    chainId: 10,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 0.001 * 1e9,
-  };
-
-  config.networks!.optimism_testnet = {
-    url: `https://goerli.optimism.io/`,
-    chainId: 420,
-    accounts: [PRIVATE_KEY],
-    timeout: 20000,
-    gasPrice: 0.001 * 1e9,
   };
 }
 
