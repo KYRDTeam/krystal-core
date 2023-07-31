@@ -11,6 +11,10 @@ export const LineaConfig: Record<string, IConfig> = {
       router: '0x6352a56caadc4f1e25cd6c75970fa768a3304e64',
     },
 
+    kyberSwapV3: {
+      router: '0x6131B5fae19EA4f9D964eAc0408E4408b66337b5',
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 1870,
 

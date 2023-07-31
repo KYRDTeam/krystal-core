@@ -1,4 +1,4 @@
-import '@nomiclabs/hardhat-etherscan';
+import '@nomicfoundation/hardhat-verify';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
@@ -318,7 +318,7 @@ if (PRIVATE_KEY) {
     chainId: 59144,
     accounts: [PRIVATE_KEY],
     timeout: 2000,
-    gasPrice: 3 * 1e9,
+    gasPrice: 1.65 * 1e9,
   };
 }
 
