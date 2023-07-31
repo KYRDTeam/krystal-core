@@ -216,6 +216,7 @@
   "linea_mainnet": {
     "smartWalletImplementation": "0xdDecC5735eC2b65C0b110d1DEdFCC90877ef8177",
     "smartWalletProxy": "0x30d97CD9B14926222b3eE73E2D8706c3C2c37739",
+    "fetchTokenBalances": "0x0f9332D3bAfdbaAa5be753819356497B8dEfe123",
     "swapContracts": {
       "openOcean": "0xfEE93FCD1a26e858325613818dE5C533d94A33b6",
       "kyberSwapV3": "0x5011a10CD27A8d4174bfA4833a48a3DB279c11aE"
