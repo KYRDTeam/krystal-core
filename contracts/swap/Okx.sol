@@ -13,16 +13,28 @@ contract Okx is BaseSwap {
     using SafeMath for uint256;
 
     address public router;
+    address public okxTokenApprove;
 
     event UpdatedAggregationRouter(address router);
+    event UpdatedOkxTokenApprove(address okxTokenApprove);
 
-    constructor(address _admin, address _router) BaseSwap(_admin) {
+    constructor(
+        address _admin,
+        address _router,
+        address _okxTokenApprove
+    ) BaseSwap(_admin) {
         router = _router;
+        okxTokenApprove = _okxTokenApprove;
     }
 
     function updateAggregationRouter(address _router) external onlyAdmin {
         router = _router;
         emit UpdatedAggregationRouter(router);
+    }
+
+    function updatedOkxTokenApprove(address _okxTokenApprove) external onlyAdmin {
+        okxTokenApprove = _okxTokenApprove;
+        emit UpdatedOkxTokenApprove(okxTokenApprove);
     }
 
     /// @dev get expected return and conversion rate if using a Uni router
@@ -79,7 +91,7 @@ contract Okx is BaseSwap {
     {
         require(params.tradePath.length == 2, "Okx_invalidTradepath");
 
-        safeApproveAllowance(address(router), IERC20Ext(params.tradePath[0]));
+        safeApproveAllowance(address(okxTokenApprove), IERC20Ext(params.tradePath[0]));
 
         IERC20Ext actualDest = IERC20Ext(params.tradePath[params.tradePath.length - 1]);
         uint256 destBalanceBefore = getBalance(actualDest, address(this));

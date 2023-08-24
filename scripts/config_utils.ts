@@ -73,6 +73,7 @@ export interface IConfig {
 
   okx?: {
     router: string;
+    okxTokenApprove: string;
     testingTokens?: string[];
   };
 

@@ -34,6 +34,7 @@ export const FantomConfig: Record<string, IConfig> = {
 
     okx: {
       router: '0xf332761c673b59B21fF6dfa8adA44d78c12dEF09',
+      okxTokenApprove: '0x70cBb871E8f30Fc8Ce23609E9E0Ea87B6b222F58',
     },
 
     supportedWallets: commonPlatformWallets,

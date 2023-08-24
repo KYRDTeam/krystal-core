@@ -301,7 +301,8 @@ async function deployContracts(
             existingContract?.['swapContracts']?.['okx'],
             undefined,
             contractAdmin,
-            networkConfig.okx.router
+            networkConfig.okx.router,
+            networkConfig.okx.okxTokenApprove
           )) as Okx),
 
       kyberDmmV2: !networkConfig.kyberDmmV2
