@@ -22,6 +22,7 @@ import {
   Velodrome,
   UniSwapV3Bsc,
   OpenOcean,
+  Okx,
 } from '../typechain';
 import {Contract} from '@ethersproject/contracts';
 import {IAaveV2Config} from './config_utils';
@@ -32,6 +33,7 @@ import {multisig} from '../hardhat.config';
 import {EthersAdapter} from '@gnosis.pm/safe-core-sdk';
 import {OperationType} from '@gnosis.pm/safe-core-sdk-types';
 import Safe from '@gnosis.pm/safe-core-sdk';
+import {ok} from 'assert';
 
 const gasLimit = 3000000;
 
@@ -57,6 +59,7 @@ export interface KrystalContracts {
     velodrome?: Velodrome;
     uniSwapV3Bsc?: UniSwapV3Bsc;
     openOcean?: OpenOcean;
+    okx?: Okx;
   };
   lendingContracts?: {
     compoundLending?: CompoundLending;
@@ -114,6 +117,10 @@ export const deploy = async (
   log(0, 'Updating openOcean config');
   log(0, '======================\n');
   await updateOpenOcean(deployedContracts.swapContracts?.openOcean, extraArgs);
+
+  log(0, 'Updating OKX config');
+  log(0, '======================\n');
+  await updateOkx(deployedContracts.swapContracts?.okx, extraArgs);
 
   log(0, 'Updating kyberDmm config');
   log(0, '======================\n');
@@ -283,7 +290,19 @@ async function deployContracts(
             undefined,
             contractAdmin,
             networkConfig.openOcean.router
-          )) as OneInch),
+          )) as OpenOcean),
+
+      okx: !networkConfig.okx
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'Okx',
+            existingContract?.['swapContracts']?.['okx'],
+            undefined,
+            contractAdmin,
+            networkConfig.okx.router
+          )) as Okx),
 
       kyberDmmV2: !networkConfig.kyberDmmV2
         ? undefined
@@ -729,6 +748,24 @@ async function updateOpenOcean(openOcean: OpenOcean | undefined, extraArgs: {fro
       await openOcean.populateTransaction.updateAggregationRouter(networkConfig.openOcean.router)
     );
     log(2, '> updated openOcean', JSON.stringify(networkConfig.openOcean, null, 2));
+    await printInfo(tx);
+  }
+}
+
+async function updateOkx(okx: Okx | undefined, extraArgs: {from?: string}) {
+  if (!okx || !networkConfig.okx) {
+    log(1, 'protocol not supported on this env');
+    return;
+  }
+  log(1, 'update proxy');
+
+  if ((await okx.router()).toLowerCase() === networkConfig.okx.router.toLowerCase()) {
+    log(2, `OKX already up-to-date at ${networkConfig.okx.router}`);
+  } else {
+    const tx = await executeTxnOnBehalfOf(
+      await okx.populateTransaction.updateAggregationRouter(networkConfig.okx.router)
+    );
+    log(2, '> updated OKX', JSON.stringify(networkConfig.okx, null, 2));
     await printInfo(tx);
   }
 }

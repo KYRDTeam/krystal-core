@@ -32,6 +32,10 @@ export const FantomConfig: Record<string, IConfig> = {
       testingTokens: ['dai', 'usdc', 'fusdt'],
     },
 
+    okx: {
+      router: '0xf332761c673b59B21fF6dfa8adA44d78c12dEF09',
+    },
+
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 3,
   },

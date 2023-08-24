@@ -71,6 +71,11 @@ export interface IConfig {
     testingTokens?: string[];
   };
 
+  okx?: {
+    router: string;
+    testingTokens?: string[];
+  };
+
   kyberSwapV2?: {
     router: string;
     aggregationExecutor: string;

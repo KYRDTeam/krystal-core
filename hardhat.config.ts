@@ -214,7 +214,7 @@ if (PRIVATE_KEY) {
     chainId: 250,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 301 * 1e9,
+    gasPrice: 50 * 1e9,
   };
 
   config.networks!.arbitrum_mainnet = {
