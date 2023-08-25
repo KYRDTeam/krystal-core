@@ -64,6 +64,11 @@ export const PolygonConfig: Record<string, IConfig> = {
       testingTokens: ['weth'],
     },
 
+    okx: {
+      router: '0xa748d6573aca135af68f2635be60cb80278bd855',
+      okxTokenApprove: '0x3b86917369b83a6892f553609f3c2f439c184e31',
+    },
+
     // Compound
     // compound: {
     //   compTroller: '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b',
