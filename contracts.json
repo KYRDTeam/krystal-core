@@ -17,7 +17,8 @@
       "uniSwap": "0x477Feff760340F73F98B340BB4D9f049CdE0db33",
       "kyberSwapV2": "0x1F8B6F7eaa0420f8CF827E18425b4F09074538E7",
       "kyberSwapV3": "0xfEb0bCdef6286c24856641319d25AE73E00de17A",
-      "openOcean": "0x6C08582D1fa4ced1af2584d3326297E74D5115FE"
+      "openOcean": "0x6C08582D1fa4ced1af2584d3326297E74D5115FE",
+      "okx": "0xa6fab972962eda0ab4b6db780c7fdfa0dd6159ef"
     },
     "lendingContracts": {}
   },
