@@ -183,7 +183,7 @@ if (PRIVATE_KEY) {
     chainId: 56,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 5 * 1e9,
+    gasPrice: 3 * 1e9,
   };
 
   config.networks!.bsc_staging = {
@@ -191,7 +191,7 @@ if (PRIVATE_KEY) {
     chainId: 56,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 5 * 1e9,
+    gasPrice: 3 * 1e9,
   };
 
   config.networks!.avalanche_fuji = {
