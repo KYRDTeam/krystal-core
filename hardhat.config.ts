@@ -278,7 +278,7 @@ if (PRIVATE_KEY) {
     chainId: 10,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 0.0000001 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.optimism_testnet = {
