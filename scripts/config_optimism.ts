@@ -41,6 +41,11 @@ export const OptimismConfig: Record<string, IConfig> = {
       router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
     },
 
+    okx: {
+      router: '0xf332761c673b59B21fF6dfa8adA44d78c12dEF09',
+      okxTokenApprove: '0x68D6B739D2020067D1e2F713b999dA97E4d54812',
+    },
+
     kyberSwapV3: {
       router: '0x617Dee16B86534a5d792A4d7A62FB491B544111E',
     },

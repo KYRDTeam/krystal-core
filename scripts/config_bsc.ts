@@ -74,6 +74,11 @@ export const BscConfig: Record<string, IConfig> = {
       router: '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64',
     },
 
+    okx: {
+      router: '0x9333C74BDd1E118634fE5664ACA7a9710b108Bab',
+      okxTokenApprove: '0x2c34A2Fb1d0b4f55de51E1d0bDEfaDDce6b7cDD6',
+    },
+
     // Venus protocol
     compound: {
       compTroller: '0xfd36e2c2a6789db23113685031d7f16329158384',

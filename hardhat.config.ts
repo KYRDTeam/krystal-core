@@ -183,7 +183,7 @@ if (PRIVATE_KEY) {
     chainId: 56,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 5 * 1e9,
+    gasPrice: 3 * 1e9,
   };
 
   config.networks!.bsc_staging = {
@@ -191,7 +191,7 @@ if (PRIVATE_KEY) {
     chainId: 56,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 5 * 1e9,
+    gasPrice: 3 * 1e9,
   };
 
   config.networks!.avalanche_fuji = {
@@ -214,7 +214,7 @@ if (PRIVATE_KEY) {
     chainId: 250,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 301 * 1e9,
+    gasPrice: 50 * 1e9,
   };
 
   config.networks!.arbitrum_mainnet = {
@@ -278,7 +278,7 @@ if (PRIVATE_KEY) {
     chainId: 10,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 0.0000001 * 1e9,
+    gasPrice: 0.1 * 1e9,
   };
 
   config.networks!.optimism_testnet = {
@@ -328,7 +328,7 @@ if (PRIVATE_KEY && INFURA_API_KEY) {
     chainId: 137,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 260 * 1e9,
+    gasPrice: 150 * 1e9,
   };
 
   config.networks!.polygon_staging = {
