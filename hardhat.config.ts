@@ -31,6 +31,7 @@ const {
   MAINNET_FORK,
   MAINNET_FORK_BLOCK,
   LINEASCAN_KEY,
+  BASESCAN_KEY,
 } = process.env;
 
 // custom network config for testing. See scripts/config.ts
@@ -132,6 +133,8 @@ const config: HardhatUserConfig = {
       // linea
       // lineaGoerli: 'YourApiKeyToken',
       linea: LINEASCAN_KEY as string,
+
+      base: BASESCAN_KEY as string,
     },
     customChains: [
       {
@@ -148,6 +151,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.lineascan.build/api',
           browserURL: 'https://lineascan.build/',
+        },
+      },
+      {
+        network: 'base',
+        chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://api.basescan.org',
         },
       },
     ],
@@ -319,6 +330,14 @@ if (PRIVATE_KEY) {
     accounts: [PRIVATE_KEY],
     timeout: 2000,
     gasPrice: 1.65 * 1e9,
+  };
+
+  config.networks!.base_mainnet = {
+    url: `https://mainnet.base.org`,
+    chainId: 8453,
+    accounts: [PRIVATE_KEY],
+    timeout: 60000,
+    gasPrice: 0.0025 * 1e9,
   };
 }
 

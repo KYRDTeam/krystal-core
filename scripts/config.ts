@@ -11,6 +11,7 @@ import {AuroraConfig} from './config_aurora';
 import {KlaytnConfig} from './config_klaytn';
 import {OptimismConfig} from './config_optimism';
 import {LineaConfig} from './config_linea';
+import {BaseConfig} from './config_base';
 
 const NetworkConfig: Record<string, IConfig> = {
   ...BscConfig,
@@ -24,6 +25,7 @@ const NetworkConfig: Record<string, IConfig> = {
   ...KlaytnConfig,
   ...OptimismConfig,
   ...LineaConfig,
+  ...BaseConfig,
 };
 
 NetworkConfig.hardhat = {
