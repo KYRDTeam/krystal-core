@@ -54,7 +54,7 @@ export const AvalancheConfig: Record<string, IConfig> = {
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 70,
 
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
   },
 
   avalanche_fuji: {
@@ -68,6 +68,6 @@ export const AvalancheConfig: Record<string, IConfig> = {
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 70,
 
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
   },
 };

@@ -18,7 +18,7 @@ export const LineaConfig: Record<string, IConfig> = {
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 1870,
 
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
   },
 
   linea_goerli: {
@@ -53,6 +53,6 @@ export const LineaConfig: Record<string, IConfig> = {
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 70,
 
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
   },
 };

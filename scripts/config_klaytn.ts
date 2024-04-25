@@ -2,7 +2,7 @@ import {commonPlatformWallets, IConfig} from './config_utils';
 
 export const KlaytnConfig: Record<string, IConfig> = {
   klaytn_mainnet: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {},
@@ -27,7 +27,7 @@ export const KlaytnConfig: Record<string, IConfig> = {
     nativeUsdRate: 1,
   },
   klaytn_testnet: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {},

@@ -2,7 +2,7 @@ import {commonPlatformWallets, IConfig} from './config_utils';
 
 export const ArbitrumConfig: Record<string, IConfig> = {
   arbitrum_mainnet: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {},
@@ -38,7 +38,7 @@ export const ArbitrumConfig: Record<string, IConfig> = {
     nativeUsdRate: 2500,
   },
   arbitrum_rinkeby: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {},

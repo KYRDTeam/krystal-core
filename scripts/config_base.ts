@@ -26,6 +26,6 @@ export const BaseConfig: Record<string, IConfig> = {
     supportedWallets: commonPlatformWallets,
     nativeUsdRate: 3385,
 
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
   },
 };

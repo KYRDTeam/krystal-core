@@ -80,6 +80,7 @@ export const deploy = async (
 
   const deployerAddress = await deployer.getAddress();
 
+  console.log('Deployer ', deployerAddress);
   log(0, 'Start deploying Krystal contracts');
   log(0, '======================\n');
   let deployedContracts = await deployContracts(existingContract, multisig || deployerAddress);
@@ -200,7 +201,7 @@ async function deployContracts(
     //   contractAdmin
     // )) as FetchTokenBalances;
 
-    if (!networkConfig.diabledFetchAaveDataWrapper) {
+    if (!networkConfig.disabledFetchAaveDataWrapper) {
       fetchAaveDataWrapper = (await deployContract(
         ++step,
         networkConfig.autoVerifyContract,
@@ -490,8 +491,8 @@ async function deployContract(
   }
 
   // Only verify new contract to save time
-  if (autoVerify && !contractAddress) {
-    // if (autoVerify) {
+  // if (autoVerify && !contractAddress) {
+  if (autoVerify) {
     try {
       log(3, '>> sleep first, wait for contract data to be propagated');
       await sleep(5000);
