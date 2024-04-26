@@ -2,7 +2,7 @@ import {commonPlatformWallets, IConfig} from './config_utils';
 
 export const AuroraConfig: Record<string, IConfig> = {
   aurora_mainnet: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {},
@@ -22,7 +22,7 @@ export const AuroraConfig: Record<string, IConfig> = {
     nativeUsdRate: 1,
   },
   aurora_testnet: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {},

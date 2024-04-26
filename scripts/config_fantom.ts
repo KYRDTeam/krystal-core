@@ -2,7 +2,7 @@ import {commonPlatformWallets, IConfig} from './config_utils';
 
 export const FantomConfig: Record<string, IConfig> = {
   fantom_mainnet: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {

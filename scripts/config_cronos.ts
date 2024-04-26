@@ -2,7 +2,7 @@ import {commonPlatformWallets, IConfig} from './config_utils';
 
 export const CronosConfig: Record<string, IConfig> = {
   cronos_mainnet: {
-    diabledFetchAaveDataWrapper: true,
+    disabledFetchAaveDataWrapper: true,
     autoVerifyContract: true,
 
     tokens: {},

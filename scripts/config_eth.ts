@@ -38,6 +38,11 @@ export const EthConfig: Record<string, IConfig> = {
       testingTokens: ['dai', 'usdt', 'usdc'],
     },
 
+    okx: {
+      router: '0x3b3ae790Df4F312e745D270119c6052904FB6790',
+      okxTokenApprove: '0x40aA958dd87FC8305b97f2BA922CDdCa374bcD7f',
+    },
+
     oneInch: {
       router: '0x11111112542d85b3ef69ae05771c2dccff4faa26',
     },

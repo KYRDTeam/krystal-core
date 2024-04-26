@@ -21,6 +21,7 @@ import {
   KyberSwapV3,
   Velodrome,
   UniSwapV3Bsc,
+  UniSwapV3Thruster,
   OpenOcean,
   Okx,
 } from '../typechain';
@@ -58,6 +59,7 @@ export interface KrystalContracts {
     kyberSwapV3?: KyberSwapV3;
     velodrome?: Velodrome;
     uniSwapV3Bsc?: UniSwapV3Bsc;
+    uniSwapV3Thruster?: UniSwapV3Thruster;
     openOcean?: OpenOcean;
     okx?: Okx;
   };
@@ -80,6 +82,7 @@ export const deploy = async (
 
   const deployerAddress = await deployer.getAddress();
 
+  console.log('Deployer ', deployerAddress);
   log(0, 'Start deploying Krystal contracts');
   log(0, '======================\n');
   let deployedContracts = await deployContracts(existingContract, multisig || deployerAddress);
@@ -101,6 +104,7 @@ export const deploy = async (
   log(0, '======================\n');
   await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3, extraArgs);
   await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3Bsc, extraArgs);
+  await updateUniSwapV3(deployedContracts.swapContracts?.uniSwapV3Thruster, extraArgs);
 
   log(0, 'Updating kyberProxy config');
   log(0, '======================\n');
@@ -200,7 +204,7 @@ async function deployContracts(
     //   contractAdmin
     // )) as FetchTokenBalances;
 
-    if (!networkConfig.diabledFetchAaveDataWrapper) {
+    if (!networkConfig.disabledFetchAaveDataWrapper) {
       fetchAaveDataWrapper = (await deployContract(
         ++step,
         networkConfig.autoVerifyContract,
@@ -246,6 +250,17 @@ async function deployContracts(
             contractAdmin,
             networkConfig.uniSwapV3Bsc.routers
           )) as UniSwapV3Bsc),
+      uniSwapV3Thruster: !networkConfig.uniSwapV3Thruster
+        ? undefined
+        : ((await deployContract(
+            ++step,
+            networkConfig.autoVerifyContract,
+            'UniSwapV3Thruster',
+            existingContract?.['swapContracts']?.['uniSwapV3Thruster'],
+            undefined,
+            contractAdmin,
+            networkConfig.uniSwapV3Thruster.routers
+          )) as UniSwapV3Thruster),
       kyberProxy: !networkConfig.kyberProxy
         ? undefined
         : ((await deployContract(

@@ -93,6 +93,11 @@ export interface IConfig {
     testingTokens?: string[];
   };
 
+  uniSwapV3Thruster?: {
+    routers: string[];
+    testingTokens?: string[];
+  };
+
   velodrome?: {
     routers: Record<
       string,
@@ -151,7 +156,7 @@ export interface IConfig {
   // For staging contracts, which doesn't need a full settings
   disableProxy?: boolean;
 
-  diabledFetchAaveDataWrapper?: boolean;
+  disabledFetchAaveDataWrapper?: boolean;
 }
 
 export const commonPlatformWallets = [

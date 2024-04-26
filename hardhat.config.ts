@@ -32,6 +32,7 @@ const {
   MAINNET_FORK_BLOCK,
   LINEASCAN_KEY,
   BASESCAN_KEY,
+  BLASTSCAN_KEY,
 } = process.env;
 
 // custom network config for testing. See scripts/config.ts
@@ -135,6 +136,8 @@ const config: HardhatUserConfig = {
       linea: LINEASCAN_KEY as string,
 
       base: BASESCAN_KEY as string,
+
+      blast: BLASTSCAN_KEY as string,
     },
     customChains: [
       {
@@ -159,6 +162,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.basescan.org/api',
           browserURL: 'https://api.basescan.org',
+        },
+      },
+      {
+        network: 'blast',
+        chainId: 81457,
+        urls: {
+          apiURL: 'https://api.blastscan.io/api',
+          browserURL: 'https://api.blastscan.io',
         },
       },
     ],
@@ -305,7 +316,7 @@ if (PRIVATE_KEY) {
     chainId: 1,
     accounts: [PRIVATE_KEY],
     timeout: 20000,
-    gasPrice: 18 * 1e9,
+    gasPrice: 10 * 1e9,
   };
 
   config.networks!.eth_goerli = {
@@ -338,6 +349,14 @@ if (PRIVATE_KEY) {
     accounts: [PRIVATE_KEY],
     timeout: 60000,
     gasPrice: 0.0025 * 1e9,
+  };
+
+  config.networks!.blast_mainnet = {
+    url: `https://rpc.blast.io`,
+    chainId: 81457,
+    accounts: [PRIVATE_KEY],
+    timeout: 60000,
+    gasPrice: 0.00001 * 1e9,
   };
 }
 
