@@ -77,7 +77,7 @@
     "smartWalletProxy": "0x9AF1B56Acb3F0Af84Be68cE1A5284ACc0615faDD",
     "swapContracts": {
       "uniSwap": "0x0f9332D3bAfdbaAa5be753819356497B8dEfe123",
-      "uniSwapV3": "0xfEE93FCD1a26e858325613818dE5C533d94A33b6",
+      "uniSwapV3Thruster": "0xA6FAb972962EdA0Ab4b6Db780C7Fdfa0dD6159ef",
       "okx": "0x30d97CD9B14926222b3eE73E2D8706c3C2c37739",
       "kyberSwapV3": "0xFaACD9f7E68Bb36c1029Ab87D1d7325919e67cc0"
     },

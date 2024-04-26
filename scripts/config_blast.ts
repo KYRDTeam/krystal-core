@@ -18,7 +18,7 @@ export const BlastConfig: Record<string, IConfig> = {
       },
     },
 
-    uniswapV3: {
+    uniSwapV3Thruster: {
       routers: [
         '0x337827814155ECBf24D20231fCA4444F530C0555', // univ3
       ],
